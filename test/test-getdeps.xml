@@ -1,0 +1,29 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <macrodef name="dependency">
+    <attribute name="name" default=""/>
+    <element name="groupId" />
+    <element name="artifactId" />
+    <element name="version" />
+    <sequential />
+  </macrodef>
+
+  <c:dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.8</version>
+  </c:dependency>
+
+  <dependency name="log4j"/>
+  
+  <c:inline-properties>
+    depot.csv = file://localhost/${basedir}/lib
+  </c:inline-properties>
+
+  
+  <mkdir dir="tmp" />
+  <c:getdeps baseline="${basedir}/FOOBAR.txt" dst="tmp"/>
+  <c:unless test="-f tmp/log4j-1.2.8.jar">
+    <fail/>
+  </c:unless>
+  <delete dir="tmp" />
+</project>

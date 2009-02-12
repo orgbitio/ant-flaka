@@ -1,0 +1,111 @@
+<project xmlns:f="antlib:net.haefelingerit.flaka" name="flaka">
+  <f:inline-properties>
+    baseline = HEAD
+    res.dir =   
+  </f:inline-properties>
+
+  <!-- Initialize Framework -->
+  <f:init />
+
+  <macrodef name="resources-copy" backtrace="true">
+    <attribute name="dst" default="${obj.dir}"/>
+    <attribute name="src" default="${src.dir}"/>
+    <sequential>
+      <!-- @{src} must exits, c:otherwise fileset fails -->
+      <echo>@src = |a@{src}a|</echo>
+      <f:when test="-d ' @{src} '">
+        <f:copy-and-replace src="@{src}" dst="@{dst}">
+          <exclude name="**/*.java"/>
+          <type type="file"/>
+        </f:copy-and-replace>
+      </f:when>
+    </sequential>
+  </macrodef>
+
+  <!-- override package init macro -->
+  <macrodef name="package-init">
+    <sequential>
+      <f:package-init />
+      <f:copy-and-replace 
+          src = "ant" 
+          dst = "${obj.dir}/net/haefelingerit/flaka"
+          />
+    </sequential>
+  </macrodef>
+
+  <presetdef name="junit">
+    <junit dir="test"  />
+  </presetdef>
+
+  <presetdef name="javac">
+      <javac source="1.4" debug="true">
+        <!-- elements -->
+      </javac>
+  </presetdef>
+
+  <dependencies>
+    <dependency alias="ant" />
+    <dependency alias="junit" scope="test" />
+    <dependency alias="commons-httpclient" scope="compile inline" />
+    <dependency alias="commons-codec" scope="compile inline" />
+    <dependency alias="commons-logging" scope="compile inline" version="1.1"/>
+    <dependency alias="jdom" scope="compile inline"/>
+  </dependencies>
+
+  <macrodef name="package">
+    <sequential>
+      <echo>Using local package ..</echo>
+      <f:package />
+      <!-- package all artefacts in scope 'inline' -->
+      <f:unset var="x" />
+      <f:find dir="${lib.dir}" var="x">
+        <f:dependency-selector scope="inline" />
+    </f:find>
+    <f:when test="-n '${x}'">
+      <f:for var="file" in="${x}">
+        <sequential>
+          <echo>inlining @{file} ..</echo>
+          <f:update-dist-jar jar="${jar.name}">
+            <zipfileset src="@{file}" />
+          </f:update-dist-jar>
+        </sequential>
+      </f:for>
+    </f:when>
+    </sequential>
+  </macrodef>
+
+  <target name=".classpath">
+    <f:dotclasspath />
+  </target>		
+
+  <target name="javadoc">
+    <mkdir dir="${build.dir}/javadoc/obj" />
+    <javadoc
+        packagenames    = "net.haefelingerit.flaka.*"
+        sourcepath      = "${src.dir}"
+        destdir         = "${build.dir}/javadoc/obj"
+        >
+      <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+      <link>http://www.jdom.org/docs/apidocs</link>
+      <link>http://logging.apache.org/log4j/1.2/apidocs</link>
+      <link>http://javadoc.haefelingerit.net/org.apache.ant/1.7.1</link>
+      <link>http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol</link>
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
+    </javadoc>
+  </target>
+  
+  <target name="install-javadoc" depends="javadoc">
+    <f:install-javadoc />
+  </target>
+
+  <target name="compile">
+    <f:compile />
+  </target>
+	
+  <target name="copy-resources">
+    <f:copy-and-replace src="${basedir}/ant" dst="${obj.dir}" />
+  </target>
+
+
+</project>

@@ -1,0 +1,69 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+
+  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!-- Initial test to check whether set/unset works properly. Both tasks are -->
+  <!-- used to determine whether trycatch/throw works as expected.            -->
+  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+  <c:when test="-P mustbeset">
+    <fail message="** property 'mustbeset' already defined??" />
+  </c:when>
+  <c:set var="mustbeset" value="true" />
+  <c:unless test="-P mustbeset">
+    <fail message="** property 'mustbeset' not defined as expected ??" />
+  </c:unless>
+  <c:unset var="mustbeset" />
+  <c:when test="-P mustbeset">
+    <fail message="** property 'mustbeset' should not be defined??" />
+  </c:when>
+
+  <macrodef name="fail-if-undefined">
+    <attribute name="property" />
+    <sequential>
+      <fail message="property @{property} not defined" unless="@{property}" />
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="fail-if-defined">
+    <attribute name="property" />
+    <sequential>
+      <fail message="property @{property} defined" if="@{property}" />
+    </sequential>
+  </macrodef>
+
+  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!-- Tests are starting here ..                                             -->
+  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <c:unset var="mustbeset mustbeset2" />
+
+  <c:trycatch property="trycatch.errmsg">
+    <try>
+      <c:trycatch>
+        <try>
+          <fail message="4711" />
+        </try>
+        <catch>
+          <c:set var="before-throw" />
+          <c:throw />
+          <c:set var="after-throw" />
+        </catch>
+        <finally>
+          <c:set var="finally" />
+        </finally>
+      </c:trycatch>
+    </try>
+    <catch match="*4711*">
+      <echo>errmsg = |${trycatch.errmsg}|</echo>
+      <c:set var="4711" />
+    </catch>
+    <catch>
+      <fail message="error in throw .." />
+    </catch>
+    <finally>
+      <fail-if-undefined property="before-throw" />
+      <fail-if-undefined property="finally" />
+      <fail-if-undefined property="4711" />
+      <fail-if-defined property="after-throw" />
+    </finally>
+  </c:trycatch>
+</project>

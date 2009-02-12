@@ -1,0 +1,50 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+
+  <mkdir dir="${basedir}/d1" />
+  <mkdir dir="${basedir}/d2" />
+  <mkdir dir="${basedir}/d3/zzz" />
+  <echo message="Java1.java" file="${basedir}/d1/Java1.java" />
+  <echo message="Java3.java" file="${basedir}/d3/zzz/Java3.java" />
+  
+  <c:unset var="x"/>
+  <fail if="x"/>
+  <c:set-if-have-file var="x" in=" d0 ${basedir}/d1 ${basedir}/d2 ${basedir}/d3 ">
+    <info>
+      <echo>trying @{dir}</echo>
+    </info>
+    <filter>
+      <include name="**/*.java" />
+    </filter>
+  </c:set-if-have-file>
+  <fail unless="x"/>
+  
+  <c:unless test="'${x}' = '${basedir}/d3'">
+    <fail message="d3 expected" />
+  </c:unless>
+
+  <c:unset var="x"/>
+  <fail if="x"/>
+  <c:set-if-have-file var="x" keepgoing="   TrUe"  in=" d0 ${basedir}/d1 ${basedir}/d2 ${basedir}/d3 ">
+    <filter>
+      <include name="**/*.java" />
+    </filter>
+  </c:set-if-have-file>
+  <fail unless="x"/>
+  <c:unless test="'${x}' = '${basedir}/d3'">
+    <fail message="d3 expected" />
+  </c:unless>
+
+  <c:unset var="x"/>
+  <fail if="x"/>
+  <c:set-if-have-file var="x" in=" d0 ${basedir}/d1 ${basedir}/d2 ${basedir}/d3 " keepgoing=" false ">
+    <filter>
+      <include name="**/*.java" />
+    </filter>
+  </c:set-if-have-file>
+  <fail unless="x"/>
+  
+  <c:unless test="'${x}' = '${basedir}/d1'">
+    <fail message="d1 expected" />
+  </c:unless>
+ 
+</project>

@@ -1,0 +1,26 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <property name="z" value="7" />
+  <c:inline-properties>
+    cvs.tag = v-uat_3_20_500
+    g.g1    = g.g1
+    g.g3    = g.g3
+  </c:inline-properties>
+
+  <echo>
+    y = |${y}|
+    z = |${z}|
+  </echo>
+
+  <c:set debug="true" override="true">
+    y = ${z}
+    x = ${y}
+    z = foobar
+  </c:set>
+
+  <echo>
+    x = |${x}|
+    y = |${y}|
+    z = |${z}|
+  </echo>
+
+</project>

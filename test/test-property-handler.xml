@@ -1,0 +1,7 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka" >
+  <c:property-handler />
+  
+  <echo>
+    hello => ${uppercase hello}
+  </echo>
+</project>

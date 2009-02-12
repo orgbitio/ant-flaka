@@ -1,0 +1,44 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:set />
+  <c:set var="x" />
+  <c:unless test="'${x}' = ''">
+    <fail message="property not defined" unless="x" />
+    <fail message="property 'x' not empty: |${x}|" />
+  </c:unless>
+  <c:unset var="x y z" />
+  <c:set var="x y z" />
+  <fail if="x" />
+  <fail if="y" />
+  <fail if="z" />
+  <c:set var="z" value="4711" />
+  <echo>
+    x = ${x}
+    y = ${y}
+    z = ${z}
+    sysprop = ${sysprop}
+    cmdprop = ${cmdprop}
+  </echo>
+  <c:set>
+    x = ${y}
+    y = ${z}
+    z = 1
+    sysprop = SYSPROP
+    cmdprop = CMDPROP
+  </c:set>
+  <echo>
+    x = ${x}
+    y = ${y}
+    z = ${z}
+    sysprop = ${sysprop}
+    cmdprop = ${cmdprop}
+  </echo>
+  <c:set var="sysprop" value="SYSPROP_VAR" />
+  <c:set var="cmdprop" value="CMDPROP_VAR" />
+  <echo>
+    x = ${x}
+    y = ${y}
+    z = ${z}
+    sysprop = ${sysprop}
+    cmdprop = ${cmdprop}
+  </echo>
+</project>

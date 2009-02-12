@@ -1,0 +1,28 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:inline-properties>
+    cvs.tag = v-uat_3_20_500
+
+    net.haefelingerit.flaka.typ = net.haefelingerit.flaka.typ
+    net.haefelingerit.flaka.env = net.haefelingerit.flaka.env
+    net.haefelingerit.flaka.ver = net.haefelingerit.flaka.ver
+    net.haefelingerit.flaka.rev = net.haefelingerit.flaka.rev
+  </c:inline-properties>
+
+  <c:cvstag-lexer />
+
+  <echo>
+    net.haefelingerit.flaka.typ = ${net.haefelingerit.flaka.typ}
+    net.haefelingerit.flaka.env = ${net.haefelingerit.flaka.env}
+    net.haefelingerit.flaka.ver = ${net.haefelingerit.flaka.ver}
+    net.haefelingerit.flaka.rev = ${net.haefelingerit.flaka.rev}
+  </echo>
+
+  <c:cvstag-lexer tag="v-3_20_500" />
+  <echo>
+    net.haefelingerit.flaka.typ = ${net.haefelingerit.flaka.typ}
+    net.haefelingerit.flaka.env = ${net.haefelingerit.flaka.env}
+    net.haefelingerit.flaka.ver = ${net.haefelingerit.flaka.ver}
+    net.haefelingerit.flaka.rev = ${net.haefelingerit.flaka.rev}
+  </echo>
+
+</project>

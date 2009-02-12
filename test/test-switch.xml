@@ -1,0 +1,104 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+
+  <c:switch value="foo" debug="true">
+    <case match="foo|bar">
+      <fail message="test 0x01 fails"/>
+    </case>
+  </c:switch>
+
+  <c:switch value="foo" debug="true">
+    <case match="/foo|bar/">
+    </case>
+    <default>
+      <fail message="test 0x02 fails"/>
+    </default>
+  </c:switch>
+  
+  <c:switch value="xfoox" debug="true">
+    <case match="/foo|bar/">
+      <fail message="test 0x03 fails"/>
+    </case>
+  </c:switch>
+
+  <c:switch value="foobar" debug="true">
+    <case match="*ob*">
+    </case>
+    <default>
+      <fail message="test 0x04 fails"/>
+    </default>
+  </c:switch>
+
+  <c:switch value="foobar" debug="true">
+    <case value="ob">
+    </case>
+    <default>
+      <fail message="test 0x05 fails"/>
+    </default>
+  </c:switch>
+
+  <c:switch value="foo bar" debug="true">
+    <case match="*bar">
+    </case>
+    <default>
+      <fail message="test 0x06 fails"/>
+    </default>
+  </c:switch>
+  
+  <c:switch value="foo bar" debug="true">
+    <case match="%*bar%">
+    </case>
+    <default>
+      <fail message="test 0x07 fails"/>
+    </default>
+  </c:switch>
+  
+  <!-- useless bug legal -->
+  <c:switch value="foobar=" debug="true" />
+
+  <c:trycatch>
+    <try>
+      <c:switch value="foo bar" debug="true">
+        <default />
+      </c:switch>
+    </try>
+    <catch>
+      <fail message="test 0x08 fails"/>
+    </catch>
+  </c:trycatch>
+  
+  <c:switch value="a.tgz">
+    <case match="*.jar">
+
+    </case>
+    <case match="/(.*)\.war/">
+
+    </case>
+    <case match="/.*(zip|tgz)/">
+      <echo>extension = ${switch.g1}</echo>
+    </case>
+  </c:switch>
+
+  <macrodef name="expect">
+    <attribute name="cand" />
+    <attribute name="this" />
+    <sequential>
+      <c:unless test="'@{this}' = '@{cand}'">
+        <fail message="unexpected '@{cand}', expected '@{this}'" />
+      </c:unless>
+    </sequential>
+  </macrodef>
+  
+  <c:switch value="v-uat_3_20_500" stem="g">
+    <case match = "/v-(?:([^\d][^_]*)_)?(\d.*)/" stem="g">
+      <expect cand="${g.p}" this="v-(?:([^\d][^_]*)_)?(\d.*)" />
+      <expect cand="${g.n}" this="2" />
+      <expect cand="${g.g0}" this="v-uat_3_20_500" />
+      <expect cand="${g.g1}" this="uat" />
+      <expect cand="${g.g2}" this="3_20_500" />
+      <expect cand="${g.g3}" this="\${g.g3}" />
+      <expect cand="${g.s1}" this="2" />
+      <expect cand="${g.e1}" this="5" />
+    </case>
+  </c:switch>
+  
+</project>

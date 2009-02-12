@@ -1,0 +1,14 @@
+<project default="foo">
+  <property name="X" value="hello, world" />
+  <macrodef name="foo">
+    <attribute name="x" default="X" />
+    <attribute name="y" default="${@{x}}" />
+    <sequential>
+      <echo>x = @{x}</echo>
+      <echo>y = @{y}</echo>
+    </sequential>
+  </macrodef>
+  <target name="foo">
+    <foo />
+  </target>
+</project>

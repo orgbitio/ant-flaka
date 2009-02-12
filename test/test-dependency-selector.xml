@@ -1,0 +1,57 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+
+  <c:dependency name="log4j" scope="runtime provided">
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.8</version>
+  </c:dependency>
+  <c:dependency scope="test">
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>3.8.1</version>
+  </c:dependency>
+
+  <c:inline-properties>
+    depot.csv = file://localhost/${basedir}/lib
+  </c:inline-properties>
+
+  <c:getdeps baseline="${basedir}/FOOBAR.txt" />
+
+  <echo>Test I</echo>
+
+  <c:unset var="x" />
+  <c:find var="x">
+    <include name="*.jar" />
+    <c:dependency-selector scope=" *RUN* " alias=" log*" />
+  </c:find>
+  <c:switch value="${x}">
+    <case match="*log4j*.jar" />
+    <otherwise>
+      <fail message="test I failed ..[x=${x}]" />
+    </otherwise>
+  </c:switch>
+
+  <echo>Test II</echo>
+  <c:find var="x">
+    <include name="*.jar" />
+    <not>
+      <c:dependency-selector scope=" *RUN* " ignore="true"/>
+    </not>
+  </c:find>
+  <echo>${x}</echo>
+
+  <c:unset var="x" />
+  <c:find var="x">
+    <include name="*.jar" />
+    <c:dependency-selector scope=" test|runtime " />
+  </c:find>
+  <echo>${x}</echo>
+
+  <echo>Test I</echo>
+  
+  <c:find>
+    <c:dependency-selector ref="xxx"/>
+  </c:find>  
+  
+ 
+</project>

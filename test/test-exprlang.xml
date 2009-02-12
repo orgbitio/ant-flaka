@@ -1,0 +1,56 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <!-- Test operator -E -->
+  <!-- -E returns true if either property does not exist or is empty, -->
+  <!-- matches whitespace only -->
+  <fail if="x"/>
+  <c:unless test="-E x">
+    <fail message="test -E does not work" />
+  </c:unless>
+  <c:set var="x" />
+  <fail unless="x"/>
+  <c:unless test="-E x">
+    <fail message="test -E does not work" />
+  </c:unless>
+  <c:unset var="x" />
+  <fail if="x"/>
+  <property name="x" value="  " />
+  <fail unless="x"/>
+  <c:unless test="-E x">
+    <fail message="test -E does not work" />
+  </c:unless>
+  <echo>x = |${x}|</echo>
+
+  <!-- make empty variable z -->
+  <c:set var="z" value="" />
+  <c:unless test="-z '${z}'">
+    <fail message="[1]"/>
+  </c:unless>
+  <c:unless test="-z ''">
+    <fail message="[2]"/>
+  </c:unless>
+  <c:when test="-z ' '">
+    <fail message="[3]"/>
+  </c:when>
+  <c:notempty var="z" >
+    <fail message="(not)empty does not work (cause |${z}| is empty)" />
+  </c:notempty>
+  <c:set var="z" value=" " />
+  <c:notempty var="z" >
+    <fail message="(not)empty does not work (cause |${z}| is empty)" />
+  </c:notempty>
+  <c:set var="z" value=" x " />
+  <c:empty var="z" >
+    <fail message="(not)empty does not work (cause |${z}| is NOT empty)" />
+  </c:empty>
+
+  <c:when test="-d ''">
+    <!-- TODO: Not in sync with standard shell, document this -->
+    <fail message="empty folder does not exist" />
+  </c:when>
+
+  <c:unless test="-d ' ${basedir} '">
+    <fail message="${basedir} exists ??" />
+  </c:unless>
+
+
+</project>

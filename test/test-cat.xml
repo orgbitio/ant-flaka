@@ -1,0 +1,20 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <echo message="hello world" file="greeting.txt" />
+  <c:cat src="greeting.txt" />
+  <c:trycatch>
+    <try>
+      <delete file="g.txt" />
+      <c:cat src="g.txt" />
+      <echo>XXXXXXXXXX</echo>
+    </try>
+    <catch type="*" match="*">
+      <echo>YYYYYYYYYY</echo>
+      <c:set var="xseen" value="true" />
+    </catch>
+    <finally>
+      <echo>xseen = ${xseen}</echo>
+      <fail message="cat does not throw exception" unless="xseen" />
+    </finally>
+  </c:trycatch>
+  
+</project>

@@ -1,0 +1,184 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:inline-properties>
+    cvs.tag = v-uat_3_20_500
+    g.g1    = g.g1
+    g.g3    = g.g3
+  </c:inline-properties>
+
+  <c:switch value="${cvs.tag}">
+    <case match = "v-(?:([^\d][^_]*)_)?(\d.*)" stem="g">
+      <echo>
+        g.p  = ${g.p}
+        g.n  = ${g.n}
+
+        g.g0 = ${g.g0}
+        g.g1 = ${g.g1}
+        g.g2 = ${g.g2}
+        g.g3 = ${g.g3}
+
+        g.s1 = ${g.s1}
+        g.e1 = ${g.e1}
+      </echo>
+    </case>
+  </c:switch>
+
+  <!-- If we have a CVS tag, break it apart: -->
+  <c:inline-properties>
+    c.g2 = xxxxxxxxxxx
+  </c:inline-properties>
+  <echo>
+    c.g2 = ${c.g2}
+  </echo>
+
+  <macrodef name="breakup">
+    <attribute name="value" />
+    <sequential>
+      <echo>breaking up value @{value}</echo>
+      <c:switch value="@{value}">
+        <case value="(\S+)-(\d.*)" stem="c">
+          <echo>
+            c.n  = ${c.n}
+            c.g0 = ${c.g0}
+            c.g1 = ${c.g1}
+            c.g2 = ${c.g2}
+            c.g3 = ${c.g3}
+          </echo>
+          <c:inline-properties>
+            project.tagtype = ${c.g1}
+            project.version = ${c.g2}
+          </c:inline-properties>
+        </case>
+        <case value="(\S+)-([^\d][^_]*)_(\d.*)" stem="c">
+          <echo>
+            c.n  = ${c.n}
+            c.g0 = ${c.g0}
+            c.g1 = ${c.g1}
+            c.g2 = ${c.g2}
+            c.g3 = ${c.g3}
+          </echo>
+          <c:inline-properties>
+            project.tagtype = ${c.g1}
+            project.env     = ${c.g2}
+            project.version = ${c.g3}
+          </c:inline-properties>
+        </case>
+      </c:switch>
+      <echo>
+        project.tagtype = ${project.tagtype}
+        project.env     = ${project.env}
+        project.version = ${project.version}
+      </echo>
+    </sequential>
+  </macrodef>
+
+  <breakup value="v-1_1_3" />
+  <breakup value="v-tempomat_1_1_3" />
+  
+  <macrodef name="bs-tag-parser">
+    <attribute name="tag" />
+    <attribute name="env"    default=""/>
+    <attribute name="ver" />
+    <attribute name="rev"    default=""/>
+    <attribute name="mst"    default="" />
+    <attribute name="bch"    default="" />
+    
+    <sequential>
+      <c:unset var="n env ver rev z.g4 z.g3 C mstone" />
+
+      <c:analyse-cvs-tag tag="@{tag}" stem="z" />
+
+      <c:unless test="-P z.ver">
+        <echo>
+        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        tag `@{tag}' 
+        ========================================================================
+        typ `${z.typ}'
+        env `${z.env}'
+        ver `${z.ver}'
+        rev `${z.rev}'
+        mst '${z.mst}'
+        bch '${z.bch}'
+        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        </echo>
+        <fail message="tag `@{tag}' did not trigger any match .." />
+      </c:unless>
+
+      <c:unless test="-P z.env">
+        <c:inline-properties>
+          z.env =
+        </c:inline-properties>
+      </c:unless>
+      <c:unless test="-P z.rev">
+        <c:inline-properties>
+          z.rev =
+        </c:inline-properties>
+      </c:unless>
+      <c:unless test="-P z.mst">
+        <c:inline-properties>
+          z.mst =
+        </c:inline-properties>
+      </c:unless>
+      <c:unless test="-P z.bch">
+        <c:inline-properties>
+          z.bch =
+        </c:inline-properties>
+      </c:unless>
+      
+      <echo>
+        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        tag `@{tag}' 
+        ========================================================================
+        env `@{env}', got `${z.env}'
+        ver `@{ver}', got `${z.ver}'
+        rev `@{rev}', got `${z.rev}'
+        mst '@{mst}', got '${z.mst}'
+        bch '@{bch}', got  '${z.bch}'
+        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      </echo>
+      
+      <c:unless test="'@{env}' = '${z.env}'">
+        <fail message="environment failure on tag @{tag} .." />
+      </c:unless>
+      <c:unless test="'@{ver}' = '${z.ver}'">
+        <fail message="version failure on tag @{tag} .." />
+      </c:unless>
+      <c:unless test="'@{rev}' = '${z.rev}'">
+        <fail message="revision failure on tag @{tag} .." />
+      </c:unless>
+      <c:unless test="'@{mst}' = '${z.mst}'">
+        <fail message="mstone failure on tag @{tag} .." />
+      </c:unless>
+      <c:unless test="'@{bch}' = '${z.bch}'">
+        <fail message="branch tag failure on tag @{tag} .." />
+      </c:unless>
+    </sequential>
+  </macrodef>
+
+  <bs-tag-parser tag="v-3"               ver="3"           />
+  <bs-tag-parser tag="v-3_20"            ver="3_20"        />
+  <bs-tag-parser tag="v-3_20_0"          ver="3_20_0"      />
+  <bs-tag-parser tag="v-3_20_0_1"        ver="3_20_0_1"    />
+  <bs-tag-parser tag="v-3_20_0_1_2"      ver="3_20_0_1_2"  />
+
+  <bs-tag-parser tag="v-env_3"          env="env" ver="3"           />
+  <bs-tag-parser tag="v-env_3_20"       env="env" ver="3_20"        />
+  <bs-tag-parser tag="v-env_3_20_0"     env="env" ver="3_20_0"      />
+  <bs-tag-parser tag="v-env_3_20_0_1"   env="env" ver="3_20_0"     rev="1"  />
+  <bs-tag-parser tag="v-env_3_20_0_1_2" env="env" ver="3_20_0"     rev="1_2"  />
+
+  <bs-tag-parser tag="v-3_20_rc_1_2"   ver="3_20"       mst="rc_1_2" />
+  <bs-tag-parser tag="v-3_20_0_rc_1_2" ver="3_20_0"     mst="rc_1_2" />
+  <bs-tag-parser tag="v-3_20_0_1_rc_2" ver="3_20_0_1"   mst="rc_2"   />
+  <bs-tag-parser tag="v-3_20_0_1_1_rc_2" ver="3_20_0_1_1" mst="rc_2" />
+  <bs-tag-parser tag="v-3_20_0_1_1_2_rc_2" ver="3_20_0_1_1_2"   mst="rc_2"  />
+  <bs-tag-parser tag="v-env_3_20_0_1_rc_2"   ver="3_20_0" mst="rc_2" env="env" rev="1"/>
+  <bs-tag-parser tag="v-env_3_20_0_1_2_rc_2" ver="3_20_0" mst="rc_2" env="env" rev="1_2"/>
+
+  <bs-tag-parser tag="v-3_20--branch"    ver="3_20"   bch="branch"/>
+  <bs-tag-parser tag="v-3_20_rc--branch"  ver="3_20"  mst="rc" bch="branch"/>
+  <bs-tag-parser tag="v-3_20_rc_1--branch"  ver="3_20"  mst="rc_1" bch="branch"/>
+  <bs-tag-parser tag="v-env_3_20_rc--branch" env="env" ver="3_20"   mst="rc" bch="branch"/>
+  <bs-tag-parser tag="v-env_3_20_rc_1--branch" env="env" ver="3_20"  mst="rc_1" bch="branch"/>
+
+
+</project>

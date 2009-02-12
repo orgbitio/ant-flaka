@@ -1,0 +1,12 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <delete dir="removeme" />
+  <c:when test="-d removeme" >
+   <fail message="folder removeme exist." />
+  </c:when>
+  <!--  arguments are relative to BASEDIR (usually build script folder) -->
+  <c:copy-and-replace src="testdata" dst="removeme" />
+  <c:unless test="-d removeme" >
+   <fail message="folder removeme not created." />
+  </c:unless>
+  <!-- TODO: check that files are equal -->
+</project>

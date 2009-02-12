@@ -1,0 +1,13 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka" default="this">
+
+  <c:set-default-target name="foobar" />
+  
+  <target name="this">
+    <echo>THIS</echo>
+  </target>
+  
+  <target name="foobar">
+    <echo>FOOBAR</echo>
+  </target>
+
+</project>

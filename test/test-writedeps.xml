@@ -1,0 +1,27 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:inline-properties>
+    depot.csv = file://localhost/${basedir}/lib
+  </c:inline-properties>
+
+  <c:dependencies>
+    <c:dependency groupId="log4j" artifactId="log4j" version="1.2.8" />
+  </c:dependencies>
+
+  <!-- Retrieve dependencies in order to create reference deps.object -->
+  <c:getdeps dst="${basedir}/lib" />
+
+  <echo>** Example V</echo>
+  <c:writedeps out="-" format="alias"/>
+
+  <echo>** Example I</echo>
+  <c:writedeps out="-" refid="%%%%" />
+  <echo>** Example II</echo>
+  <c:writedeps out="-" format="maven"/>
+  <echo>** Example III</echo>
+  <c:writedeps out="-" format="mAvEN"/>
+   <echo>** Example IV</echo>
+   <c:writedeps out="-" format="mAvEN"/>
+   <echo>** Example VI</echo>
+   <c:writedeps out="-" format="flat"/>
+   
+</project>

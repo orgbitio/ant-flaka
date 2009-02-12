@@ -1,0 +1,12 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:set var="foobar" value="foobar" />
+  <c:inline-properties>
+    foobar = yoyo
+  </c:inline-properties>
+  <echo>${foobar}</echo>
+
+  <echo>debug=${debug}</echo>
+  <c:unset var=" debug " />
+  <fail message="debug defined via command line .." if="debug" />
+  <echo>debug=${debug}</echo>
+</project>
