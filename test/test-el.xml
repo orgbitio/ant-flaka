@@ -1,0 +1,51 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+
+  <c:echo>
+    The #{ 'good' } and the #{ 'ugly'.doesnotexist } is a well\
+    known movie.
+  </c:echo>
+  <c:echo>
+    The great \\#{escape}. Or: #{'#'}escape.
+  </c:echo>
+  <c:echo>#{'} #{'abc'} 3*5=#{3*5}</c:echo>
+  <c:echo>
+    The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
+  </c:echo>
+  <c:echo>#{'} #{'abc''} 3*5=#{3*5}</c:echo>
+  <c:echo>4*6=#{4*6}</c:echo>
+  <c:echo>#{'abc'}</c:echo>
+  <c:echo>#{'}</c:echo>
+  <c:echo>#{'} #{'abc'}</c:echo>
+  <c:echo>#{</c:echo>
+  <c:echo>$${}</c:echo>
+  <c:echo>$${</c:echo>
+  <c:echo>$${ </c:echo>
+  <c:echo>a$${ b</c:echo>
+  <c:echo>a$${</c:echo>
+  <c:echo>a$${b</c:echo>
+
+  <c:echo>
+    #{3 * 5}
+  </c:echo>
+
+  <c:echo>
+    ${ ' }
+	</c:echo>
+  <c:echo>a$${</c:echo>
+
+  <c:echo>
+    ${ ' }
+	</c:echo>
+  <c:echo>
+    a#{}b
+    ${ ' }
+	</c:echo>
+
+  <c:echo>
+    a#{ }b
+    #{ '\d' }
+    #{ "" }
+    #{ "'" }
+    #{}
+	</c:echo>
+</project>

@@ -1,0 +1,19 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:set>
+    _var_ = 'list'
+  </c:set>
+  <c:echo>
+    #{_var_}
+  </c:echo>
+  <c:list var=" #{ _var_} ">
+    file('.')
+    ;; each line is a EL expression
+    3 * 5
+    ''.tofile.list
+  </c:list>
+
+  <c:for var="item" in=" #{_var_} ">
+    <c:echo>#{item}</c:echo>
+  </c:for>
+
+</project>

@@ -1,0 +1,2918 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE antlib [
+<!ENTITY NL "&#10;">
+<!ENTITY HSEP "====================================================================" >
+<!ENTITY HSEPNL "&HSEP;&NL;" >
+]>
+<antlib xmlns:c="ant:current">
+  <typedef name="dependency-selector" classname="net.haefelingerit.flaka.dep.Select" />
+  <typedef name="filterset" classname="net.haefelingerit.flaka.FilterSet" />
+  <typedef name="istext-selector" classname="net.haefelingerit.flaka.IsText" />
+  <typedef name="identity-globmapper" classname="net.haefelingerit.flaka.GlobMap" />
+
+  <!--=============================================================-->
+  <!--                         TASKS                               -->
+  <!--=============================================================-->
+
+  <taskdef name="rescue" classname="net.haefelingerit.flaka.Rescue" />
+  <taskdef name="list" classname="net.haefelingerit.flaka.List" />
+  <taskdef name="fail" classname="net.haefelingerit.flaka.Fail" />
+  <taskdef name="break" classname="net.haefelingerit.flaka.Break" />
+  <taskdef name="choose" classname="net.haefelingerit.flaka.Choose" /> <!-- replaces if/else -->
+  <taskdef name="component-handler" classname="net.haefelingerit.flaka.InstCompH" />
+  <taskdef name="continue" classname="net.haefelingerit.flaka.Continue" />
+  <taskdef name="create-target" classname="net.haefelingerit.flaka.CreateTarget" />
+  <taskdef name="cvsstat" classname="net.haefelingerit.flaka.CvsStat" />
+  <taskdef name="dotclasspath-task" classname="net.haefelingerit.flaka.DotClassPath" />
+  <taskdef name="echo" classname="net.haefelingerit.flaka.Echo" />
+  <taskdef name="export" classname="net.haefelingerit.flaka.Export" />
+  <taskdef name="export-task" classname="net.haefelingerit.flaka.Export" />
+  <taskdef name="find" classname="net.haefelingerit.flaka.Find" />
+  <taskdef name="for" classname="net.haefelingerit.flaka.For2" />
+  <taskdef name="getdeps" classname="net.haefelingerit.flaka.GetDeps" />
+  <taskdef name="initssl" classname="net.haefelingerit.flaka.InitSSL" />
+  <taskdef name="logo" classname="net.haefelingerit.flaka.Logo" />
+  <taskdef name="make-dir" classname="net.haefelingerit.flaka.Mkdir" />
+  <taskdef name="set" classname="net.haefelingerit.flaka.MSet" />
+  <taskdef name="properties" classname="net.haefelingerit.flaka.Property" />
+  <taskdef name="inline-properties" classname="net.haefelingerit.flaka.Property" />
+  <taskdef name="property-by-regex" classname="net.haefelingerit.flaka.Select" />
+  <taskdef name="property-handler" classname="net.haefelingerit.flaka.Init" />
+  <taskdef name="requires-ant" classname="net.haefelingerit.flaka.Require" />
+  <taskdef name="resdeps" classname="net.haefelingerit.flaka.ResolveDeps" />
+  <taskdef name="run-macro" classname="net.haefelingerit.flaka.RunMacro" />
+  <taskdef name="run-target" classname="net.haefelingerit.flaka.RunTarget" />
+  <taskdef name="scndeps" classname="net.haefelingerit.flaka.ScanDeps" />
+  <taskdef name="set-default-target" classname="net.haefelingerit.flaka.SetDefault" />
+  <taskdef name="switch" classname="net.haefelingerit.flaka.Switch" />
+  <taskdef name="taskdotclasspath" classname="net.haefelingerit.flaka.DotClassPath" />
+  <taskdef name="throw" classname="net.haefelingerit.flaka.Throw" />
+  <taskdef name="try-exec" classname="net.haefelingerit.flaka.Exec" />
+  <taskdef name="trycatch" classname="net.haefelingerit.flaka.TryCatch" />
+  <taskdef name="trycatch" classname="net.haefelingerit.flaka.TryCatch" />
+  <taskdef name="unless" classname="net.haefelingerit.flaka.Unless" />
+  <taskdef name="unset" classname="net.haefelingerit.flaka.Unset" />
+  <taskdef name="uploadtask" classname="net.haefelingerit.flaka.HttpUploadTask" />
+  <taskdef name="when" classname="net.haefelingerit.flaka.When" />
+  <taskdef name="writedeps" classname="net.haefelingerit.flaka.WriteDeps" />
+  <taskdef name="xmlmerge" classname="net.haefelingerit.flaka.XmlMerger" />
+
+  <!--=============================================================-->
+  <!--                         MACROS                              -->
+  <!--=============================================================-->
+  <macrodef name="run-local-macro" backtrace="true">
+    <attribute name="name" />
+    <sequential>
+      <c:choose>
+        <when test="-M '@{name}'">
+          <c:run-macro name="@{name}" />
+        </when>
+        <when test="-M 'antlib:net.haefelingerit.flaka:@{name}'">
+          <c:run-macro name="antlib:net.haefelingerit.flaka:@{name}" />
+        </when>
+      </c:choose>
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="local-package" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="package" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="internal-package" backtrace="true">
+    <sequential>
+      <c:exec-target name="package" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-package" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="package" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="internal-clean" backtrace="true">
+    <sequential>
+      <c:exec-target name="clean" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-clean" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="clean" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="internal-distclean" backtrace="true">
+    <sequential>
+      <c:exec-target name="distclean" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-distclean" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="distclean" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="internal-compile" backtrace="true">
+    <sequential>
+      <c:exec-target name="compile" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-compile" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="compile" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="internal-compile-test" backtrace="true">
+    <sequential>
+      <c:exec-target name="compile-test" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-compile-test" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="compile-test" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="internal-test" backtrace="true">
+    <sequential>
+      <c:exec-target name="test" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-test" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="test" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="internal-testclient" backtrace="true">
+    <sequential>
+      <c:exec-target name="testclient" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-testclient" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="testclient" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="internal-dotclasspath" backtrace="true">
+    <sequential>
+      <c:exec-target name="dotclasspath" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-dotclasspath" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="dotclasspath" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="internal-reload-baseline" backtrace="true">
+    <sequential>
+      <c:exec-target name="reload-baseline" />
+    </sequential>
+  </macrodef>
+  <macrodef name="local-reload-baseline" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="reload-baseline" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="local-apropos" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="apropos" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-depends" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="depends" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-deploy" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="deploy" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-install" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="install" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="local-export" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="export" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-upload" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="upload" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="local-upload-test" backtrace="true">
+    <sequential>
+      <c:run-local-macro name="upload-test" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="export" backtrace="true">
+    <attribute name="dir" default="${build.dir}/antlib" />
+    <sequential>
+      <mkdir dir="${build.dir}/antlib" />
+      <c:export-task src="antlib.xml" dst="@{dir}/antlib.xml"
+                     tee="true" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="define-targets" backtrace="true">
+    <sequential>
+      <c:create-target name="list-tasks"
+                       task="antlib:net.haefelingerit.flaka:list-tasks" />
+      <!--=============================================================-->
+      <!-- package                                                     -->
+      <!--=============================================================-->
+
+      <!-- starting with version 2.0 target `package' should be used   -->
+      <!-- instead of depricated target `dist'. The semantic of this   -->
+      <!-- target remains - the project gets compiled and distribut=   -->
+      <!-- ables are getting created.                                  -->
+
+      <c:create-target name="package"
+                       task="antlib:net.haefelingerit.flaka:internal-package"
+                       description="package distributables." />
+
+      <c:create-target name="local-package"
+                       task="antlib:net.haefelingerit.flaka:local-package" depends="local-compile" />
+
+      <!-- Synonym targets for target "package" -->
+      <c:create-target name="all" depends="package" />
+      <c:create-target name="default" depends="package" />
+      <c:create-target name="jar" depends="package" />
+
+      <!--=============================================================-->
+      <!-- dependencies                                                -->
+      <!--=============================================================-->
+
+      <c:create-target name="depends"
+                       task="antlib:net.haefelingerit.flaka:local-depends" description="report dependencies of this project" />
+
+      <!--=============================================================-->
+      <!-- export                                                      -->
+      <!--=============================================================-->
+
+      <c:create-target name="export"
+                       task="antlib:net.haefelingerit.flaka:local-export" description="export scripting layer (antlib.xml) to stdout" />
+
+
+      <!--=============================================================-->
+      <!-- properties                                                  -->
+      <!--=============================================================-->
+
+      <c:create-target name="properties"
+                       task="antlib:net.haefelingerit.flaka:local-apropos" />
+
+      <c:create-target name="apropos"
+                       task="antlib:net.haefelingerit.flaka:local-apropos" description="export project properties" />
+
+      <!--=============================================================-->
+      <!-- clean                                                       -->
+      <!--=============================================================-->
+
+      <c:create-target name="clean"
+                       task="antlib:net.haefelingerit.flaka:internal-clean"
+                       description="remove object files" />
+
+      <c:create-target name="local-clean"
+                       task="antlib:net.haefelingerit.flaka:local-clean" />
+
+      <!--=============================================================-->
+      <!-- distclean                                                   -->
+      <!--=============================================================-->
+
+      <c:create-target name="distclean"
+                       task="antlib:net.haefelingerit.flaka:internal-distclean"
+                       description="remove build folder" />
+
+      <c:create-target name="local-distclean"
+                       task="antlib:net.haefelingerit.flaka:local-distclean" />
+
+      <!--=============================================================-->
+      <!-- test                                                        -->
+      <!--=============================================================-->
+
+      <c:create-target name="test"
+                       task="antlib:net.haefelingerit.flaka:internal-test" description="execute unit tests" />
+
+      <c:create-target name="local-test"
+                       task="antlib:net.haefelingerit.flaka:local-test" depends="local-compile,local-compile-test" />
+
+
+      <!--=============================================================-->
+      <!-- testclient                                                  -->
+      <!--=============================================================-->
+
+      <c:create-target name="testclient"
+                       task="antlib:net.haefelingerit.flaka:internal-testclient"
+                       description="execute HTTP unit tests" />
+
+      <c:create-target name="local-testclient"
+                       task="antlib:net.haefelingerit.flaka:local-testclient" depends="local-compile" />
+
+      <!--=============================================================-->
+      <!-- eclipse                                                     -->
+      <!--=============================================================-->
+
+      <c:create-target name=".classpath"
+                       task="antlib:net.haefelingerit.flaka:internal-dotclasspath"
+                       description="creates/updates .classpath file" />
+      <c:create-target name="dotclasspath"
+                       task="antlib:net.haefelingerit.flaka:internal-dotclasspath" />
+
+      <c:create-target name="local-dotclasspath"
+                       task="antlib:net.haefelingerit.flaka:local-dotclasspath" />
+      <c:create-target name="local-.classpath"
+                       task="antlib:net.haefelingerit.flaka:local-dotclasspath" />
+
+      <!--=============================================================-->
+      <!-- compile                                                     -->
+      <!--=============================================================-->
+
+      <c:create-target name="compile"
+                       task="antlib:net.haefelingerit.flaka:internal-compile"
+                       description="execute compilation step" />
+
+      <c:create-target name="local-compile"
+                       task="antlib:net.haefelingerit.flaka:local-compile" />
+
+      <c:create-target name="compile-test"
+                       task="antlib:net.haefelingerit.flaka:internal-compile-test"
+                       description="execute compilation step for tests" />
+
+      <c:create-target name="local-compile-test"
+                       task="antlib:net.haefelingerit.flaka:local-compile-test"
+                       depends="local-compile" />
+
+      <!--=============================================================-->
+      <!-- rmi                                                         -->
+      <!--=============================================================-->
+
+      <c:create-target name="local-compile-rmi"
+                       task="antlib:net.haefelingerit.flaka:local-compile-rmi" depends="local-compile" />
+
+      <!--=============================================================-->
+      <!-- deploy                                                      -->
+      <!--=============================================================-->
+
+      <c:create-target name="deploy"
+                       task="antlib:net.haefelingerit.flaka:local-deploy" depends="package"
+                       description="install on remote machine" />
+
+
+      <!--=============================================================-->
+      <!-- install                                                     -->
+      <!--=============================================================-->
+
+      <c:create-target name="install"
+                       task="antlib:net.haefelingerit.flaka:local-install" depends="package"
+                       description="install on your local machine" />
+
+      <!--=============================================================-->
+      <!-- create a project structure                                  -->
+      <!--=============================================================-->
+
+      <c:create-target name="create-project"
+                       task="antlib:net.haefelingerit.flaka:local-create-project"
+                       description="create project based on property 'project.type'" />
+
+      <!--=============================================================-->
+      <!-- upload                                                      -->
+      <!--=============================================================-->
+      <c:create-target name="upload"
+                       task="antlib:net.haefelingerit.flaka:local-upload" description="upload artefact(s) on depot" />
+
+      <c:create-target name="upload-test"
+                       task="antlib:net.haefelingerit.flaka:local-upload-test"
+                       description="test upload artefact(s) on depot" />
+
+      <!--=============================================================-->
+      <!-- baseline                                                    -->
+      <!--=============================================================-->
+
+      <c:create-target name="reload-baseline"
+                       task="antlib:net.haefelingerit.flaka:internal-reload-baseline"
+                       description="throw Baseline away and get last revision" />
+
+      <c:create-target name="local-reload-baseline"
+                       task="antlib:net.haefelingerit.flaka:local-reload-baseline" />
+
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="init" backtrace="true">
+    <sequential>
+      <!--
+          :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      -->
+      <!--
+          A rather long list of "extension points"
+      -->
+      <!--
+          :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      -->
+
+      <presetdef name="reload-baseline">
+        <c:reload-baseline />
+      </presetdef>
+
+      <presetdef name="analyse-cvs-tag">
+        <c:analyse-cvs-tag />
+      </presetdef>
+
+      <!--macro `compile-exec'-->
+      <presetdef name="compile-exec">
+        <c:compile-exec />
+      </presetdef>
+
+      <!--macro `compile-exec'-->
+      <presetdef name="compile-exec-java">
+        <c:compile-exec-java />
+      </presetdef>
+
+      <!--macro `compile-init'-->
+      <presetdef name="compile-init">
+        <c:compile-init />
+      </presetdef>
+
+      <!--macro `compile-post'-->
+      <presetdef name="compile-post">
+        <c:compile-post />
+      </presetdef>
+
+      <!--macro `compile-test'-->
+      <presetdef name="compile-test">
+        <c:compile-test />
+      </presetdef>
+
+      <!--macro `compile-test-exec'-->
+      <presetdef name="compile-test-exec">
+        <c:compile-test-exec />
+      </presetdef>
+
+      <!--macro `compile-test-exec-java'-->
+      <presetdef name="compile-test-exec-java">
+        <c:compile-test-exec-java />
+      </presetdef>
+
+      <!--macro `compile-test-init'-->
+      <presetdef name="compile-test-init">
+        <c:compile-test-init />
+      </presetdef>
+
+      <!--macro `compile-test-post'-->
+      <presetdef name="compile-test-post">
+        <c:compile-test-post />
+      </presetdef>
+
+      <!--macro `dependencies'-->
+      <presetdef name="dependencies">
+        <c:dependencies />
+      </presetdef>
+
+      <!--macro `dependency'-->
+      <presetdef name="dependency">
+        <c:dependency />
+      </presetdef>
+
+      <!--macro `ear-package'-->
+      <presetdef name="ear-package">
+        <c:ear-package />
+      </presetdef>
+
+      <!--macro `ear-package-exec'-->
+      <presetdef name="ear-package-exec">
+        <c:ear-package-exec />
+      </presetdef>
+
+      <!--macro `ear-package-init'-->
+      <presetdef name="ear-package-init">
+        <c:ear-package-init />
+      </presetdef>
+
+      <!--macro `ear-package-post'-->
+      <presetdef name="ear-package-post">
+        <c:ear-package-post />
+      </presetdef>
+
+      <!--macro `jar-package'-->
+      <presetdef name="jar-package">
+        <c:jar-package />
+      </presetdef>
+
+      <!--macro `jar-package-exec'-->
+      <presetdef name="jar-package-exec">
+        <c:jar-package-exec />
+      </presetdef>
+
+      <!--macro `jar-package-init'-->
+      <presetdef name="jar-package-init">
+        <c:jar-package-init />
+      </presetdef>
+
+      <!--macro `jar-package-post'-->
+      <presetdef name="jar-package-post">
+        <c:jar-package-post />
+      </presetdef>
+
+      <!--macro `javac-exec'-->
+      <presetdef name="javac-exec">
+        <c:javac-exec />
+      </presetdef>
+
+      <!--macro `package-exec'-->
+      <presetdef name="package-exec">
+        <c:package-exec />
+      </presetdef>
+
+      <!--macro `package-init'-->
+      <presetdef name="package-init">
+        <c:package-init />
+      </presetdef>
+
+      <!--macro `package-post'-->
+      <presetdef name="package-post">
+        <c:package-post />
+      </presetdef>
+
+      <!--macro `test-exec'-->
+      <presetdef name="test-exec">
+        <c:test-exec />
+      </presetdef>
+
+      <!--macro `test-init'-->
+      <presetdef name="test-init">
+        <c:test-init />
+      </presetdef>
+
+      <!--macro `test-junit'-->
+      <presetdef name="test-junit">
+        <c:test-junit />
+      </presetdef>
+
+      <!--macro `test-post'-->
+      <presetdef name="test-post">
+        <c:test-post />
+      </presetdef>
+
+      <!--macro `test'-->
+      <presetdef name="testclient">
+        <c:testclient />
+      </presetdef>
+
+
+      <!--macro `war-package'-->
+      <presetdef name="war-package">
+        <c:war-package />
+      </presetdef>
+
+      <!--macro `war-package-exec'-->
+      <presetdef name="war-package-exec">
+        <c:war-package-exec />
+      </presetdef>
+
+      <!--macro `war-package-init'-->
+      <presetdef name="war-package-init">
+        <c:war-package-init />
+      </presetdef>
+
+      <!--macro `war-package-post'-->
+      <presetdef name="war-package-post">
+        <c:war-package-post />
+      </presetdef>
+
+      <!--macro `rmi' -->
+      <presetdef name="compile-rmi">
+        <c:compile-rmi />
+      </presetdef>
+
+      <c:define-targets />
+
+      <!-- install component handler -->
+      <c:unless test=" has.property['no.component-handler'] ">
+        <c:component-handler install="true" fail="false" />
+      </c:unless>
+
+      <!--=============================================================-->
+      <!-- war                                                         -->
+      <!--=============================================================-->
+
+      <!-- Define a filter for replacing tokens when generating a war  -->
+      <!-- file. This filter is getting applied to all files found in  -->
+      <!-- directory ${web.dir}.                                       -->
+
+      <filterset id="war.filterset">
+        <filter token="version" value="${project.version}" />
+      </filterset>
+
+      <!--=============================================================-->
+      <!-- automatic init and configuration                            -->
+      <!--=============================================================-->
+
+      <!-- init if not explicitly disabled -->
+      <c:auto-init />
+    </sequential>
+  </macrodef>
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    U T I L I T I E S                        -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <macrodef name="copy-and-replace" backtrace="true">
+    <attribute name="src" />
+    <attribute name="dst" />
+    <element name="selector-element" implicit="true" optional="true" />
+    <sequential>
+      <c:when test="-d '@{src}'">
+        <!-- copy all files (except *.in) without token replacement-->
+        <copy todir="@{dst}" overwrite="true">
+          <fileset dir="@{src}">
+            <exclude name="**/*.in" />
+            <selector-element />
+          </fileset>
+        </copy>
+        <!-- filterset (special version, all properties become tokens) -->
+        <c:filterset id="properties.filterset">
+          <properties />
+        </c:filterset>
+        <!-- copy all textual files (again) by replacing tokens   -->
+        <!-- *.in files are renamed by removing extension *.in    -->
+        <copy todir="@{dst}" overwrite="true">
+          <fileset dir="@{src}">
+            <selector-element />
+            <c:istext-selector />
+          </fileset>
+          <!-- replace tokens -->
+          <filterset refid="properties.filterset" />
+          <c:identity-globmapper from="*.in" to="*" />
+        </copy>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="resources-copy" backtrace="true">
+    <attribute name="dst" default="${obj.dir}" />
+    <attribute name="src" default="${src.dir}" />
+    <sequential>
+      <!-- @{src} must exits, c:otherwise fileset fails -->
+      <c:when test="-d '@{src}'">
+        <c:copy-and-replace src="@{src}" dst="@{dst}">
+          <exclude name="**/*.java" />
+          <type type="file" />
+        </c:copy-and-replace>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+  <!--
+      A macro to extend a path element. The way to do so is quite cumber-
+      some and should probably be implemented as (Java) task. @refid The
+      id of a Path resource which must exist. @element-path Any element
+      which accepted by Path
+  -->
+
+  <macrodef name="path-prepend" backtrace="true">
+    <attribute name="refid" />
+    <element name="element-path" implicit="true" />
+    <sequential>
+      <c:unset>@{refid}</c:unset>
+      <pathconvert refid="@{refid}" property="@{refid}" />
+      <path id="@{refid}">
+        <element-path />
+        <pathelement path="${@{refid}}" />
+      </path>
+    </sequential>
+  </macrodef>
+
+  <!-- calls a program in all valid directories -->
+  <macrodef name="run-in-subdirs" backtrace="true">
+    <attribute name="args" />
+    <attribute name="dirs" default="${subdirs}" />
+    <attribute name="prog" default="${ant.exe}" />
+    <attribute name="fail" default="true" />
+    <sequential>
+      <c:for var="dir" in="@{dirs}">
+        <sequential>
+          <c:choose>
+            <c:when test="-d '@{dir}'">
+              <echo>&HSEPNL;cd
+              '@{dir} &lt;&lt; @{prog} @{args}&NL;&HSEP;</echo>
+              <exec executable="@{prog}" dir="@{dir}" failonerror="@{fail}">
+                <arg line="@{args}"/>
+              </exec>
+            </c:when>
+            <otherwise>
+              <c:verbose>directory `@{dir}' does not exist.</c:verbose>
+            </otherwise>
+          </c:choose>
+        </sequential>
+      </c:for>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="foreach-subdir" backtrace="true">
+    <attribute name="var" default="dir"/>
+    <element name="body" implicit="true"/>
+    <sequential>
+      <c:for var="@{var}" in="${subdirs}">
+        <sequential>
+          <body/>
+        </sequential>
+      </c:for>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="subdir" backtrace="true">
+    <attribute name="dir"/>
+    <sequential>
+      <c:choose>
+        <c:when test=" not has.property.subdirs">
+          <c:set>
+            subdirs := '@{dir}'
+          </c:set>
+        </c:when>
+        <c:otherwise>
+          <c:set>
+            subdirs ::= concat(property['subdirs'],'@{dir}')
+          </c:set>
+        </c:otherwise>
+      </c:choose>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="log" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <attribute name="level"/>
+    <attribute name="message"/>
+    <sequential>
+      <echo message="@{message}" level="@{level}" />
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="verbose" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <text name="text" optional="true"/>
+    <sequential>
+      <c:log trim="@{trim}" level="verbose" message="@{text}"/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="debug" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <text name="text" optional="true"/>
+    <sequential>
+      <c:log trim="@{trim}" level="debug" message="@{text}"/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="info" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <text name="text" optional="true"/>
+    <sequential>
+      <c:log trim="@{trim}" level="info" message="@{text}"/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="warning" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <text name="text" optional="true"/>
+    <sequential>
+      <c:log trim="@{trim}" level="warning" message="@{text}"/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="error" backtrace="true">
+    <attribute name="trim" default="false"/>
+    <text name="text" optional="true"/>
+    <sequential>
+      <c:log trim="@{trim}" level="error" message="@{text}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assert" backtrace="true">
+    <attribute name="test"/>
+    <sequential>
+      <c:unless test="@{test}">
+        <fail message="assertion error: test `@{test}' failed."/>
+      </c:unless>
+    </sequential>
+  </macrodef>
+
+  <!-- test whether a property is defined (set) and fail otherwise -->
+  <macrodef name="if-not-set-fail" backtrace="true">
+    <attribute name="property"/>
+    <sequential>
+      <fail unless="@{property}">
+        property `@{property}' is not defined.
+      </fail>
+    </sequential>
+  </macrodef>
+  
+  <!-- this macro shall create a clean directory by removing a  -->
+  <!-- directory with the same name, if such a directory exists -->
+  <macrodef name="clean-dir" backtrace="true">
+    <attribute name="name"/>
+    <sequential>
+      <delete dir="@{name}"/>
+      <c:make-dir dir="@{name}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="if-dir-exists-set" backtrace="true">
+    <attribute name="property"/>
+    <attribute name="dir"/>
+    <sequential>
+      <c:when test=" '@{dir}'.tofile.isdir ">
+        <property name="@{property}" value="@{dir}"/>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to create a distributable in appropriate directory    -->
+  <macrodef name="make-dist-jar" backtrace="true">
+    <attribute name="jar" default="${jar.name}"/>
+    <attribute name="dir" default="${dist.dir}"/>
+    <element name="jar-element" implicit="true"/>
+    <sequential>
+      <c:make-dir dir="@{dir}"/>
+      <delete file="@{dir}/@{jar}"/>
+      <c:make-jar jar="@{dir}/@{jar}">
+        <jar-element/>
+      </c:make-jar>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to update a distributable in appropriate directory    -->
+  <macrodef name="update-dist-jar" backtrace="true">
+    <attribute name="jar" default="${jar.name}"/>
+    <attribute name="dir" default="${dist.dir}"/>
+    <element name="zip-element" implicit="true"/>
+    <sequential>
+      <c:make-dir dir="@{dir}"/>
+      <zip destfile="@{dir}/@{jar}" update="true">
+        <zip-element/>
+      </zip>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to create a distributable in appropriate directory    -->
+  <macrodef name="remove-dist-jar" backtrace="true">
+    <attribute name="jar" default="${jar.name}"/>
+    <attribute name="dir" default="${dist.dir}"/>
+    <sequential>
+      <delete file="@{dir}/@{jar}"/>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to create a distributable in appropriate directory    -->
+  <macrodef name="remove-from-dist-dir" backtrace="true">
+    <attribute name="dir" default="${dist.dir}"/>
+    <element name="fileset-element" implicit="true"/>
+    <sequential>
+      <delete>      
+        <fileset dir="@{dir}">
+          <fileset-element/>
+        </fileset>
+      </delete>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to create a well formed jar, i.e. a jar that can be up- -->
+  <!-- loaded on a depot. -->
+  <macrodef name="make-jar" backtrace="true">
+    <attribute name="jar"    default="${dist.dir}/${jar.name}"/>
+    <attribute name="update" default="false"/>
+    <attribute name="nil" default=""/>
+    <element name="jar-element" implicit="true"/>
+    <sequential>
+      <c:fail test=" '@{jar}'.tofile.isdir ">
+        `@{jar}' is a directory - cowardly refused to remove in order to create/update a jar file.
+      </c:fail>
+      <jar update="@{update}" destfile="@{jar}">
+        <manifest>
+          <attribute name="Implementation-Title" value="#{ property['project.title'] }" />
+          <attribute name="Implementation-Version" value="#{ property['project.version'] }" />
+          <attribute name="Implementation-Vendor" value="#{ property['project.vendor'] }" />
+          <attribute name="Implementation-Group" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Specification-Title" value="#{ property['specification.title'] }" />
+          <attribute name="Specification-Version" value="#{ property['specification.version'] }" />
+          <attribute name="Specification-Vendor" value="#{ property['specification.vendor'] }" />
+          <attribute name="Repository" value="#{ property['project.cvsroot'] }" />
+          <attribute name="Repository-Tag" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Baseline" value="#{ property['baseline'] }" />
+          <attribute name="Baseline-Revision" value="#{ property['baseline.rev'] }" />
+          <attribute name="Baseline-Repository" value="#{ property['baseline.cvsdir'] }" />
+          <attribute name="Flaka-Version" value="#{ property['flaka.version'] }"/>
+        </manifest>
+        <jar-element/>
+      </jar>
+    </sequential>
+  </macrodef>
+  
+  <!-- macro to create a well formed ear, i.e. a ear that can be up- -->
+  <!-- loaded on depot. -->
+  <macrodef name="make-ear" backtrace="true">
+    <attribute name="ear"/>
+    <attribute name="appxml"/>
+    <attribute name="update" default="false"/>
+    <attribute name="nil" default=""/>
+    <element name="ear-element" implicit="true"/>
+    <sequential>
+      <ear update="@{update}" destfile="@{ear}" appxml="@{appxml}">
+        <manifest>
+          <attribute name="Implementation-Title" value="#{ property['project.title'] }" />
+          <attribute name="Implementation-Version" value="#{ property['project.version'] }" />
+          <attribute name="Implementation-Vendor" value="#{ property['project.vendor'] }" />
+          <attribute name="Implementation-Group" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Specification-Title" value="#{ property['specification.title'] }" />
+          <attribute name="Specification-Version" value="#{ property['specification.version'] }" />
+          <attribute name="Specification-Vendor" value="#{ property['specification.vendor'] }" />
+          <attribute name="Repository" value="#{ property['project.cvsroot'] }" />
+          <attribute name="Repository-Tag" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Baseline" value="#{ property['baseline'] }" />
+          <attribute name="Baseline-Revision" value="#{ property['baseline.rev'] }" />
+          <attribute name="Baseline-Repository" value="#{ property['baseline.cvsdir'] }" />
+          <attribute name="Flaka-Version" value="#{ property['flaka.version'] }"/>
+        </manifest>
+        <ear-element/>
+      </ear>
+    </sequential>
+  </macrodef>
+
+  <!-- macro to create a well formed war, i.e. a war that can be up- -->
+  <!-- loaded on depot. -->
+
+  <macrodef name="make-war" backtrace="true">
+    <attribute name="war"/>
+    <attribute name="update" default="false"/>
+    <attribute name="nil" default=""/>
+    <attribute name="webxml" default=""/>
+    <element name="war-element" implicit="true"/>
+    <sequential>
+      <c:when test=" '@{update}' == 'false' ">
+        <c:choose>
+          <c:when test=" file('@{war}').isdir ">
+            <delete dir="@{war}"/>
+          </c:when>
+          <c:otherwise>
+            <delete file="@{war}"/>
+          </c:otherwise>
+        </c:choose>
+      </c:when>
+      <war update="@{update}" destfile="@{war}" webxml="@{webxml}">
+        <manifest>
+          <attribute name="Implementation-Title" value="#{ property['project.title'] }" />
+          <attribute name="Implementation-Version" value="#{ property['project.version'] }" />
+          <attribute name="Implementation-Vendor" value="#{ property['project.vendor'] }" />
+          <attribute name="Implementation-Group" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Specification-Title" value="#{ property['specification.title'] }" />
+          <attribute name="Specification-Version" value="#{ property['specification.version'] }" />
+          <attribute name="Specification-Vendor" value="#{ property['specification.vendor'] }" />
+          <attribute name="Repository" value="#{ property['project.cvsroot'] }" />
+          <attribute name="Repository-Tag" value="#{ property['project.cvsdir'] }" />
+          <attribute name="Baseline" value="#{ property['baseline'] }" />
+          <attribute name="Baseline-Revision" value="#{ property['baseline.rev'] }" />
+          <attribute name="Baseline-Repository" value="#{ property['baseline.cvsdir'] }" />
+          <attribute name="Flaka-Version" value="#{ property['flaka.version'] }"/>
+        </manifest>
+        <war-element/>
+      </war>
+    </sequential>
+  </macrodef>
+
+  <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+  <!--          Write testcase for each macro above                          -->
+  <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+
+
+  <macrodef name="guess-project-type" backtrace="true">
+    <sequential>
+      <!-- We try to determine the project type here regardless whether type -->
+      <!-- has been set by user or not. However, we do not override any user -->
+      <!-- settings.                                                         -->
+      <c:choose>
+        <c:when test="-d WEB-INF">
+          <property name="project.type" value="war-package"/>
+          <property name="web.dir"   value="." />
+        </c:when>
+        <c:when test="-d web/WEB-INF">
+          <property name="project.type" value="war-package"/>
+          <property name="web.dir"   value="web" />
+        </c:when>
+        <c:when test="-d src/main/webapp/WEB-INF">
+          <property name="project.type" value="war-package"/>
+          <property name="web.dir"   value="src/main/webapp" />
+        </c:when>
+        <c:when test="-d ear/META-INF -o -f META-INF/application.xml">
+          <property name="project.type" value="ear-package"/>
+        </c:when>
+        <c:otherwise>
+          <property name="project.type" value="jar-package" />
+        </c:otherwise>
+      </c:choose>
+      <echo>** project.type is `${project.type}'</echo>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                  D O C U M E N T A T I O N                  -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="docs" backtrace="true">
+    <sequential>
+      <echo>customize macro `docs' to generate documentation</echo>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                        A P R O P O S                        -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="apropos" backtrace="true">
+    <attribute name="debug" default="false" />
+    <sequential>
+      <c:echo debug="@{debug}">
+        /* Project */
+        project.name            #{ property['project.name'] }
+        project.vendor          #{ property['project.vendor'] }
+        project.version         #{ property['project.version'] }
+        project.env             #{ property['project.env'] }
+        project.cvsdir          #{ property['project.cvsdir'] }
+        project.cvsalias        #{ property['project.cvsalias'] }
+        project.cvstag          #{ property['project.cvstag'] }
+        project.cvsroot         #{ property['project.cvsroot'] }
+        project.type            #{ property['project.type'] }
+        project.title           #{ property['project.title'] }
+
+        /* Relevant directories */
+        src.dir                 #{ property['src.dir'] }
+        res.dir                 #{ property['res.dir'] }
+        web.dir                 #{ property['web.dir'] }
+
+        /* Build directories */
+        build.dir               #{ property['build.dir'] }
+        dist.dir                #{ property['dist.dir'] }
+        lib.dir                 #{ property['lib.dir'] }
+        javadoc.dir             #{ property['javadoc.dir'] }
+        obj.dir                 #{ property['obj.dir'] }
+        var.dir                 #{ property['var.dir'] }
+        tmp.dir                 #{ property['tmp.dir'] }
+
+        /* Baseline */
+        baseline                #{ property['baseline'] }
+        baseline.via            #{ property['baseline.via'] }
+        baseline.dir            #{ property['baseline.dir'] }
+        baseline.rev            #{ property['baseline.rev'] }
+        baseline.cvsdir         #{ property['baseline.cvsdir'] }
+        baseline.cvsroot        #{ property['baseline.cvsroot'] }
+        baseline.httproot       #{ property['baseline.httproot'] }
+
+        /* Unit tests */
+        test.src.dir            #{ property['test.src.dir'] }
+        test.res.dir            #{ property['test.res.dir'] }
+        test.obj.dir            #{ property['test.obj.dir'] }
+        test.pat                #{ property['test.pat'] }
+
+        /* HTTP Unit tests */
+        testclient.src.dir      #{ property['testclient.src.dir'] }
+        testclient.res.dir      #{ property['testclient.res.dir'] }
+        testclient.obj.dir      #{ property['testclient.obj.dir'] }
+        testclient.pat          #{ property['testclient.pat'] }
+        
+        /* RMI */
+        rmi.class.name          #{ property['rmi.class.name'] }
+        package.name            #{ property['package.name'] }
+        
+        /* Artefact names */
+        jar.name                #{ property['jar.name'] }
+        war.name                #{ property['war.name'] }
+        ear.name                #{ property['ear.name'] }
+
+        /* Eclipse */
+        classpath.file          #{ property['classpath.file'] }
+        
+        /* dependencies and binary depots */
+        depot.regex             #{ property['depot.regex'] }
+        depot.csv               ${depot.csv}
+        depxml.regex            #{ property['depxml.regex'] }
+        depxml.csv              ${depxml.csv}
+
+        /* Uploading */
+        uploadtask.endpoint     ${uploadtask.endpoint}
+        uploadtask.debug        ${uploadtask.debug}
+        uploadtask.category     ${uploadtask.category}
+        uploadtask.rcfile       ${uploadtask.rcfile}
+        uploadtask.folder       ${uploadtask.folder}
+        uploadtask.pattern      #{ property['uploadtask.pattern'] }
+      </c:echo>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="validate-core-properties" backtrace="true">
+    <sequential>
+      <c:if-not-set-fail property="project.name"/>
+      <c:if-not-set-fail property="project.vendor"/>
+      <c:if-not-set-fail property="project.version"/>
+      
+      <c:if-not-set-fail property="build.dir"/>
+      <c:if-not-set-fail property="dist.dir"/>
+      <c:if-not-set-fail property="lib.dir"/>
+      <c:if-not-set-fail property="javadoc.dir"/>
+      <c:if-not-set-fail property="obj.dir"/>
+      <c:if-not-set-fail property="var.dir"/>
+      <c:if-not-set-fail property="tmp.dir"/>
+      
+      <c:if-not-set-fail property="baseline"/>
+      <c:if-not-set-fail property="baseline.dir"/>
+      
+      <c:if-not-set-fail property="test.obj.dir"/>
+      <c:if-not-set-fail property="test.xml.dir"/>
+      <c:if-not-set-fail property="test.pat"/>
+
+      <c:if-not-set-fail property="testclient.obj.dir"/>
+      <c:if-not-set-fail property="testclient.xml.dir"/>
+      <c:if-not-set-fail property="testclient.pat"/>
+      
+      <c:if-not-set-fail property="package.name"/>
+      
+      <c:if-not-set-fail property="version.jar"/>
+      
+      <c:if-not-set-fail property="project.title"/>
+      
+      <c:if-not-set-fail property="jar.name"/>
+      
+      <c:if-not-set-fail property="war.name"/>
+      <c:if-not-set-fail property="ear.name"/>
+      
+      <c:if-not-set-fail property="depxml.csv"/>
+      <c:if-not-set-fail property="depot.csv"/>
+      
+      <c:if-not-set-fail property="project.type"/>
+      <c:if-not-set-fail property="classpath.file"/>
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                        C L E A N                            -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="clean" backtrace="true">
+    <sequential>
+      <echo>calling framework clean</echo>
+      <c:clean-dir name="${obj.dir}"/>
+      <c:clean-dir name="${test.obj.dir}"/>
+      <c:clean-dir name="${testclient.obj.dir}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="distclean" backtrace="true">
+    <sequential>
+      <delete dir="${build.dir}"/>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    B A S E L I N E                          -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="baseline-httpget" backtrace="true">
+    <attribute name="httproot" default="${baseline.httproot}" />
+    <attribute name="baseline" default="${baseline}" />
+    <attribute name="rev"      default="${baseline.rev}" />
+    <sequential>
+      <mkdir dir="${baseline.dir}" />
+      <delete file="${baseline.dir}/${baseline}.txt"/>
+      <echo>&HSEPNL;CHECKOUT BASELINE VIA HTTP&#10;&HSEP;</echo>
+      <get src="@{httproot}/@{baseline}/@{rev}"
+           dest="${baseline.dir}/@{baseline}.txt" 
+           verbose="false"
+           />
+    </sequential>
+  </macrodef>
+
+  <!-- checkout my baseline -->
+  <macrodef name="baseline-checkout" backtrace="true">
+    <sequential>
+      <c:switch value="${baseline.via}" debug="true">
+        <case match="HTTP" ignorecase="true">
+          <c:baseline-httpget/>
+        </case>
+        <case match="NULL">
+          <!-- do not use baseline -->
+        </case>
+        <otherwise>
+          <c:verbose>
+            ** Baseline not checked out, no handler defined. **
+          </c:verbose>
+        </otherwise>
+      </c:switch>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="reload-baseline" backtrace="true">
+    <sequential>
+      <c:baseline-checkout/>
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--::                    D E P E N D E N C I E S                -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="depends" backtrace="true">
+    <sequential>
+      <c:dependencies-load/>
+      <c:writedeps 
+          var="project.dependencies" 
+          out="${ifdef depends.out,${depends.out}}" 
+          fmt="${ifdef depends.fmt,${depends.fmt}}"
+          />
+    </sequential>
+  </macrodef>
+
+  <!-- next two macros do nothing - they just allow you to write a -->
+  <!-- dependency within your build.xml script.                    -->
+
+  <macrodef name="dependencies" backtrace="true">
+    <element name="body" implicit="true" optional="true"/>
+    <sequential>
+      <body/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="dependency" backtrace="true">
+    <attribute name="name" default=""/>
+    <attribute name="alias" default=""/>
+    <attribute name="version" default=""/>
+    <attribute name="scope" default=""/>
+    <attribute name="jar" default=""/>
+    <attribute name="artifactid" default=""/>
+    <attribute name="groupid" default=""/>
+    <attribute name="type" default=""/>
+    <attribute name="url" default=""/>
+    <!-- flaka -->    
+    <attribute name="group" default="" />
+    <!-- ivy -->
+    <attribute name="org" default="" />
+    <attribute name="rev" default="" />
+    <attribute name="branch" default="" />
+    <attribute name="force" default="" />
+    <attribute name="conf" default="" />
+    <attribute name="transitive" default="" />
+    <attribute name="changing" default="" />
+    <element name="groupId" optional="true"/>
+    <element name="artifactId" optional="true"/>
+    <element name="version" optional="true"/>
+    <element name="jar" optional="true"/>
+    <element name="type" optional="true"/>
+    <element name="scope" optional="true"/>
+    <element name="url" optional="true"/>
+    <element name="properties" optional="true"/>
+    <sequential>
+    </sequential>
+  </macrodef>
+
+
+  <!-- A rather private and cumbersome way to check whether there are aliases used -->
+  <macrodef name="hasalias">
+    <attribute name="src"/>
+    <sequential>
+      <c:unset>
+        hasalias
+        hasalias.content
+      </c:unset>
+      <c:when test="-f '@{src}'">
+        <loadfile srcfile="@{src}" property="hasalias.content" />
+        <c:switch value="${hasalias.content}">
+          <case match="/^\s*[^#\s]/" find="true" multiline="true">
+            <c:set>
+              hasalias := null
+            </c:set>
+          </case>
+        </c:switch>
+        <c:unset>
+          hasalias.content
+        </c:unset>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="dependencies-load" backtrace="true">
+    <attribute name="from" default="${depot.csv}"/>
+    <attribute name="debug" default="false" />
+    <sequential>
+      <mkdir dir="${build.dir}/pom" />
+      <mkdir dir="${build.dir}/lib" />
+      <!--  TODO: ugly (alternatives to provided a CS string? -->
+      <c:scndeps src="${project.dep.xml}" debug="@{debug}"/>
+      <c:writedeps 
+          out="${build.dir}/pom/alias.txt" 
+          fmt="alias"
+          debug = "true"
+          />
+      <c:hasalias src="${build.dir}/pom/alias.txt" />
+      <c:choose>
+        <when test="-P hasalias">
+          <echo>LOADING BASELINE</echo>
+          <c:baseline-checkout />
+          <c:resdeps />
+        </when>
+        <otherwise>
+          <echo>GO AHEAD WITHOUT BASELINE</echo>
+        </otherwise>
+      </c:choose>
+      <c:writedeps 
+          var="project.dependencies" 
+          out="${build.dir}/pom/dependencies.xml" 
+          fmt="maven"
+          debug="@{debug}"
+          />
+      <c:writedeps 
+          var="project.dependencies" 
+          out="${build.dir}/pom/m1path.txt" 
+          fmt="m1path"
+          debug="@{debug}"
+          />
+      <c:writedeps 
+          var="project.dependencies" 
+          out="${build.dir}/pom/m2path.txt" 
+          fmt="m2path"
+          debug="@{debug}"
+          />
+      <c:getdeps dst="${lib.dir}" src="@{from}" debug="@{debug}"/>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       E C L I P S E                         -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <macrodef name="cat" backtrace="true">
+    <attribute name="src" />
+    <attribute name="level" default="info" />
+    <attribute name="fail"  default="true" /> 
+    <sequential>
+      <!-- dump content -->
+      <c:unset>flaka.cat</c:unset>
+      <loadfile failonerror="@{fail}" property="flaka.cat" srcFile="@{src}" />
+      <echo level="@{level}">${flaka.cat}</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="dotclasspath" backtrace="true">
+    <attribute name="libdir"    default="${lib.dir}"/>
+    <attribute name="echo"      default="true" />
+    <attribute name="var"       default="" />
+    <attribute name="flush"     default="" />
+    <attribute name="file"      default=".classpath" />
+    <element name="body" implicit="true" optional="true"/>
+    <sequential>
+      <!-- If .project does not exist, create a default one -->
+      <c:unless test="-f .project">
+        <echoxml file=".project">
+          <projectDescription>
+            <name>${project.name}</name>
+            <comment>Please provide a comment</comment>
+            <projects>
+            </projects>
+            <buildSpec>
+              <buildCommand>
+                <name>org.eclipse.jdt.core.javabuilder</name>
+                <arguments>
+                </arguments>
+              </buildCommand>
+            </buildSpec>
+            <natures>
+              <nature>org.eclipse.jdt.core.javanature</nature>
+            </natures>
+          </projectDescription>
+        </echoxml>
+      </c:unless>
+
+      <!-- If .classpath does not exist, create one using a template -->
+      <c:unless test="-f @{file}">
+        <echoxml file="@{file}">
+          <classpath>
+            <body />
+          </classpath>
+        </echoxml>
+        <!-- Check whether we have a container. If not, just add a default-->
+        <c:unset>_z</c:unset>
+        <c:taskdotclasspath op="q" var="_z" file="@{file}">
+          <classpathentry kind="con" />
+        </c:taskdotclasspath>
+        <c:unless test="-P _z">
+          <c:taskdotclasspath op="a" file="@{file}">
+            <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+          </c:taskdotclasspath>
+        </c:unless>
+      </c:unless>
+
+      <!-- Remove all (unprotected) "lib" entries -->
+      <c:taskdotclasspath op="r" >
+        <classpathentry kind="lib" protected="/\s*(0|false)\s*/" />
+      </c:taskdotclasspath>
+
+      <!-- Add dependencies -->
+      <c:taskdotclasspath op="a" debug="false">
+        <!-- lib files -->
+        <fileset dir="@{libdir}">
+          <c:dependency-selector />
+        </fileset>
+        <!-- default output -->
+        <classpathentry 
+            kind="output" 
+            path="${obj.dir}"
+            />
+        <!-- source paths -->
+        <classpathentry 
+            kind = "src" 
+            path = "${src.dir}"
+            />
+        <classpathentry 
+            kind = "src" 
+            path = "${test.src.dir}" 
+            output="${test.obj.dir}" 
+            /> 
+        <classpathentry 
+            kind="src" 
+            path="${testclient.src.dir}" 
+            output="${testclient.obj.dir}"
+            />
+        <!-- resource directories -->
+        <classpathentry 
+            kind="src" 
+            path="${res.dir}" 
+            excluding="**/*.java"
+            output="${obj.dir}"
+            />
+        <classpathentry 
+            kind="src" 
+            path="${test.res.dir}" 
+            excluding="**/*.java" 
+            output="${test.obj.dir}"
+            />
+        <classpathentry 
+            kind="src" 
+            path="${testclient.res.dir}" 
+            excluding="**/*.java" 
+            output="${testclient.obj.dir}"
+            />
+      </c:taskdotclasspath>
+      <c:unset>_z</c:unset>
+      <c:taskdotclasspath op="q" var="_z" file="@{file}" debug="false" echo="false">
+        <classpathentry kind="src" path="${src.dir}" />
+        <classpathentry kind="src" path="${src.dir}/*" />
+      </c:taskdotclasspath>
+      <c:when test="-P _z">
+        <c:taskdotclasspath op="r" file="@{file}" debug="false">
+          <classpathentry kind="src" path="${src.dir}"/>
+        </c:taskdotclasspath>
+      </c:when>
+      <!-- dump content -->
+      <c:switch value="@{echo}">
+        <case match="/\s*(true|1)\s*/">
+          <c:cat src="@{file}" />
+        </case>
+      </c:switch>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       J A V A D O C S                       -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="javadocs" backtrace="true">
+    <sequential>
+      <!-- create ${javadoc} directory -->
+      <c:make-dir dir="${javadoc.dir}"/>
+      <!-- classpath set by init-deps -->
+      <javadoc destdir="${javadoc.dir}" classpathref="javac.classpath">
+        <fileset dir="${src.dir}" defaultexcludes="yes"/>
+      </javadoc>      
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       COMPILATION - JAVA                    -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+
+  <macrodef name="compile-init" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-exec" backtrace="true" >
+    <sequential>
+      <!-- customizable -->
+      <compile-exec-java/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-post" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-test-init" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-test-exec" backtrace="true">
+    <sequential>
+      <compile-test-exec-java/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-test-post" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile" backtrace="true">
+    <sequential>
+      <compile-init/>
+      <compile-exec/>
+      <compile-rmi />  <!-- for now until we know better -->
+      <compile-post/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-test" backtrace="true">
+    <sequential>
+      <compile-test-init/>
+      <compile-test-exec/>
+      <compile-test-post/>
+    </sequential>
+  </macrodef>
+  
+
+  <macrodef name="compile-exec-java" backtrace="true">
+    <attribute name="srcdir" default="${src.dir}"/>
+    <sequential>
+      <c:ifndef reference="src.path">
+        <c:for var="dir" in="@{srcdir}">
+          <sequential>
+            <!-- compile each source dir independently -->
+            <c:when test=" '@{dir}'.tofile.isdir ">
+              <javac-exec>
+                <src path="@{dir}"/>
+              </javac-exec>
+            </c:when>
+          </sequential>
+        </c:for>
+      </c:ifndef>
+      <c:ifdef reference="src.path">
+        <javac-exec >
+          <src refid="src.path"/>
+        </javac-exec>
+      </c:ifdef>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="compile-test-exec-java" backtrace="true">
+    <attribute name="srcdir" default="${test.src.dir}" />
+    <attribute name="objdir" default="${test.obj.dir}" />
+    <attribute name="clspth" default="test.classpath" />
+    <sequential>
+      <echo>Compiling Java tests ..</echo>
+      <c:ifndef reference="test.src.path">
+        <c:for var="dir" in="@{srcdir}">
+          <sequential>
+            <echo>compiling @{dir} ..</echo>
+            <c:choose>
+              <when test="-d '@{dir}'">
+                <javac-exec destdir="@{objdir}" classpathref="@{clspth}">
+                  <src path="@{dir}"/>
+                </javac-exec>
+              </when>
+              <otherwise>
+                <echo>warning: folder does not exist: @{dir} (ignored)"</echo>
+              </otherwise>
+            </c:choose>
+          </sequential>
+        </c:for>
+      </c:ifndef>
+      <c:ifdef reference="test.src.path">
+        <javac-exec 
+            destdir      = "${test.obj.dir}" 
+            classpathref = "test.classpath"
+            >
+          <src refid="test.src.path"/>
+        </javac-exec>
+      </c:ifdef>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="javac-exec" backtrace="true">
+    <attribute name="destdir" default="${obj.dir}"/>
+    <attribute name="classpathref" default="javac.classpath"/>
+    <element name="javac-element" implicit="true"/>
+    <sequential>
+      <!-- create object directory -->
+      <c:make-dir dir="@{destdir}"/>
+      <!-- compile java source files -->
+      <javac destdir="@{destdir}" classpathref="@{classpathref}">
+        <javac-element/>
+      </javac>
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       COMPILATION - RMI                     -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+  <macrodef name="compile-rmi" backtrace="true">
+    <sequential>
+      <!-- property rmi.class.name -->
+      <c:when test="-P rmi.class.name -a -n '${rmi.class.name}'">
+        <c:for var="x" in="${rmi.class.name}">
+          <sequential>
+            <c:set>
+              y := x.replace('\\.','/')
+              z := '**/${y}.class'
+            </c:set>
+            <c:find dir="${obj.dir}" type="f" var="x">
+              <include name="${z}"/>
+            </c:find>
+            <c:choose>
+              <c:when test="-n '${x}'">
+                <echo>rmic ${x} ..</echo>
+                <rmic includes="${z}" base="${obj.dir}" stubversion="1.2"/>
+              </c:when>
+              <c:otherwise>
+                <fail message="required file `${y}.class' does not exist, check property `rmi.class.name'."/>
+              </c:otherwise>
+            </c:choose>
+          </sequential>
+        </c:for>
+      </c:when>
+      <!-- resource rmi.class.patternset -->
+      <c:when test="-R rmi.class.patternset">
+        <c:set>
+          x ::= null
+        </c:set>
+        <c:find dir="${obj.dir}" type="f" var="x">
+          <patternset refid="rmi.class.patternset"/>
+        </c:find>
+        <c:choose>
+          <c:when test="-n '${x}'">
+            <echo>rmic ${x} ..</echo>
+            <rmic base="${obj.dir}" stubversion="1.2">
+              <patternset refid="rmi.class.patternset"/>
+            </rmic>
+          </c:when>
+          <c:otherwise>
+            <fail message="patternset `rmi.class.patternset' did not match any file."/>
+          </c:otherwise>
+        </c:choose>
+      </c:when>
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--::                       T E S T                           ::-->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <!-- This macro gets called by target `test' -->
+  <macrodef name="test" backtrace="true">
+    <sequential>
+      <test-init/>
+      <test-exec/>
+      <test-post/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="test-init" backtrace="true">
+    <sequential>
+      <c:when test="-d '${test.res.dir}'">
+        <echo message="* instantiating test resources .."/>
+        <c:resources-copy src="${test.res.dir}" dst="${test.obj.dir}" />
+      </c:when>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="test-exec" backtrace="true">
+    <sequential>
+      <!-- exec unit tests -->
+      <test-junit />
+      <!-- add other tests as well -->
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="test-post" backtrace="true">
+    <sequential>
+      <!-- customize me -->
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--::                 JUNIT TESTS                               -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <!-- A rather larget marco around standard Ant task "junit". This-->
+  <!-- macro is highly customizable but if it does not suit your   -->
+  <!-- needs then simply override it.                              -->
+  
+  <macrodef name="test-junit" backtrace="true"> 
+    <attribute name="testdir" default="${test.obj.dir}"/>
+    <attribute name="fileset" default="junit.fileset"/>
+    <attribute name="classpath" default="test.classpath"/>
+    <element name="init" optional="yes"/>
+    <element name="post" optional="yes"/>
+    <element name="exec" optional="yes"/>
+    <element name="free" optional="yes"/>
+    <sequential> 
+      <init />
+      <c:when test="-d '@{testdir}'">
+        <exec />
+      </c:when>
+      <post />
+      <free />
+      <c:when test="-P test.failed">
+        <fail message="Tests failed! Check test reports."/>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+  <presetdef name="test-junit">
+    <c:test-junit>
+      <init>
+        <c:unset>test.failed</c:unset>
+        <delete dir="${test.xml.dir}"/>
+        <c:make-dir dir="${test.xml.dir}"/>
+      </init>
+      <exec>
+        <junit>
+          <classpath>
+            <path refid="@{classpath}"/>
+          </classpath>
+          <formatter type="brief" usefile="false"/>
+          <formatter type="xml"/>
+          <batchtest todir="${test.xml.dir}">
+            <fileset refid="@{fileset}"/>
+          </batchtest>
+          <jvmarg value="-ea"/>   
+        </junit>
+      </exec>
+    </c:test-junit>
+  </presetdef>
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--::                       T E S T C L I E N T               ::-->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <!-- This macro gets called by target `testclient' -->
+  <macrodef name="testclient" backtrace="true">
+    <attribute name="classpath" default="testclient.classpath"  />
+    <attribute name="fileset"   default="testclient.fileset"  />
+    <attribute name="srcdir"    default="${testclient.src.dir}" />
+    <attribute name="resdir"    default="${testclient.res.dir}" />
+    <attribute name="objdir"    default="${testclient.obj.dir}" />
+    <sequential>
+      <delete dir="@{objdir}" />
+      <mkdir dir="@{objdir}" />
+      <!-- compile HTTP test cases -->
+      <c:testclient-compile
+          dst       = "@{objdir}"
+          classpath = "@{classpath}"
+          src       = "@{srcdir}"
+          />
+      <!-- copy resources -->
+      <c:when test="-d '@{resdir}'">
+        <echo message="* instantiating testclient resources .."/>
+        <!-- copy configured resources into build/testclient/obj -->
+        <c:resources-copy src="@{resdir}" dst="@{objdir}" />
+      </c:when>
+      <!-- execute HTTP unit tests -->
+      <c:test-junit 
+          fileset="@{fileset}" 
+          classpath="@{classpath}" 
+          />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="testclient-compile"  backtrace="true">
+    <attribute name="dst"       />
+    <attribute name="classpath" />
+    <attribute name="src"       />
+    <sequential>
+      <echo>compiling httpclient ..</echo>
+      <c:choose>
+        <c:when test="-R testclient.src.path">
+          <c:javac-exec destdir="@{dst}" classpathref="@{classpath}">
+            <src refid="testclient.src.path" />
+          </c:javac-exec>
+        </c:when>
+        <c:when test="-d '@{src}'">
+          <c:javac-exec destdir="@{dst}" classpathref="@{classpath}">
+            <src path="@{src}" />
+          </c:javac-exec>
+        </c:when>
+      </c:choose>
+    </sequential>
+  </macrodef>
+
+  <!--==========================================================-->
+  <!-- package                                                  -->
+  <!--==========================================================-->  
+
+  <macrodef name="package-init" backtrace="true">
+    <sequential>
+      <!-- copy resources found in source directory -->
+      <c:resources-copy src="${src.dir}" />
+      <!-- copy resources found in resource directory -->
+      <c:resources-copy src="${res.dir}" />
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="package-exec" backtrace="true">
+    <attribute name="type" default="${project.type}"/>
+    <sequential>
+      <c:switch value="@{type}" >
+        <c:case match="war-package">
+          <!-- create war package -->
+          <war-package/>
+        </c:case>
+        <c:case match="ear-package">
+          <!-- create ear package -->
+          <ear-package/>
+        </c:case>
+        <c:default>
+          <!-- create jar package -->
+          <c:choose>
+            <c:when test="-T package-jar">
+              <c:run-target name="package-jar"/>
+            </c:when>
+            <c:otherwise>
+              <jar-package/>
+            </c:otherwise>
+          </c:choose>
+        </c:default>
+      </c:switch>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="package-post" backtrace="true">
+    <sequential>
+      <c:package-free />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="package-free" backtrace="true">
+    <attribute name="tmpdir" default="${build.dir}/tmp"/>
+    <sequential>
+      <!-- clean up directory for temporaries -->
+      <c:unless test="-P no.package-free">
+        <delete dir="@{tmpdir}"/>
+      </c:unless>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="package" backtrace="true">
+    <sequential>
+      <package-init/>
+      <package-exec/>
+      <package-post/>
+    </sequential>
+  </macrodef>
+
+
+  <!--==========================================================-->
+  <!-- jar package                                              -->
+  <!--==========================================================-->  
+
+  <macrodef name="jar-package" backtrace="true">
+    <sequential>
+      <jar-package-init/>
+      <jar-package-exec/>
+      <jar-package-post/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="jar-package-init" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="jar-package-exec" backtrace="true">
+    <sequential>
+      <c:make-dist-jar jar="${jar.name}">
+        <fileset dir="${obj.dir}">
+          <patternset refid="jar-package.patternset"/>
+        </fileset>
+      </c:make-dist-jar>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="jar-package-post" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="all" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="default" backtrace="true">
+    <sequential>
+    </sequential>
+  </macrodef>
+
+
+  <!--==========================================================-->
+  <!-- war package                                              -->
+  <!--==========================================================-->  
+
+  <macrodef name="war-package" backtrace="true">
+    <sequential>
+      <war-package-init/>
+      <war-package-exec/>
+      <war-package-post/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="war-package-init" backtrace="true">
+    <sequential>
+      <fail unless="web.dir" message="property web.dir not defined" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="war-package-exec" backtrace="true">
+    <sequential>
+      <c:make-war war="${dist.dir}/${war.name}" webxml="${web.dir}/WEB-INF/web.xml">
+        <!-- class objects -->
+        <classes dir="${obj.dir}"/>
+        <!-- all other files -->
+        <fileset dir="${web.dir}">
+          <exclude name="WEB-INF/web.xml"/>
+        </fileset>
+      </c:make-war>
+      <!-- include resources -->
+      <c:clean-dir name="${build.dir}/tmp/war" />
+      <c:resources-copy src="${res.dir}" dst="${obj.dir}"/>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="war-package-post" backtrace="true">
+    <sequential>
+      <c:when test="-f '${dist.dir}/${war.name}'">
+        <!-- update WEB-INF/lib section -->
+        <c:update-dist-jar jar="${war.name}">
+          <zipfileset dir="${lib.dir}" prefix="WEB-INF/lib">
+            <c:dependency-selector scope="compile"/>
+            <!-- do not include artefacts already provided by container -->
+            <c:dependency-selector scope="provided" invert="true" />
+          </zipfileset>
+        </c:update-dist-jar>
+      </c:when>
+    </sequential>
+  </macrodef>
+
+  <!--==========================================================-->
+  <!-- ear package                                              -->
+  <!--==========================================================-->  
+
+
+  <macrodef name="ear-package" backtrace="true">
+    <sequential>
+      <ear-package-init/>
+      <ear-package-exec/>
+      <ear-package-post/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="ear-package-init" backtrace="true">
+    <sequential>
+      <mkdir dir="${build.dir}/tmp"/>
+      <mkdir dir="${dist.dir}"/>
+      <delete dir="${build.dir}/tmp/ear"/>
+    </sequential>
+  </macrodef>
+
+  
+  <!-- assemble ear package -->
+  <macrodef name="ear-package-exec" backtrace="true">
+    <attribute name="varear" default="${build.dir}/tmp/ear"/>
+    <attribute name="eardir" default="${ear.dir}"/>
+    <sequential>
+      
+      <!-- copy local ear directory, replace tokens on the fly -->
+      <c:copy-and-replace src="@{eardir}" dst="@{varear}"/>
+      
+      <!-- make initial ear file, we update later on -->
+      <c:make-dist-jar jar="${ear.name}">
+        <fileset dir="@{varear}"/>
+      </c:make-dist-jar>
+      
+      <!-- update -->
+      <c:foreach-subdir>
+        <c:update-dist-jar jar="${ear.name}">
+          <zipfileset dir="@{dir}/build/dist" includes="*.jar *.war *.rar *.ear"/>
+        </c:update-dist-jar>
+      </c:foreach-subdir>
+      
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="ear-package-post" backtrace="true">
+    <sequential>
+      <!-- customize me -->
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                         UPLOAD                              -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <macrodef name="upload-artefacts" backtrace="true">
+    <attribute name="category" default="${uploadtask.category}"/>
+    <attribute name="test"     default="true"/>
+    <attribute name="rcfile"   default="${uploadtask.rcfile}"/>
+    <attribute name="folder"   default="${uploadtask.folder}"/>
+    <attribute name="pattern"  default="${uploadtask.pattern}"/>
+    <attribute name="endpoint" default="${uploadtask.endpoint}" />
+    <attribute name="debug"    default="${uploadtask.debug}" />
+    <sequential>
+      <echo>calling upload with test="@{test}</echo>
+      <!-- rcfile must be a valid file with at least two words - the  -->
+      <!-- first words shall be the 'username' while the second word  -->
+      <!-- shall be the password. At the time of writing, the username-->
+      <!-- and password are those used to login into Windows.         -->
+      <c:uploadtask debug="@{debug}" endpoint="@{endpoint}" 
+                    category="@{category}" rcfile="@{rcfile}" 
+                    test="@{test}"
+                    >
+        <fileset dir="@{folder}">
+          <include name="@{pattern}"/>
+        </fileset>
+      </c:uploadtask>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="upload" backtrace="true">
+    <sequential>
+      <c:upload-artefacts test="false" />
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="upload-test" backtrace="true">
+    <sequential>
+      <c:upload-artefacts test="true" />
+    </sequential>
+  </macrodef>
+  
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                        D E P L O Y                          -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="deploy" backtrace="true">
+    <sequential>
+      <echo>customize macro `deploy' for deployment.</echo>
+    </sequential>
+  </macrodef>
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       I N S T A L L                         -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="install" backtrace="true">
+    <attribute name="srcdir" default="${dist.dir}" />
+    <sequential>
+      <c:choose>
+        <c:when test="-P install.dir -a -n '${install.dir}'">
+          <!-- copy all artefacts in dist.dir to install.dir -->
+          <c:copy-and-replace src="@{srcdir}" dst="${install.dir}"/>
+        </c:when>
+        <c:otherwise>
+          <echo>Property "install.dir" not defined.</echo>
+        </c:otherwise>
+      </c:choose>
+    </sequential>
+  </macrodef>
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                      I N I T                                -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+
+  <macrodef name="init-directories" backtrace="true">
+    <sequential>
+      <!-- make sure that we have this properties set -->
+      <c:if-not-set-fail property="build.dir"/>
+      <c:if-not-set-fail property="lib.dir"/>
+      <c:if-not-set-fail property="obj.dir"/>
+      <c:if-not-set-fail property="dist.dir"/>
+      <c:if-not-set-fail property="test.obj.dir"/>
+      <c:if-not-set-fail property="test.xml.dir"/>
+      <c:if-not-set-fail property="testclient.obj.dir"/>
+      <c:if-not-set-fail property="testclient.xml.dir"/>
+      
+      <c:make-dir dir="${build.dir}"/>
+      <c:make-dir dir="${lib.dir}"/>
+      <c:make-dir dir="${obj.dir}"/>
+      <c:make-dir dir="${dist.dir}"/>
+      <c:make-dir dir="${test.obj.dir}"/>
+      <c:make-dir dir="${test.xml.dir}"/>
+      <c:make-dir dir="${testclient.obj.dir}"/>
+      <c:make-dir dir="${testclient.xml.dir}"/>
+
+      <!-- make sure that this directories exist -->
+      <c:assert test="-d '${build.dir}'"/>
+      <c:assert test="-d '${lib.dir}'"/>
+      <c:assert test="-d '${obj.dir}'"/>        
+      <c:assert test="-d '${dist.dir}'"/>
+      <c:assert test="-d '${test.obj.dir}'"/>
+      <c:assert test="-d '${test.xml.dir}'"/>
+      <c:assert test="-d '${testclient.obj.dir}'"/>
+      <c:assert test="-d '${testclient.xml.dir}'"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="init-user-properties" backtrace="true">
+    <sequential>
+      <!-- read environment variables -->   
+      <c:property environment="env"/>
+      
+      <!-- load properties from build.properties -->
+      <c:property file="build.properties"/>
+      
+      <!-- load properties from build.properties -->
+      <c:property file="project.properties"/>
+      
+      <!-- load user properties -->
+      <c:property file="${env.HOME}/.build.properties"/>
+      
+      <!-- load user properties -->
+      <c:property file="${user.home}/.build.properties"/>
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!-- EXTENSION POINT                                                       -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+  <macrodef name="analyse-cvs-tag" backtrace="true">
+    <attribute name="tag"  default="${project.cvstag}" />
+    <attribute name="stem" default="cvstag" />
+    <sequential>
+      <!-- @read http://w/Flaka/API/analyse-cvs-tag -->
+      <c:unset>
+        @{stem}.env 
+        @{stem}.ver  
+        @{stem}.rev  
+        @{stem}.mst  
+        @{stem}.bch
+      </c:unset>
+
+      <!-- A tag may have optionally a so called branch tag. We strip this branch off -->
+      <!-- and do not take it into account for the version or the artefact name. Note -->
+      <!-- that whitespace characters are automtically stripped. -->
+      <c:set>
+        __z := @{tag}
+      </c:set>
+
+      <c:switch value="@{tag}" stem="__z">
+        <case match="/^(.*?)--(.*?)$/">
+          <c:set>
+            __z         := ${__z.g1}
+            @{stem}.bch := ${__z.g2}
+          </c:set>
+        </case>
+      </c:switch>
+
+      <!-- Check whether we have a milestone -->
+      <c:switch value="${__z}" stem="__z">
+        <case match="/^(.*?_\d+)_([a-z].*)$/">
+          <c:set>
+            __z         := ${__z.g1}
+            @{stem}.mst := ${__z.g2}
+          </c:set>
+        </case>
+      </c:switch>
+
+      <c:switch value="${__z}" stem="__z">
+        <!-- A standard "non-environmental" tag -->
+        <case match="/^([a-z])-(\d+(?:_\d+)*)$/">
+          <c:set>
+            @{stem}.typ := ${__z.g1}
+            @{stem}.ver := ${__z.g2}
+          </c:set>
+        </case>
+        <!-- A environment tag with at most three numbers -->
+        <!-- Example: v-env_X_Y -->
+        <case match="/^([a-z])-([a-z][^_]*)_(\d+(?:_\d+){0,2})$/" >
+          <c:set>
+            @{stem}.typ := ${__z.g1}
+            @{stem}.env := ${__z.g2}
+            @{stem}.ver := ${__z.g3}
+          </c:set>
+        </case>
+        <!-- A environment tag with 4 or more numbers -->
+        <!-- Example: v-env_X_Y_Z_R -->
+        <case match="/^([a-z])-([a-z][^_]*)_(\d+(?:_\d+){2})_(\d+(?:_\d+)*)$/" >
+          <c:set>
+            @{stem}.typ := ${__z.g1}
+            @{stem}.env := ${__z.g2}
+            @{stem}.ver := ${__z.g3}
+            @{stem}.rev := ${__z.g4}
+          </c:set>
+        </case>
+      </c:switch>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="auto-init" backtrace="true">
+    <sequential>
+      <c:logo text="HELLO, Flaka @project.version@" width="68" />
+
+      <!-- we need at least this version, older versions are too buggy -->
+      <c:requires-ant atleast="1.7.0"/>  
+
+      <!-- set the version of Flaka -->
+      <c:set>
+        flaka.version := @project.version@
+      </c:set>
+      
+      <!-- init ssl -->
+      <c:initssl verifycertificate="off"/>
+
+      <!-- install property handler -->
+      <c:ifndef property="no.property-handler">
+        <c:property-handler/>
+      </c:ifndef>
+      
+
+      <!-- make sure that this properties do not exist -->
+      <c:unset>os.is.windows os.is.unix</c:unset>
+      <c:set>
+        ant.exe := ${ant.home}/bin/ant
+      </c:set>
+      
+      <!-- check whether we are running on windows -->
+      <condition property="os.is.windows">
+        <os family="windows"/>
+      </condition>
+      
+      <!-- check whether we are running on unix -->
+      <condition property="os.is.unix">
+        <os family="unix"/>
+      </condition>
+      
+      <c:when test="-P os.is.windows">
+        <c:set>
+          ant.exe := ${ant.home}/bin/ant.bat
+        </c:set>
+      </c:when>
+      
+      <!-- read user properties -->
+      <c:init-user-properties/>
+      
+      <!-- configure properties -->
+      <c:set-default-target name="default"/>
+      
+      <c:ifndef property="project.name">
+        <c:choose>
+          <c:when test="-P project">
+            <c:property name="project.name" value="${project}"/>
+          </c:when>
+          <c:when test="-P ant.project.name">
+            <c:property name="project.name" value="${ant.project.name}"/>
+          </c:when>
+          <c:otherwise>
+            <c:property name="project.name" value="${basename ${dirname ${ant.file}}}"/>
+          </c:otherwise>
+        </c:choose>
+      </c:ifndef>
+      
+      <c:guess-project-type/>
+      
+      <!-- default value -->
+      <c:property name="project.type" value="jar"/>
+      
+      <!-- set a couple of cvs related properties prefixed with stem  -->
+      <!-- project (project.cvsroot,project.cvstag etc)               -->
+
+      <c:cvsstat stem="project" arg="${ant.file}" preserve="true" />
+
+      <!-- special handling for 'project.cvsroot' - if not set, then -->
+      <!-- create it by using (a) environment  variable CVSROOT or   -->
+      <!-- (b) build it by using property $user.name                 -->
+      
+      <c:ifndef property="project.cvsroot">
+        <c:choose>
+          <c:when test="-P env.CVSROOT">
+            <c:property name="project.cvsroot" value="${env.CVSROOT}"/>
+          </c:when>
+          <c:otherwise>
+            <c:property name="project.cvsroot" value=":pserver:${user.name}@haefelinger.it:/var/cvsroot"/>
+          </c:otherwise>
+        </c:choose>
+      </c:ifndef>
+      
+      <!-- If we have a CVS tag, tokenize it via extension point analyse-cvs-tag. -->
+      <!-- This will create a set of properties to be used for certain default    -->
+      <!-- values. This extension point is properly documented. Please read       -->
+      <!-- http://w/Flaka/API/analyse-cvs-tag -->
+      
+      <c:ifdef property="project.cvstag">
+        <echo>analyzing project.cvstag (${project.cvstag})..</echo>
+        <analyse-cvs-tag tag="${project.cvstag}" stem="cvstag" />
+      </c:ifdef>
+
+      <!-- derive project version from cvs tag - if not already set  -->
+      <!-- if there is not cvs tag then we are using SNAPSHOT        -->
+
+      <c:ifndef property="project.version">
+        <c:choose>
+          <c:when test="-P cvstag.ver">
+            <c:inline-properties>
+              project.version = ${cvstag.ver}
+            </c:inline-properties>
+          </c:when>
+          <c:when test="-P project.cvstag">
+            <c:inline-properties>
+              project.version = ${project.cvstag}
+            </c:inline-properties>
+          </c:when>
+          <c:otherwise>
+            <c:inline-properties>
+              project.version = SNAPSHOT
+            </c:inline-properties>
+          </c:otherwise>
+        </c:choose>
+      </c:ifndef>
+
+      <!-- If a milestone is available, append the milestone to the version. -->
+      <!-- Example: v-3_20_rc_5_0  => version = 3.20rc5_0 -->
+      <c:ifdef property="cvstag.mst">
+        <c:switch value="${cvstag.mst}" stem="__z">
+          <case match="/^([^_]*?)_(.*)$/">
+            <c:set> 
+              project.version := ${project.version}${__z.g1}${__z.g2}
+            </c:set>
+          </case>
+          <case match="/^([^_]*?)$/">
+            <c:set>
+              project.version := ${project.version}${__z.g1}0
+            </c:set>
+          </case>
+        </c:switch>
+      </c:ifdef>
+
+      <!-- normalize project version (might be in tag format here) -->
+      <c:set>
+        project.version := ${subst v-,,${subst _,.,${project.version}}}
+      </c:set>
+
+
+      <c:ifdef property="cvstag.env">
+        <c:set>
+          project.name := ${project.name}-${cvstag.env}
+        </c:set>
+      </c:ifdef>
+
+
+      <!-- if there's no cvs tag use HEAD instead -->
+      <!--  TODO: -->
+      
+      <c:ifndef property="project.cvsdir">
+        <c:property name="project.cvsdir" value=""/>
+      </c:ifndef>
+      
+
+      <!-- derive cvs alias name from cvsdir                         -->
+      <c:ifndef property="project.cvsalias">
+        <c:ifdef property="project.cvsdir">
+          <c:property name="project.cvsalias" value="${subst /,_,${project.cvsdir}}"/>
+        </c:ifdef>
+      </c:ifndef>
+
+
+      <!-- java sources ? -->
+      <c:ifndef property="src.dir">
+        <c:set-if-have-file var="src.dir" in="
+                                              src
+                                              src/java
+                                              src/main/java
+                                              " >
+          <filter>
+            <include name="**/*.java" />
+          </filter>
+        </c:set-if-have-file>
+      </c:ifndef>
+      
+      <c:property name="test.pat"  value="**/*Test"/>
+      <!-- test src directory ? -->
+      <c:ifndef property="test.src.dir">
+        <c:set-if-have-file var="test.src.dir" in="
+                                                   test
+                                                   test/src
+                                                   test/java
+                                                   test/src/java
+                                                   testsuite
+                                                   testsuite/src
+                                                   testsuite/src/java
+                                                   src/test/java
+                                                   ">
+          <info>
+            <echo>checking @{dir} for unit tests [${test.pat}.java]: ${@{counter}}</echo>
+          </info>
+          <filter>
+            <include name="${test.pat}.java"/>
+          </filter>
+        </c:set-if-have-file>
+        <echo>test.src.dir = ${test.src.dir}</echo>
+      </c:ifndef>
+      
+      <!-- application/library resources -->
+      <c:ifndef property="res.dir">
+        <c:if-dir-exists-set property="res.dir" dir="${src.dir}"/>
+        <c:if-dir-exists-set property="res.dir" dir="resources"/>
+        <c:if-dir-exists-set property="res.dir" dir="resources/src"/>
+        <c:if-dir-exists-set property="res.dir" dir="resources/java"/>
+        <c:if-dir-exists-set property="res.dir" dir="resources/src/java"/>
+        <!-- maven -->
+        <c:if-dir-exists-set property="res.dir" dir="src/main/resources"/>
+      </c:ifndef>
+      
+      <!-- test application/library resources -->
+      <c:ifndef property="test.res.dir">
+        
+        <c:if-dir-exists-set property="test.res.dir" dir="${test.src.dir}"/>
+        <c:if-dir-exists-set property="test.res.dir" dir="test/resources"/>
+        <c:if-dir-exists-set property="test.res.dir" dir="test/resources/src"/>
+        <c:if-dir-exists-set property="test.res.dir" dir="test/resources/java"/>
+        <c:if-dir-exists-set property="test.res.dir" dir="test/resources/src/java"/>
+        <c:if-dir-exists-set property="test.res.dir" dir="test-resources"/>
+        <!-- maven -->
+        <c:if-dir-exists-set property="test.res.dir" dir="src/test/resources"/>
+      </c:ifndef>
+
+      
+      <!-- by default we're going to show evaluted properties. -->
+      <c:property name="apropos.fmt" value="eval"/>
+      
+      <c:property name="depot.10.url" value="${env.DEPOT}"/>
+      <c:property name="depot.11.url" value="http://haefelingerit.net/depot"/>
+
+      <c:property name="depxml.0.url" value="${ant.file}"/>
+      <c:property name="depxml.1.url" value="dependencies.xml"/>
+      <c:property name="depxml.2.url" value="project.xml"/>
+      <c:property name="depxml.3.url" value="pom.xml"/>
+      
+      
+      <!-- standard properties -->
+      <c:property name="project.vendor" value="Unknown Vendor (set project.vendor pls)"/>
+      <c:ifndef property="src.dir">
+        <echo>&HSEPNL;source directory not set, compilation disabled&NL;&HSEP;</echo>
+      </c:ifndef>
+      
+      <c:property name="build.dir" value="build"/>
+      <c:property name="dist.dir" value="${build.dir}/dist"/>
+      <c:property name="lib.dir" value="${build.dir}/lib"/>
+      <c:property name="javadoc.dir" value="${build.dir}/javadoc"/>
+      <c:property name="obj.dir" value="${build.dir}/obj"/>
+      <c:property name="tmp.dir" value="${build.dir}/tmp"/>
+      <c:property name="var.dir" value="${build.dir}/var"/>
+
+      <!--  TODO: -->
+      <c:property name="baseline"          value="DEVL"/>
+      <c:property name="baseline.via"      value="HTTP" />
+      <c:property name="baseline.dir"      value="${build.dir}/baseline"/>
+      <c:property name="baseline.rev"      value="HEAD"/>
+      <c:property name="baseline.cvsdir"   value="var/baselines"/>
+      <c:property name="baseline.cvsroot"  value="${project.cvsroot}"/>
+      <c:property name="baseline.httproot" value="http://haefelingerit.net/baseline" />
+
+      <c:property name="test.src.dir"     value="test"/>
+      <c:property name="test.obj.dir"     value="${build.dir}/test/obj"/>
+      <c:property name="test.xml.dir"     value="${build.dir}/test/xml"/>
+
+      <c:inline-properties>
+        testclient.src.dir = src/testclient/java
+        testclient.res.dir = src/testclient/resources
+        testclient.obj.dir = ${build.dir}/testclient/obj
+        testclient.xml.dir = ${build.dir}/testclient/xml
+        testclient.pat     = **/*Test
+      </c:inline-properties>
+      
+      <c:property name="package.name" value=""/>
+      <c:property name="package.location" value="${subst \.,/, ${package.name}}"/>
+      <c:property name="version.jar" value="${project.version}.jar"/>
+      <c:property name="project.title" value="${project.name}"/>
+      <c:property name="jar.name" value="${project.name}-${version.jar}"/>
+      <c:property name="war.name" value="${project.name}-${project.version}.war"/>
+      <c:property name="ear.name" value="${project.name}-${project.version}.ear"/>
+      <c:property name="classpath.file" value=".classpath"/>
+      <c:property name="depot.regex"  value="depot\.\d+\.url"/>
+      <c:property name="depxml.regex" value="depxml\.\d+\.url"/>
+      
+      <c:inline-properties>
+        uploadtask.endpoint = http://haefelingerit.net/upload
+        uploadtask.debug    = false
+        uploadtask.category = component
+        uploadtask.rcfile   = ${user.home}/.flaka.d/upload.conf
+        uploadtask.folder   = ${dist.dir}
+        uploadtask.pattern  = *.jar
+      </c:inline-properties>
+
+      <c:property-by-regex sep="," property="depot.csv" regex="${depot.regex}"/>
+      <c:property-by-regex sep="," property="depxml.csv" regex="${depxml.regex}"/>
+
+      <!--fail if not all relevant properties are defined  -->
+      <c:validate-core-properties/>
+      
+      <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+      <!--:: Make sure that required properties are set                    ::-->
+      <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+      
+      <c:switch value="${project.type}">
+        <case match="war-package">
+          <echo>testing property web.dir = `${web.dir}'</echo>
+          <c:unless test="-P web.dir -a -d ${web.dir}">
+            <echo>&NL;&HSEP;</echo>
+            <echo>Property "web.dir" not defined or not a directory but required</echo>
+            <echo>in order to build a war-package.</echo>
+            <echo>web.dir = `${web.dir}'</echo>
+            <echo>&HSEP;&NL;</echo>
+            <fail message="invalid property web.dir = `${web.dir}'" /> 
+          </c:unless>
+        </case>
+      </c:switch>
+
+      <!--=========================================================-->
+      <!--                    INIT BASIC TASKS                     -->
+      <!--=========================================================-->
+
+      <!-- compile java source files -->
+      <c:switch value="${build.type}">
+        <c:case match="user-defined">
+          <!-- do not init -->
+        </c:case>
+        <c:case match="debug">
+          <presetdef name="javac">
+            <javac 
+                destdir      = "${obj.dir}" 
+                classpathref = "${javac.classpath}" 
+                debug="on" 
+                deprecation="off" 
+                optimize="off" 
+                listfiles="off" 
+                encoding="ASCII" 
+                includeAntRuntime="no" 
+                includeJavaRuntime="no" 
+                fork="yes"
+                />
+          </presetdef>
+        </c:case>
+        <c:default>
+          <presetdef name="javac">
+            <javac 
+                destdir       = "${obj.dir}" 
+                classpathref  = "${javac.classpath}" 
+                debug="off" 
+                deprecation="on" 
+                optimize="on" 
+                listfiles="off" 
+                encoding="ASCII" 
+                includeAntRuntime="no" 
+                includeJavaRuntime="no" 
+                fork="yes"
+                />
+          </presetdef>
+        </c:default>
+      </c:switch>
+      
+      
+      <!-- rmic class files -->
+      <c:switch value="${build.type}">
+        <c:case match="debug">
+          <presetdef name="rmic">
+            <rmic base="${obj.dir}" stubversion="1.2" classpathref="javac.classpath" sourcebase="${src.dir}"/>
+          </presetdef>
+        </c:case>
+        <c:default>
+          <presetdef name="rmic">
+            <rmic base="${obj.dir}" stubversion="1.2" classpathref="javac.classpath" sourcebase="${src.dir}"/>
+          </presetdef>
+        </c:default>
+      </c:switch>
+      
+      <!-- junit -->
+      <presetdef name="junit">
+        <junit 
+            haltonfailure="no" 
+            printsummary="yes" 
+            showoutput="yes" 
+            errorProperty="test.failed" 
+            failureProperty="test.failed" 
+            fork="yes"
+            />
+      </presetdef>
+      
+      <!--=========================================================-->
+      <!--                    F I L E S E T S                      --> 
+      <!--=========================================================-->
+
+      
+      <!-- This fileset selects the junit tests to be executed by Junit-->
+      <fileset id="junit.fileset" dir="${test.obj.dir}">
+        <include name="${test.pat}.class"/>
+      </fileset>
+
+      <!-- This fileset selects the junit tests to be executed by Junit-->
+      <fileset id="test.fileset" refid="junit.fileset" />
+
+      <!-- This fileset selects the junit tests to be executed by Junit-->
+      <fileset id="testclient.fileset" dir="${testclient.obj.dir}">
+        <include name="**/*Test.class"/>
+      </fileset>
+
+      <!--=========================================================-->
+      <!--                 P A T T E R N  S E T S                  -->
+      <!--=========================================================-->
+      
+      <!-- standard patternset for creating a regular package -->
+      <patternset id="jar-package.patternset">
+        <include name="**"/>
+      </patternset>
+
+
+      <!--=========================================================-->
+      <!-- INIT DIRETORIES                                         -->
+      <!--=========================================================-->
+
+      <c:init-directories/>
+      
+      <!--=========================================================-->
+      <!-- LOAD DEPENDENCIES                                       -->
+      <!--=========================================================-->
+
+      <c:dependencies-load/>
+      
+      <!--=========================================================-->
+      <!-- CLASSPATHS                                              -->
+      <!--=========================================================-->
+
+      <!-- define standard javac classpath -->
+      <path id="javac.classpath">
+        <pathelement location="${obj.dir}"/>
+        <fileset dir="${lib.dir}">
+          <c:dependency-selector scope="/compile|provided/" />
+        </fileset>
+      </path>
+      
+      <c:when test="-d '${res.dir}'">
+        <c:path-prepend refid="javac.classpath">
+          <pathelement location="${res.dir}"/>
+        </c:path-prepend>
+      </c:when>
+
+      <!-- define standard junit classpath - this path is used for -->
+      <!-- compiling classes as well as for running junit tests.   -->
+      <path id="junit.classpath">
+        <pathelement location="${test.obj.dir}"/>
+        <path refid="javac.classpath"/>
+        <fileset dir="${lib.dir}">
+          <c:dependency-selector scope="test" />
+        </fileset>
+      </path>
+      
+      <!--
+          <c:when test="-d '${test.res.dir}'">
+          <c:path-prepend refid="junit.classpath">
+          <pathelement location="${test.res.dir}"/>
+          </c:path-prepend>
+          </c:when>
+      -->
+
+      <!-- define a classpath consisting of all dependencies       -->
+      <!-- regardless their scope.                                 -->
+      <path id="deps.classpath">
+        <fileset dir="${lib.dir}">
+          <c:dependency-selector/>
+        </fileset>
+      </path>
+      
+      <!-- junit.classpath is deprecated -->
+      <path id="test.classpath" refid="junit.classpath"/>
+
+      <!-- setup testclient classpath -->
+      <path id="testclient.classpath">
+        <pathelement location="${testclient.obj.dir}"/>
+        <fileset dir="${lib.dir}">
+          <c:dependency-selector scope="testclient" />
+        </fileset>
+      </path>
+
+    </sequential>
+  </macrodef>
+  
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--  CREATE AND INIT PROJECTS                                   -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+  <macrodef name="create-project" backtrace="true">
+    <attribute name="type"    default="jar-package" />
+    <attribute name="subtype" default="" />
+    <attribute name="style"   default="maven" />
+    <sequential>
+      <c:choose>
+        
+        <!-- 
+             :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+             Run this macro to create a J2EE default directory structure
+             :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        -->
+        <c:when test="@{type} = 'war-package'">
+          <echo>creating war directory structure ..</echo>
+          <c:inline-properties>
+            webapp.dir      = ${basedir}/src/main/webapp
+            webinf.dir      = ${webapp.dir}/WEB-INF
+            site.dir        = ${basedir}/src/main/site
+          </c:inline-properties>
+          <!-- MAVEN SITE DIR -->
+          <mkdir dir="${site.dir}" /> 
+          
+          <!-- WEN IMAGES -->
+          <mkdir dir="${webapp.dir}/images" /> 
+          
+          <!-- WEB-INF DIRECTORY -->
+          <mkdir dir="${webinf.dir}" /> 
+          <mkdir dir="${webinf.dir}/jsp" /> 
+          <mkdir dir="${webinf.dir}/tld" /> 
+          <mkdir dir="${webinf.dir}/lib" /> 
+          <mkdir dir="${webinf.dir}/classes" /> 
+          <mkdir dir="${webinf.dir}/tags" />    <!-- JSP 2.0 tags -->
+          
+          <!-- Java Stuff -->
+          <mkdir dir="${basedir}/src/main/java" />
+          <mkdir dir="${basedir}/src/main/resources" />
+          
+          <!-- UNIT TESTS -->
+          <mkdir dir="${basedir}/src/test/java" />
+          <mkdir dir="${basedir}/src/test/resources" />
+          
+          <!-- HTTP UNIT TESTS -->
+          <mkdir dir="${basedir}/src/testclient/java" />
+          <mkdir dir="${basedir}/src/testclient/resources" />
+          
+          <!-- create .cvsignore -->
+          <c:init-cvsignore />
+        </c:when>
+        
+        <c:otherwise>          
+          <echo>creating jar directory structure ..</echo>
+          <!-- Java Stuff -->
+          <mkdir dir="${basedir}/src/main/java" />
+          <mkdir dir="${basedir}/src/main/resources" />
+          
+          <!-- UNIT TESTS -->
+          <mkdir dir="${basedir}/src/test/java" />
+          <mkdir dir="${basedir}/src/test/resources" />
+          
+          <!-- Site -->
+          <mkdir dir="${basedir}/src/main/site" />
+        </c:otherwise>
+
+      </c:choose>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="init-cvsignore" backtrace="true">
+    <sequential>
+      <echo file="${basedir}/.cvsignore" append="true" level="info">
+        # Hello CVS, please ignore this directories.
+        target
+        .settings
+        .springBeans
+        repository.xml
+        build
+        bin
+      </echo>
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="exec-target" backtrace="true">
+    <attribute name="name"/>
+    <sequential>
+      <c:run-in-subdirs args="@{name}" />
+      <c:run-target name="local-@{name}" />
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="manifest-update" backtrace="true">
+    <attribute name="src"    default="${dist.dir}/${jar.name}" />
+    <attribute name="tmpdir" default="${build.dir}/tmp" />
+    <attribute name="mode" default="update" />
+    <element name="manifest-element" implicit="true"/>
+    <sequential>
+      <mkdir dir="@{tmpdir}"/>
+      <tempfile property="temp.manifest.dir" destdir="@{tmpdir}" />
+      <c:make-empty-folder dir="${temp.manifest.dir}" />
+      <unzip src="@{src}" dest="${temp.manifest.dir}">
+        <patternset>
+          <include name="META-INF/MANIFEST.MF" />
+        </patternset>
+      </unzip>
+      <manifest file="${temp.manifest.dir}/META-INF/MANIFEST.MF" mode="@{mode}">
+        <manifest-element />
+      </manifest>
+      <tempfile property="temp.zipfile" destdir="@{tmpdir}" />
+      <zip destfile="${temp.zipfile}">
+        <fileset dir="${temp.manifest.dir}">
+          <include name="META-INF/MANIFEST.MF" />
+        </fileset>
+        <zipfileset src="@{src}" excludes="META-INF/MANIFEST.MF" />
+      </zip>
+      <move file="${temp.zipfile}" tofile="@{src}" overwrite="true"/>
+      <delete file="${temp.zipfile}" />
+      <delete dir="${temp.manifest.dir}" />
+    </sequential>
+  </macrodef>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--:: small helper macro to ensure that folder exists and is empty      ::-->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="make-empty-folder"  backtrace="true">
+    <attribute name="dir" />
+    <sequential>
+      <delete dir="@{dir}" />
+      <mkdir  dir="@{dir}" />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="set-if-have-file">
+    <attribute name="var" />
+    <attribute name="in" />
+    <element name="filter" optional="true"/>
+    <sequential>
+      <c:rescue>
+        <vars>
+          __dir__
+          __x__
+        </vars>
+        <properties>
+          x
+          u
+        </properties>
+        <sequential>
+          <c:set>
+            ;; make sure that var is gone 
+            @{var} = null
+          </c:set>
+          <c:for var=" __dir__ " in="@{in}">
+            <c:when test="not __dir__.tofile.isdir" >
+              <c:continue />
+            </c:when>
+            <c:find dir=" __dir__ " var="__x__">
+              <filter />
+            </c:find>
+            <c:when test="not empty __x__">
+              <c:set>
+                @{var} = list(__dir__,append(__x__))
+              </c:set>
+              <c:break />
+            </c:when>
+          </c:for>
+        </sequential>
+      </c:rescue>
+    </sequential>
+  </macrodef>
+
+
+</antlib>

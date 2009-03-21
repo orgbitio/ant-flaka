@@ -1,0 +1,16 @@
+<dependencies>
+<dependency>
+<groupId>log4j</groupId>
+<artifactId>log4j</artifactId>
+<version>1.2.8</version>
+<type>jar</type>
+<scope>compile</scope>
+</dependency>
+<dependency alias="LOG4J.jar">
+<groupId>log4j</groupId>
+<artifactId>log4j</artifactId>
+<version>1.2.13</version>
+<type>jar</type>
+<scope>compile</scope>
+</dependency>
+</dependencies>

@@ -1,0 +1,41 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <macrodef name="dependency">
+    <attribute name="alias" default=""/>
+    <element name="groupId" />
+    <element name="artifactId" />
+    <element name="version" />
+    <sequential />
+  </macrodef>
+
+  <c:dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.8</version>
+  </c:dependency>
+
+  <dependency alias="log4j"/>
+  
+  <c:inline-properties>
+    depot.csv = file://localhost/${basedir}/lib
+  </c:inline-properties>
+
+  
+  <mkdir dir="tmp" />
+  <!-- TODO: what is the name of my file?? -->
+  <!-- read dependencies and append them to project.dependencies .. -->
+  <c:scndeps var="dependencies" debug="true">
+	<include name="test-scndeps.xml" />
+  </c:scndeps>
+	
+  <:set var="project.dependencies" value=" #{list(project.dependencies,dependencies)} " />	
+	
+  <echo>DEPENDENCY</echo>
+  <c:writedeps fmt="maven"  />
+  <echo>M1</echo>
+  <c:writedeps fmt="m1path"  />
+  <echo>M2</echo>
+  <c:writedeps fmt="m2path"  />
+  <echo>= ALIAS =</echo>
+  <c:writedeps fmt="alias" ifs="," out="alias.txt"/>
+  
+</project>

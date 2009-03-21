@@ -1,0 +1,41 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+	<macrodef name="hasalias">
+		<attribute name="src" />
+		<sequential>
+			<c:unset>
+      			notempty
+      			alias
+      		</c:unset>
+			<loadfile srcfile="@{src}" property="alias" />
+			<echo>${alias}</echo>
+			<condition property="notempty">
+				<matches pattern="^\s*([^#\s])" string="${alias}" multiline="true" />
+			</condition>
+			<c:when test=" has.property.notempty ">
+				<echo>THERE IS AT LEAST ONE ALIAS USED ..</echo>
+			</c:when>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="hasalias2">
+		<attribute name="src" />
+		<sequential>
+			<c:unset>
+      			notempty
+      			alias
+      		</c:unset>
+			<loadfile srcfile="@{src}" property="alias" />
+			<c:switch value="${alias}" debug="true">
+				<case match="/^\s*[^#\s]/" find="true" multiline="true">
+					<echo>FOUND</echo>
+				</case>
+			</c:switch>
+		</sequential>
+	</macrodef>
+
+	<echo file="alias.txt">
+    #
+  </echo>
+	<hasalias2 src="alias.txt" />
+</project>

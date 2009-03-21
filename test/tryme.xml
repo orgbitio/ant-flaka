@@ -1,0 +1,12 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+ <c:echo shift=" 3 " >
+  ; ignore \
+  me (still a comment here) 
+  Hello\
+      >,
+>>World.
+</c:echo>
+<c:echo shift="3*%">
+        >
+</c:echo>
+</project>

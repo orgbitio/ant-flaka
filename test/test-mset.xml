@@ -1,0 +1,58 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:set>
+    s := '3 * 5'
+    ;; defines r as 15
+    r = #{ ${s} }
+  </c:set>
+
+  <c:echo>
+    f = #{f}
+  </c:echo>
+  <c:when test="not (r == 15)">
+    <c:fail>
+      message="r has unexpected value: #{r}"
+  </c:fail>
+  </c:when>
+  <c:set>
+    p = null
+    p := null
+  </c:set>
+  <c:when test="has.var.p">
+    <fail message="variable p *does not* exist here!!" />
+  </c:when>
+  <fail message="property 'p' *does not* exist" if="p" />
+  
+  <c:when test=" property.p == '' ">
+    <fail message="property 'p' can't be empty string here" />
+  </c:when>
+  <c:set>
+    v = 'i'
+    #{v} = 0
+    it = 'f'
+
+    p := 'hello'
+    ;; override
+    p ::= 'HELLO'
+    ;;
+    try again
+    p := 'ignored'
+  </c:set>
+  <fail message="property 'p' does not exist" unless="p" />
+  <c:when test="not (property.p == 'HELLO')">
+    <fail message="property 'p' exists but not overridden as expected" />
+  </c:when>
+  <c:for var=" #{it} " in=" ''.tofile ">
+    <c:set>
+      #{v} = #{v} + 1
+      ;; last modified (as date)
+      d = f.mtime
+    </c:set>
+    <c:echo>
+      \#{it} = #{it}
+      \#{v} = #{v}
+      #{i} : `#{f}', last modified at
+      #{d}
+    </c:echo>
+  </c:for>
+
+</project>

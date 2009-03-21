@@ -1,0 +1,31 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:properties>
+    ;; comment \
+    cont \\
+    p0x1 = p0x1
+  </c:properties>
+  <property name="p0x2" value="p0x2" />
+  <c:set>
+    p0x3 := 'p0x3'
+    p0x4 ::= #{'p0x4'}
+   </c:set>
+  <fail unless="p0x1" />
+  <fail unless="p0x2" />
+  <fail unless="p0x3" />
+  <fail if="p0x4" />
+  <c:unset>
+    ;; comment
+    #{'p0x1'}
+    p0x2
+    ;; comment \
+    continued
+    p0x3
+    ;; not \
+    continued \\
+    p0x4
+  </c:unset>
+  <fail if="p0x1" />
+  <fail if="p0x2" />
+  <fail if="p0x3" />
+  <fail if="p0x4" />
+</project>

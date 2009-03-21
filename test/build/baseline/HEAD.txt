@@ -1,0 +1,1314 @@
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#                         THIS IS BASELINE  
+#
+#                               HEAD
+#
+# This file is maintained by a BuildServer and should only be touched by 
+# humans in  exceptional cases. Therefore please do not modify this file 
+# until you are absolutely sure about what you are doing. 
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+# Regarding the format of this file:
+#
+# A  Baseline  consists  of an optional header followed by (java style) 
+# properties. The header  (you are reading right now)  is a consecutive
+# number of comment lines, optionally preceded by an arbitrary number of
+# blank lines. 
+# 
+#                                 * * *
+#
+# A blank line is a line containing only so called whitespace characters
+# (like space, tab et cetera).
+#
+# A comment  line  (or comment) is  a line where the first non-whitespace
+# character is '#' and the second character is not '@'. Comment lines are 
+# ignored.
+#
+# Although comment lines can appear anywhere in a Baseline file, comments
+# appearing after the header are not preserved.
+# 
+# A property line is similar in format of a Java property except that line
+# continuation is not supported. This means that a Java property like
+# 
+#   fruits : banana \
+#            orange
+#
+# is illegal. Furthermore, whitespace  characters  before line ending are 
+# not taken into account (which Java does and more than often is a source
+# of confusion).
+#
+#                                 * * *
+#
+# A property is a key and value pair. They  are  usually  separated using
+# character '=' while character ':' is also perfectly legal.
+#
+# A key contains an arbitrary number of characters except whitespace, ':'
+# or "=". A value may contain any character, also  whitespace character.
+# Note again that all whitespace characters before line ending are removed.
+#
+# A key has the format <base> "." <tag> where <tag> contains any character
+# allowed in a <key> except character ".".
+#
+# Well known <tag>s are:
+#  "path", "name", "vers", "jar",  "extn", "vtag", "uses"
+#
+#
+#                                 * * *
+# 
+# Properties are falling into three main categories:
+# a. <dependency> properties, i.e. properties where the tag is either "path",
+#    "name", "vers", "jar", or "extn"
+# b. <project:dependency> properties, i.e. properties with tag "uses"
+# c. <project:cvstag>     properties, i.e. properites with tag "vtag"
+#
+# Although properties can appear in any order, it is recommended to group
+# properties  according to their main categories and to avoid mixing them.
+#
+#
+#                                 * * *
+#
+# A <dependency> specifies a resource relative to a URL and is typically
+# used to down-load a jar file.
+# 
+# A <dependency> property has the following format:
+# 
+#  <dependency> ::= 
+#   <alias>".path" '=' <value> |
+#   <alias>".name" '=' <value  |
+#   <alias>".vers" '=' <value> |
+#   <alias>".jar"  '=' <value> |
+#   <alias>".extn" '=' <value> 
+# 
+# An <alias> has the format:
+#
+#  <alias> ::=  <alias-name> "." <type>
+#
+# <alias-name> shall consist of upper-case letters, digits or character
+# underscore "_". <type> may contain any non-whitespace character.
+#
+# The overall assumption is that a resource on a depot can be located by
+#
+#  <path> "/" <type> "s/" <name> "-" <vers> "." <extn>
+# 
+# where <path> is the <value> in property `<alias>".path" = <value>' and
+# so on and <type> is the <type> within the <alias>.
+#
+# The <alias> uniquely identifies a dependency.
+#
+#                                 * * *
+#
+# EXAMPLE:
+# Resource "external/log4j/jars/log4j-1.2.8.jar" is described by this set
+# of properties:
+#
+#  LOG4J.jar.path = log4j
+#  LOG4J.jar.name = log4j
+#  LOG4J.jar.vers = 1.2.8
+#
+#
+# Note that <extn> property is missing. If not present, then <extn> will
+# be equal to <type>.
+#
+# The canonical name of this dependency is "LOG4J.jar".
+#
+# Some resources do not follow the <name> "-" <vers> "." <extn>
+# convention. If that is the case for a resource, the property <jar>
+# shall be  used in which case properties <name>,<version> and <extn>
+# are ignored. An alternative way of specifying log4j as above would be
+# 
+#  LOG4J.jar.path = log4j
+#  LOG4J.jar.jar  = log4j-1.2.8.jar
+#
+# Although shorter, this format shall not be used until required. It's
+# disadvantage is the loss of information about version and extension.
+#
+#
+#                                 * * * 
+# 
+# A Baseline may contain  additional information (typically information
+# used for maintenance).
+#
+#                                 * * *
+# 
+# A <project:dependency> property specified a relation between a 
+# project and dependencies used by this project:
+#
+# <project:dependency> ::= <project>".uses" "=" <alias>*
+# 
+# EXAMPLE:
+#  net.haefelingerit.tagmod.uses = LOG4J.jar JDOM.jar 
+#
+#                                 * * *
+#
+# Property  <project:cvstag> specifies a relation between a project and
+# it's (CVS) tag. It's format is:
+#
+#  <project>".vtag" = <value>
+#
+# EXAMLE:
+#  net.haefelingerit.tagmod.vtag = v-1_00
+# 
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+#@ ACTIVATION.jar
+   ACTIVATION.jar.path = javax/activation
+   ACTIVATION.jar.name = activation
+   ACTIVATION.jar.vers = 1.1
+
+
+
+#@ ANT.jar
+   ANT.jar.path = org.apache.ant
+   ANT.jar.name = ant
+   ANT.jar.vers = 1.7.0
+
+
+#@ ANTLR.jar
+   ANTLR.jar.path = antlr
+   ANTLR.jar.name = antlr
+   ANTLR.jar.vers = 2.7.6rc1
+
+
+#@ AOPALLIANCE.jar
+   AOPALLIANCE.jar.path = aopalliance
+   AOPALLIANCE.jar.name = aopalliance
+   AOPALLIANCE.jar.vers = 1.0
+
+
+#@ AXIS.jar
+   AXIS.jar.path = axis
+   AXIS.jar.name = axis
+   AXIS.jar.vers = 1.2
+
+
+#@ AXIS_ANT.jar
+   AXIS_ANT.jar.path = axis
+   AXIS_ANT.jar.name = axis-ant
+   AXIS_ANT.jar.vers = 1.2
+
+
+#@ AXIS_JAXRPC.jar
+   AXIS_JAXRPC.jar.path = axis
+   AXIS_JAXRPC.jar.name = axis-jaxrpc
+   AXIS_JAXRPC.jar.vers = 1.2
+
+
+#@ AXIS_SAAJ.jar
+   AXIS_SAAJ.jar.path = axis
+   AXIS_SAAJ.jar.name = axis-saaj
+   AXIS_SAAJ.jar.vers = 1.2
+
+
+#@ BSF.jar
+   BSF.jar.path = bsf
+   BSF.jar.name = bsf
+   BSF.jar.vers = 2.4.0
+
+
+#@ CASTOR.jar
+   CASTOR.jar.path = castor
+   CASTOR.jar.name = castor
+   CASTOR.jar.vers = 0.9.6
+
+
+#@ CATALINA.jar
+   CATALINA.jar.path = tomcat
+   CATALINA.jar.name = catalina
+   CATALINA.jar.vers = 5.5.9
+
+
+#@ CATALINA_OPTIONAL.jar
+   CATALINA_OPTIONAL.jar.path = tomcat
+   CATALINA_OPTIONAL.jar.name = catalina-optional
+   CATALINA_OPTIONAL.jar.vers = 5.5.9
+
+
+#@ CGLIB.jar
+   CGLIB.jar.path = cglib
+   CGLIB.jar.name = cglib
+   CGLIB.jar.vers = 2.1_3
+
+
+#@ CGLIB_FULL.jar
+   CGLIB_FULL.jar.path = cglib
+   CGLIB_FULL.jar.name = cglib-full
+   CGLIB_FULL.jar.vers = 2.0.2
+
+
+
+#@ COMMONS_BEANUTILS_CORE.jar
+   COMMONS_BEANUTILS_CORE.jar.path = commons-beanutils
+   COMMONS_BEANUTILS_CORE.jar.name = commons-beanutils-core
+   COMMONS_BEANUTILS_CORE.jar.vers = 1.7.0
+
+
+#@ COMMONS_CLI.jar
+   COMMONS_CLI.jar.path = commons-cli
+   COMMONS_CLI.jar.name = commons-cli
+   COMMONS_CLI.jar.vers = 1.0
+
+
+#@ COMMONS_CODEC.jar
+   COMMONS_CODEC.jar.path = commons-codec
+   COMMONS_CODEC.jar.name = commons-codec
+   COMMONS_CODEC.jar.vers = 1.3
+
+
+#@ COMMONS_COLLECTIONS.jar
+   COMMONS_COLLECTIONS.jar.path = commons-collections
+   COMMONS_COLLECTIONS.jar.name = commons-collections
+   COMMONS_COLLECTIONS.jar.vers = 3.1
+
+
+#@ COMMONS_CONFIGURATION.jar
+   COMMONS_CONFIGURATION.jar.path = commons-configuration
+   COMMONS_CONFIGURATION.jar.name = commons-configuration
+   COMMONS_CONFIGURATION.jar.vers = 1.3
+
+
+#@ COMMONS_DIGESTER.jar
+   COMMONS_DIGESTER.jar.path = commons-digester
+   COMMONS_DIGESTER.jar.name = commons-digester
+   COMMONS_DIGESTER.jar.vers = 1.6
+
+
+#@ COMMONS_DISCOVERY.jar
+   COMMONS_DISCOVERY.jar.path = commons-discovery
+   COMMONS_DISCOVERY.jar.name = commons-discovery
+   COMMONS_DISCOVERY.jar.vers = 0.2
+
+
+#@ COMMONS_HTTPCLIENT.jar
+   COMMONS_HTTPCLIENT.jar.path = commons-httpclient
+   COMMONS_HTTPCLIENT.jar.name = commons-httpclient
+   COMMONS_HTTPCLIENT.jar.vers = 3.1
+
+
+#@ COMMONS_IO.jar
+   COMMONS_IO.jar.path = commons-io
+   COMMONS_IO.jar.name = commons-io
+   COMMONS_IO.jar.vers = 1.0
+
+
+#@ COMMONS_JEXL.jar
+   COMMONS_JEXL.jar.path = commons-jexl
+   COMMONS_JEXL.jar.name = commons-jexl
+   COMMONS_JEXL.jar.vers = 1.1
+
+
+#@ COMMONS_JXPATH.jar
+   COMMONS_JXPATH.jar.path = commons-jxpath
+   COMMONS_JXPATH.jar.name = commons-jxpath
+   COMMONS_JXPATH.jar.vers = 1.2
+
+
+#@ COMMONS_LANG.jar
+   COMMONS_LANG.jar.path = commons-lang
+   COMMONS_LANG.jar.name = commons-lang
+   COMMONS_LANG.jar.vers = 2.3
+
+
+#@ COMMONS_LOGGING.jar
+   COMMONS_LOGGING.jar.path = commons-logging
+   COMMONS_LOGGING.jar.name = commons-logging
+   COMMONS_LOGGING.jar.vers = 1.0.4
+
+
+#@ COMMONS_LOGGING_API.jar
+   COMMONS_LOGGING_API.jar.path = commons-logging
+   COMMONS_LOGGING_API.jar.name = commons-logging-api
+   COMMONS_LOGGING_API.jar.vers = 1.0.4
+
+
+#@ COMMONS_NET.jar
+   COMMONS_NET.jar.path = commons-net
+   COMMONS_NET.jar.name = commons-net
+   COMMONS_NET.jar.vers = 1.4.0
+
+
+#@ COMMONS_POOL.jar
+   COMMONS_POOL.jar.path = commons-pool
+   COMMONS_POOL.jar.name = commons-pool
+   COMMONS_POOL.jar.vers = 1.2
+
+
+#@ CONCURRENT.jar
+   CONCURRENT.jar.path = concurrent
+   CONCURRENT.jar.name = concurrent
+   CONCURRENT.jar.vers = 1.3.4
+
+
+#@ CONNECTOR.jar
+   CONNECTOR.jar.path = ibmwebspheremq
+   CONNECTOR.jar.name = connector
+   CONNECTOR.jar.vers = 5.3
+
+
+#@ COS.jar
+   COS.jar.path = servlets.com
+   COS.jar.name = cos
+   COS.jar.vers = 05Nov2002
+
+
+#@ CRISPY.jar
+   CRISPY.jar.path = net.sf.crispy
+   CRISPY.jar.name = crispy
+   CRISPY.jar.vers = 1.1.1
+
+
+#@ CRUISECONTROL.jar
+   CRUISECONTROL.jar.path = cruisecontrol
+   CRUISECONTROL.jar.name = cruisecontrol
+   CRUISECONTROL.jar.vers = 2.7.1
+
+
+#@ CRUISECONTROL_JSP.jar
+   CRUISECONTROL_JSP.jar.path = cruisecontrol
+   CRUISECONTROL_JSP.jar.name = cruisecontrol-jsp
+   CRUISECONTROL_JSP.jar.vers = 2.5.0
+
+
+#@ CTGCLIENT.jar
+   CTGCLIENT.jar.path = ctgclient
+   CTGCLIENT.jar.name = ctgclient
+   CTGCLIENT.jar.vers = 5.01
+
+
+#@ DB2JCC.jar
+   DB2JCC.jar.path = db2
+   DB2JCC.jar.name = db2jcc
+   DB2JCC.jar.vers = 8.2.11
+
+
+#@ DB2JCC_LICENSE_CU.jar
+   DB2JCC_LICENSE_CU.jar.path = db2
+   DB2JCC_LICENSE_CU.jar.name = db2jcc_license_cu
+   DB2JCC_LICENSE_CU.jar.vers = 8.2.11
+
+
+#@ DERBY.jar
+   DERBY.jar.path = derby
+   DERBY.jar.name = derby
+   DERBY.jar.vers = 10.1.3.1
+
+#@ DOCTYPECHANGER.jar
+   DOCTYPECHANGER.jar.path = socialchange
+   DOCTYPECHANGER.jar.name = DoctypeChanger
+   DOCTYPECHANGER.jar.vers = 1.0.0
+
+
+#@ DOM.jar
+   DOM.jar.path = jwsdp
+   DOM.jar.name = dom
+   DOM.jar.vers = 20041215
+
+
+#@ DOM4J.jar
+   DOM4J.jar.path = dom4j
+   DOM4J.jar.name = dom4j
+   DOM4J.jar.vers = 1.6.1
+
+
+#@ DTDPARSER.jar
+   DTDPARSER.jar.path = dtdparser
+   DTDPARSER.jar.name = dtdparser
+   DTDPARSER.jar.vers = 1.21
+
+
+#@ DYNACACHE.jar
+   DYNACACHE.jar.path = wps
+   DYNACACHE.jar.name = dynacache
+   DYNACACHE.jar.vers = 5.0.2
+
+
+#@ EASYMOCK.jar
+   EASYMOCK.jar.path = easymock
+   EASYMOCK.jar.name = easymock
+   EASYMOCK.jar.vers = 1.1
+
+
+#@ EASYMOCKCLASSEXTENSION.jar
+   EASYMOCKCLASSEXTENSION.jar.path = easymock
+   EASYMOCKCLASSEXTENSION.jar.name = easymockclassextension
+   EASYMOCKCLASSEXTENSION.jar.vers = 1.1
+
+
+#@ EHCACHE.jar
+   EHCACHE.jar.path = ehcache
+   EHCACHE.jar.name = ehcache
+   EHCACHE.jar.vers = 1.1
+
+
+#@ EMULATOR.jar
+   EMULATOR.jar.path = Emulator
+   EMULATOR.jar.jar = Emulator.jar
+
+
+
+#@ EXCALIBUR_COMPONENT.jar
+   EXCALIBUR_COMPONENT.jar.path = excalibur-component
+   EXCALIBUR_COMPONENT.jar.name = excalibur-component
+   EXCALIBUR_COMPONENT.jar.vers = 2.1
+
+
+#@ EXCALIBUR_DATASOURCE.jar
+   EXCALIBUR_DATASOURCE.jar.path = excalibur-datasource
+   EXCALIBUR_DATASOURCE.jar.name = excalibur-datasource
+   EXCALIBUR_DATASOURCE.jar.vers = 2.1
+
+
+#@ EXCALIBUR_I18N.jar
+   EXCALIBUR_I18N.jar.path = excalibur-i18n
+   EXCALIBUR_I18N.jar.name = excalibur-i18n
+   EXCALIBUR_I18N.jar.vers = 1.1
+
+
+#@ EXCALIBUR_INSTRUMENT_API.jar
+   EXCALIBUR_INSTRUMENT_API.jar.path = excalibur-instrument
+   EXCALIBUR_INSTRUMENT_API.jar.name = excalibur-instrument-api
+   EXCALIBUR_INSTRUMENT_API.jar.vers = 2.1
+
+
+#@ EXCALIBUR_INSTRUMENT_MGR_API.jar
+   EXCALIBUR_INSTRUMENT_MGR_API.jar.path = excalibur-instrument
+   EXCALIBUR_INSTRUMENT_MGR_API.jar.name = excalibur-instrument-mgr-api
+   EXCALIBUR_INSTRUMENT_MGR_API.jar.vers = 2.1
+
+
+#@ EXCALIBUR_INSTRUMENT_MGR_HTTP.jar
+   EXCALIBUR_INSTRUMENT_MGR_HTTP.jar.path = excalibur-instrument
+   EXCALIBUR_INSTRUMENT_MGR_HTTP.jar.name = excalibur-instrument-mgr-http
+   EXCALIBUR_INSTRUMENT_MGR_HTTP.jar.vers = 2.1
+
+
+#@ EXCALIBUR_INSTRUMENT_MGR_IMPL.jar
+   EXCALIBUR_INSTRUMENT_MGR_IMPL.jar.path = excalibur-instrument
+   EXCALIBUR_INSTRUMENT_MGR_IMPL.jar.name = excalibur-instrument-mgr-impl
+   EXCALIBUR_INSTRUMENT_MGR_IMPL.jar.vers = 2.1
+
+
+#@ EXCALIBUR_LOGGER.jar
+   EXCALIBUR_LOGGER.jar.path = excalibur-logger
+   EXCALIBUR_LOGGER.jar.name = excalibur-logger
+   EXCALIBUR_LOGGER.jar.vers = 2.1
+
+
+#@ EXCALIBUR_NAMING.jar
+   EXCALIBUR_NAMING.jar.path = excalibur-naming
+   EXCALIBUR_NAMING.jar.name = excalibur-naming
+   EXCALIBUR_NAMING.jar.vers = 1.0
+
+
+#@ EXCALIBUR_POOL_API.jar
+   EXCALIBUR_POOL_API.jar.path = excalibur-pool
+   EXCALIBUR_POOL_API.jar.name = excalibur-pool-api
+   EXCALIBUR_POOL_API.jar.vers = 2.1
+
+
+#@ EXCALIBUR_POOL_IMPL.jar
+   EXCALIBUR_POOL_IMPL.jar.path = excalibur-pool
+   EXCALIBUR_POOL_IMPL.jar.name = excalibur-pool-impl
+   EXCALIBUR_POOL_IMPL.jar.vers = 2.1
+
+
+#@ EXCALIBUR_POOL_INSTRUMENTED.jar
+   EXCALIBUR_POOL_INSTRUMENTED.jar.path = excalibur-pool
+   EXCALIBUR_POOL_INSTRUMENTED.jar.name = excalibur-pool-instrumented
+   EXCALIBUR_POOL_INSTRUMENTED.jar.vers = 2.1
+
+
+#@ EXCALIBUR_SOURCERESOLVE.jar
+   EXCALIBUR_SOURCERESOLVE.jar.path = excalibur-sourceresolve
+   EXCALIBUR_SOURCERESOLVE.jar.name = excalibur-sourceresolve
+   EXCALIBUR_SOURCERESOLVE.jar.vers = 2.1
+
+
+#@ EXCALIBUR_STORE.jar
+   EXCALIBUR_STORE.jar.path = excalibur-store
+   EXCALIBUR_STORE.jar.name = excalibur-store
+   EXCALIBUR_STORE.jar.vers = 2.1
+
+
+#@ EXCALIBUR_XMLUTIL.jar
+   EXCALIBUR_XMLUTIL.jar.path = excalibur-xmlutil
+   EXCALIBUR_XMLUTIL.jar.name = excalibur-xmlutil
+   EXCALIBUR_XMLUTIL.jar.vers = 2.1
+
+
+#@ FOP.jar
+   FOP.jar.path = fop
+   FOP.jar.name = fop
+   FOP.jar.vers = 0.20.5
+
+
+#@ FORMS.jar
+   FORMS.jar.path = jgoodies
+   FORMS.jar.name = forms
+   FORMS.jar.vers = 1.0.5
+
+
+#@ GERONIMO_SPEC_ACTIVATION.jar
+   GERONIMO_SPEC_ACTIVATION.jar.path = geronimo-spec
+   GERONIMO_SPEC_ACTIVATION.jar.name = geronimo-spec-activation
+   GERONIMO_SPEC_ACTIVATION.jar.vers = 1.0.2-rc4
+
+
+#@ GERONIMO_SPEC_JAVAMAIL.jar
+   GERONIMO_SPEC_JAVAMAIL.jar.path = geronimo-spec
+   GERONIMO_SPEC_JAVAMAIL.jar.name = geronimo-spec-javamail
+   GERONIMO_SPEC_JAVAMAIL.jar.vers = 1.3.1-rc5
+
+
+
+#@ HIBERNATE.jar
+   HIBERNATE.jar.path = hibernate
+   HIBERNATE.jar.name = hibernate
+   HIBERNATE.jar.vers = 3.1.1
+
+
+#@ HTTPUNIT.jar
+   HTTPUNIT.jar.path = httpunit
+   HTTPUNIT.jar.name = httpunit
+   HTTPUNIT.jar.vers = 1.6.1
+
+
+#@ IAIK_JCE_SIGNED.jar
+   IAIK_JCE_SIGNED.jar.path = iaik
+   IAIK_JCE_SIGNED.jar.name = iaik_jce-signed
+   IAIK_JCE_SIGNED.jar.vers = 3.03
+
+
+#@ ICU4J.jar
+   ICU4J.jar.path = com.ibm.icu
+   ICU4J.jar.name = icu4j
+   ICU4J.jar.vers = 3.4.4
+
+
+
+#@ INIEDITOR.jar
+   INIEDITOR.jar.path = ubique
+   INIEDITOR.jar.name = inieditor
+   INIEDITOR.jar.vers = r2
+
+
+
+#@ ISORELAX.jar
+   ISORELAX.jar.path = isorelax
+   ISORELAX.jar.name = isorelax
+   ISORELAX.jar.vers = 20030108
+
+
+#@ ITEXT.jar
+   ITEXT.jar.path = itext
+   ITEXT.jar.name = itext
+   ITEXT.jar.vers = 2.0.4
+
+
+#@ J2EE.jar
+   J2EE.jar.path = j2ee
+   J2EE.jar.name = j2ee
+   J2EE.jar.vers = 1.4.2
+
+
+#@ JAAS.jar
+   JAAS.jar.path = jaas
+   JAAS.jar.name = jaas
+   JAAS.jar.vers = 1.0.01
+
+
+#@ JACKRABBIT_CORE.jar
+   JACKRABBIT_CORE.jar.path = org.apache.jackrabbit
+   JACKRABBIT_CORE.jar.name = jackrabbit-core
+   JACKRABBIT_CORE.jar.vers = 1.1
+
+
+#@ JACKRABBIT_JCR_RMI.jar
+   JACKRABBIT_JCR_RMI.jar.path = org.apache.jackrabbit
+   JACKRABBIT_JCR_RMI.jar.name = jackrabbit-jcr-rmi
+   JACKRABBIT_JCR_RMI.jar.vers = 1.1
+
+
+#@ JAKARTA_BCEL.jar
+   JAKARTA_BCEL.jar.path = bcel
+   JAKARTA_BCEL.jar.name = bcel
+   JAKARTA_BCEL.jar.vers = 5.1
+
+
+#@ JAKARTA_REGEXP.jar
+   JAKARTA_REGEXP.jar.path = jakarta-regexp
+   JAKARTA_REGEXP.jar.name = jakarta-regexp
+   JAKARTA_REGEXP.jar.vers = 1.4
+
+
+#@ JAMON.jar
+   JAMON.jar.path = jamon
+   JAMON.jar.name = JAMon
+   JAMON.jar.vers = 1.0
+
+
+#@ JAVAMAIL.jar
+   JAVAMAIL.jar.path = javax/mail
+   JAVAMAIL.jar.name = mail
+   JAVAMAIL.jar.vers = 1.4
+
+
+#@ JAXB_API.jar
+   JAXB_API.jar.path = jaxb
+   JAXB_API.jar.name = jaxb-api
+   JAXB_API.jar.vers = 1.0.2
+
+
+#@ JAXB_IMPL.jar
+   JAXB_IMPL.jar.path = jaxb
+   JAXB_IMPL.jar.name = jaxb-impl
+   JAXB_IMPL.jar.vers = 1.0.4
+
+
+#@ JAXB_LIBS.jar
+   JAXB_LIBS.jar.path = jaxb
+   JAXB_LIBS.jar.name = jaxb-libs
+   JAXB_LIBS.jar.vers = 1.0.4
+
+
+#@ JAXB_XJC.jar
+   JAXB_XJC.jar.path = jaxb
+   JAXB_XJC.jar.name = jaxb-xjc
+   JAXB_XJC.jar.vers = 1.0.4
+
+
+#@ JAXEN.jar
+   JAXEN.jar.path = jaxen
+   JAXEN.jar.name = jaxen
+   JAXEN.jar.vers = 1.1-beta-8
+
+
+#@ JAXRPC.jar
+   JAXRPC.jar.path = jaxrpc
+   JAXRPC.jar.name = jaxrpc
+   JAXRPC.jar.vers = 1.1
+
+
+#@ JAX_QNAME.jar
+   JAX_QNAME.jar.path = jaxb
+   JAX_QNAME.jar.name = jax-qname
+   JAX_QNAME.jar.vers = 1.0.2
+
+
+#@ JBOSSSX.jar
+   JBOSSSX.jar.path = jboss
+   JBOSSSX.jar.name = jbosssx
+   JBOSSSX.jar.vers = 4.0.3
+
+
+#@ JCOMMON.jar
+   JCOMMON.jar.path = jcommon
+   JCOMMON.jar.name = jcommon
+   JCOMMON.jar.vers = 0.9.5
+
+
+#@ JCR.jar
+   JCR.jar.path = javax.jcr
+   JCR.jar.name = jcr
+   JCR.jar.vers = 1.0
+
+
+#@ JCS.jar
+   JCS.jar.path = jcs
+   JCS.jar.name = jcs
+   JCS.jar.vers = 20030822.182132
+
+
+#@ JCSI_BASE.jar
+   JCSI_BASE.jar.path = jcsi
+   JCSI_BASE.jar.name = jcsi_base
+   JCSI_BASE.jar.vers = 3.0
+
+
+#@ JCSI_JCE.jar
+   JCSI_JCE.jar.path = jcsi
+   JCSI_JCE.jar.name = jcsi_jce
+   JCSI_JCE.jar.vers = 3.0
+
+
+#@ JCSI_KRB.jar
+   JCSI_KRB.jar.path = jcsi
+   JCSI_KRB.jar.name = jcsi_krb
+   JCSI_KRB.jar.vers = 3.0
+
+
+#@ JCSI_KRB_JAAS.jar
+   JCSI_KRB_JAAS.jar.path = jcsi
+   JCSI_KRB_JAAS.jar.name = jcsi_krb_jaas
+   JCSI_KRB_JAAS.jar.vers = 3.0
+
+
+#@ JCSI_KRB_PROVIDER.jar
+   JCSI_KRB_PROVIDER.jar.path = jcsi
+   JCSI_KRB_PROVIDER.jar.name = jcsi_krb_provider
+   JCSI_KRB_PROVIDER.jar.vers = 3.0
+
+
+#@ JCSI_LICENSE.jar
+   JCSI_LICENSE.jar.path = jcsi
+   JCSI_LICENSE.jar.name = jcsi_license
+   JCSI_LICENSE.jar.vers = 2.6.0
+
+
+#@ JDIC.jar
+   JDIC.jar.path = jdic
+   JDIC.jar.name = jdic
+   JDIC.jar.vers = 0.9.1
+
+
+#@ JDIC_STUB_LINUX.jar
+   JDIC_STUB_LINUX.jar.path = jdic
+   JDIC_STUB_LINUX.jar.name = jdic-stub-linux
+   JDIC_STUB_LINUX.jar.vers = 0.9.1
+
+
+#@ JDIC_STUB_SUNOS.jar
+   JDIC_STUB_SUNOS.jar.path = jdic
+   JDIC_STUB_SUNOS.jar.name = jdic-stub-sunos
+   JDIC_STUB_SUNOS.jar.vers = 0.9.1
+
+
+#@ JDIC_STUB_WINDOWS.jar
+   JDIC_STUB_WINDOWS.jar.path = jdic
+   JDIC_STUB_WINDOWS.jar.name = jdic-stub-windows
+   JDIC_STUB_WINDOWS.jar.vers = 0.9.1
+
+
+#@ JDOM.jar
+   JDOM.jar.path = jdom
+   JDOM.jar.name = jdom
+   JDOM.jar.vers = 1.0
+
+
+#@ JDTCORE.jar
+   JDTCORE.jar.path = eclipse
+   JDTCORE.jar.name = jdtcore
+   JDTCORE.jar.vers = 3.0.1
+
+
+#@ JHALL.jar
+   JHALL.jar.path = jhall
+   JHALL.jar.name = jhall
+   JHALL.jar.vers = 1.1.3
+
+
+#@ JINI_CORE.jar
+   JINI_CORE.jar.path = jini-1.2
+   JINI_CORE.jar.jar = jini-core.jar
+
+
+#@ JINI_EXT.jar
+   JINI_EXT.jar.path = jini-1.2
+   JINI_EXT.jar.jar = jini-ext.jar
+
+
+#@ JINI_REGGIE.jar
+   JINI_REGGIE.jar.path = jini-1.2
+   JINI_REGGIE.jar.jar = reggie.jar
+
+
+#@ JINI_REGGIE_DL.jar
+   JINI_REGGIE_DL.jar.path = jini-1.2
+   JINI_REGGIE_DL.jar.jar = reggie-dl.jar
+
+
+#@ JINI_SUNUTIL.jar
+   JINI_SUNUTIL.jar.path = jini-1.2
+   JINI_SUNUTIL.jar.jar = sun-util.jar
+
+
+#@ JINI_TOOLS.jar
+   JINI_TOOLS.jar.path = jini-1.2
+   JINI_TOOLS.jar.jar = tools.jar
+
+
+#@ JMIMEMAGIC.jar
+   JMIMEMAGIC.jar.path = jmimemagic
+   JMIMEMAGIC.jar.name = jmimemagic
+   JMIMEMAGIC.jar.vers = 0.0.4a
+
+
+#@ JMOCK.jar
+   JMOCK.jar.path = jmock
+   JMOCK.jar.name = jmock
+   JMOCK.jar.vers = 1.0.1
+
+
+#@ JMX.jar
+   JMX.jar.path = jboss
+   JMX.jar.name = jmx
+   JMX.jar.vers = 4.0.3
+
+
+#@ JMXRI.jar
+   JMXRI.jar.path = jmx
+   JMXRI.jar.name = jmxri
+   JMXRI.jar.vers = 1.2.1
+
+
+#@ JMXTOOLS.jar
+   JMXTOOLS.jar.path = jmx
+   JMXTOOLS.jar.name = jmxtools
+   JMXTOOLS.jar.vers = 1.2.1
+
+
+
+#@ JSTL.jar
+   JSTL.jar.path = jstl
+   JSTL.jar.name = jstl
+   JSTL.jar.vers = 1.1.2
+
+
+#@ JTA.jar
+   JTA.jar.path = ibmwebspheremq
+   JTA.jar.name = jta
+   JTA.jar.vers = 5.3
+
+
+#@ JTIDY.jar
+   JTIDY.jar.path = jtidy
+   JTIDY.jar.name = jtidy
+   JTIDY.jar.vers = 4aug2000r7-dev
+
+
+#@ JUNIT.jar
+   JUNIT.jar.path = junit
+   JUNIT.jar.name = junit
+   JUNIT.jar.vers = 3.8.1
+
+
+#@ JUNITPERF.jar
+   JUNITPERF.jar.path = junitperf
+   JUNITPERF.jar.name = junitperf
+   JUNITPERF.jar.vers = 1.8
+
+
+#@ JUNIT_ADDONS.jar
+   JUNIT_ADDONS.jar.path = junit-addons
+   JUNIT_ADDONS.jar.name = junit-addons
+   JUNIT_ADDONS.jar.vers = 1.4
+
+
+#@ JYTHON.jar
+   JYTHON.jar.path = jython
+   JYTHON.jar.name = jython
+   JYTHON.jar.vers = 2.1
+
+
+
+#@ LOG4J.jar
+   LOG4J.jar.path = log4j
+   LOG4J.jar.name = log4j
+   LOG4J.jar.vers = 1.2.13
+
+
+#@ LOOKS.jar
+   LOOKS.jar.path = jgoodies
+   LOOKS.jar.name = looks
+   LOOKS.jar.vers = 1.2.2
+
+
+#@ LUCENE.jar
+   LUCENE.jar.path = lucene
+   LUCENE.jar.name = lucene
+   LUCENE.jar.vers = 1.4.3
+
+
+#@ MAVEN_XDOCLET_PLUGIN.plugin
+   MAVEN_XDOCLET_PLUGIN.plugin.path = xdoclet
+   MAVEN_XDOCLET_PLUGIN.plugin.name = maven-xdoclet-plugin
+   MAVEN_XDOCLET_PLUGIN.plugin.vers = 1.2.3
+   MAVEN_XDOCLET_PLUGIN.plugin.extn = jar
+
+
+#@ MSV.jar
+   MSV.jar.path = msv
+   MSV.jar.name = msv
+   MSV.jar.vers = 20030225
+
+
+#@ MX4J.jar
+   MX4J.jar.path = mx4j
+   MX4J.jar.name = mx4j
+   MX4J.jar.vers = 3.0.2
+
+
+#@ MX4J_JMX.jar
+   MX4J_JMX.jar.path = mx4j
+   MX4J_JMX.jar.name = mx4j-jmx
+   MX4J_JMX.jar.vers = 2.1.1
+
+
+#@ MX4J_REMOTE.jar
+   MX4J_REMOTE.jar.path = mx4j
+   MX4J_REMOTE.jar.name = mx4j-remote
+   MX4J_REMOTE.jar.vers = 3.0.2
+
+
+
+#@ NAMESPACE.jar
+   NAMESPACE.jar.path = jaxb
+   NAMESPACE.jar.name = namespace
+   NAMESPACE.jar.vers = 1.0.2
+
+
+#@ NEKODTD.jar
+   NEKODTD.jar.path = nekohtml
+   NEKODTD.jar.name = nekodtd
+   NEKODTD.jar.vers = 0.1.11
+
+
+#@ NEKOHTML.jar
+   NEKOHTML.jar.path = nekohtml
+   NEKOHTML.jar.name = nekohtml
+   NEKOHTML.jar.vers = 0.9.5
+
+
+#@ NETSCAPE_SEC.jar
+   NETSCAPE_SEC.jar.path = netscape_sec
+   NETSCAPE_SEC.jar.name = netscape_sec
+   NETSCAPE_SEC.jar.vers = 4.0.0
+
+
+#@ OGNL.jar
+   OGNL.jar.path = ognl
+   OGNL.jar.name = ognl
+   OGNL.jar.vers = 2.6.9
+
+
+#@ ORO.jar
+   ORO.jar.path = oro
+   ORO.jar.name = oro
+   ORO.jar.vers = 2.0.8
+
+
+#@ OSCACHE.jar
+   OSCACHE.jar.path = opensymphony
+   OSCACHE.jar.name = oscache
+   OSCACHE.jar.vers = 2.3
+
+
+#@ OSCORE.jar
+   OSCORE.jar.path = opensymphony
+   OSCORE.jar.name = oscore
+   OSCORE.jar.vers = 2.2.4
+
+
+#@ OSUSER.jar
+   OSUSER.jar.path = opensymphony
+   OSUSER.jar.jar = osuser-atl.user.jar
+
+
+
+#@ PORTAL_COMMON_LIB.jar
+   PORTAL_COMMON_LIB.jar.path = jboss
+   PORTAL_COMMON_LIB.jar.name = portal-common-lib
+   PORTAL_COMMON_LIB.jar.vers = 2.0
+
+
+#@ PORTAL_CORE_LIB.jar
+   PORTAL_CORE_LIB.jar.path = jboss
+   PORTAL_CORE_LIB.jar.name = portal-core-lib
+   PORTAL_CORE_LIB.jar.vers = 2.0
+
+
+#@ PORTAL_SERVER_LIB.jar
+   PORTAL_SERVER_LIB.jar.path = jboss
+   PORTAL_SERVER_LIB.jar.name = portal-server-lib
+   PORTAL_SERVER_LIB.jar.vers = 2.0
+
+
+#@ PORTLET_API.jar
+   PORTLET_API.jar.path = portlet-api
+   PORTLET_API.jar.name = portlet-api
+   PORTLET_API.jar.vers = 1.0
+
+
+#@ RECJAVA.jar
+   RECJAVA.jar.path = recjava
+   RECJAVA.jar.name = recjava
+   RECJAVA.jar.vers = 3.5.3
+
+
+#@ REGEXP.jar
+   REGEXP.jar.path = regexp
+   REGEXP.jar.name = regexp
+   REGEXP.jar.vers = 1.3
+
+
+#@ RELAXNGDATATYPE.jar
+   RELAXNGDATATYPE.jar.path = jaxb
+   RELAXNGDATATYPE.jar.name = relaxngDatatype
+   RELAXNGDATATYPE.jar.vers = 1.0.2
+
+
+#@ RHINO.jar
+   RHINO.jar.path = rhino
+   RHINO.jar.name = js
+   RHINO.jar.vers = 1.6R5
+
+
+#@ RMISSL.jar
+   RMISSL.jar.path = jmx
+   RMISSL.jar.name = rmissl
+   RMISSL.jar.vers = 1.0.1
+
+
+#@ ROWSET_PATCHED.jar
+   ROWSET_PATCHED.jar.path = javax.sql
+   ROWSET_PATCHED.jar.name = rowset_patched
+   ROWSET_PATCHED.jar.vers = 1.0
+
+
+#@ SAPDBC.jar
+   SAPDBC.jar.path = maxdb
+   SAPDBC.jar.name = sapdbc
+   SAPDBC.jar.vers = 7_6_00_00_3247
+
+
+#@ SAS.jar
+   SAS.jar.path = websphere
+   SAS.jar.name = sas
+   SAS.jar.vers = 5.1
+
+
+#@ SAXPATH.jar
+   SAXPATH.jar.path = saxpath
+   SAXPATH.jar.name = saxpath
+   SAXPATH.jar.vers = 1.0
+
+
+
+#@ SERAPH.jar
+   SERAPH.jar.path = atlassian
+   SERAPH.jar.name = seraph
+   SERAPH.jar.vers = 0.7.23
+
+
+#@ SERIALIZER.jar
+   SERIALIZER.jar.path = org.apache.xalan
+   SERIALIZER.jar.name = serializer
+   SERIALIZER.jar.vers = 2.7.0
+
+
+#@ SERVLET_API.jar
+   SERVLET_API.jar.path = servletapi
+   SERVLET_API.jar.name = servlet-api
+   SERVLET_API.jar.vers = 2.4
+
+
+#@ SLF4J.jar
+   SLF4J.jar.path = slf4j
+   SLF4J.jar.name = slf4j-log4j12
+   SLF4J.jar.vers = 1.0
+
+
+#@ SNOWBND.jar
+   SNOWBND.jar.path = snowbound
+   SNOWBND.jar.name = snowbound
+   SNOWBND.jar.vers = 9
+
+
+#@ SPRING.jar
+   SPRING.jar.path = springframework
+   SPRING.jar.name = spring
+   SPRING.jar.vers = 1.2.6
+
+
+#@ SPRING_BEANS.jar
+   SPRING_BEANS.jar.path = org.springframework
+   SPRING_BEANS.jar.name = spring-beans
+   SPRING_BEANS.jar.vers = 2.0
+
+
+#@ SPRING_CONTEXT.jar
+   SPRING_CONTEXT.jar.path = org.springframework
+   SPRING_CONTEXT.jar.name = spring-context
+   SPRING_CONTEXT.jar.vers = 2.0
+
+
+#@ SPRING_CORE.jar
+   SPRING_CORE.jar.path = org.springframework
+   SPRING_CORE.jar.name = spring-core
+   SPRING_CORE.jar.vers = 2.0
+
+
+#@ SPRING_MOCK.jar
+   SPRING_MOCK.jar.path = springframework
+   SPRING_MOCK.jar.name = spring-mock
+   SPRING_MOCK.jar.vers = 1.2.6
+
+
+#@ TAGLIBS_DATETIME.jar
+   TAGLIBS_DATETIME.jar.path = taglibs
+   TAGLIBS_DATETIME.jar.name = datetime
+   TAGLIBS_DATETIME.jar.vers = 1.0.1
+
+
+#@ TAGLIBS_IO.jar
+   TAGLIBS_IO.jar.path = jakarta-taglibs-io
+   TAGLIBS_IO.jar.name = jakarta-taglibs-io
+   TAGLIBS_IO.jar.vers = 20060829
+
+
+#@ TAGLIBS_LOG.jar
+   TAGLIBS_LOG.jar.path = taglibs
+   TAGLIBS_LOG.jar.name = log
+   TAGLIBS_LOG.jar.vers = 1.0
+
+
+#@ TAGLIBS_REGEXP.jar
+   TAGLIBS_REGEXP.jar.path = taglibs
+   TAGLIBS_REGEXP.jar.name = regexp
+   TAGLIBS_REGEXP.jar.vers = 1.0.1
+
+
+#@ TAGLIBS_STANDARD.jar
+   TAGLIBS_STANDARD.jar.path = taglibs
+   TAGLIBS_STANDARD.jar.name = standard
+   TAGLIBS_STANDARD.jar.vers = 1.1.2
+
+
+#@ TAGLIBS_XTAGS.jar
+   TAGLIBS_XTAGS.jar.path = jakarta-taglibs-xtags
+   TAGLIBS_XTAGS.jar.name = jakarta-taglibs-xtags
+   TAGLIBS_XTAGS.jar.vers = 20060829
+
+
+#@ WP_ADMIN_COMMON.jar
+   WP_ADMIN_COMMON.jar.path = wps
+   WP_ADMIN_COMMON.jar.name = wp.admin.common
+   WP_ADMIN_COMMON.jar.vers = 5.1
+
+
+#@ WP_BASE.jar
+   WP_BASE.jar.path = wps
+   WP_BASE.jar.name = wp.base
+   WP_BASE.jar.vers = 5.1
+
+
+#@ WP_ENGINE_IMPL.jar
+   WP_ENGINE_IMPL.jar.path = wps
+   WP_ENGINE_IMPL.jar.name = wp.engine.impl
+   WP_ENGINE_IMPL.jar.vers = 5.1
+
+
+#@ WP_PE_API_LEGACY.jar
+   WP_PE_API_LEGACY.jar.path = wps
+   WP_PE_API_LEGACY.jar.name = wp.pe.api.legacy
+   WP_PE_API_LEGACY.jar.vers = 5.1
+
+
+#@ WP_PE_API_STANDARD.jar
+   WP_PE_API_STANDARD.jar.path = wps
+   WP_PE_API_STANDARD.jar.name = wp.pe.api.standard
+   WP_PE_API_STANDARD.jar.vers = 5.1
+
+
+#@ WP_PE_RT_API.jar
+   WP_PE_RT_API.jar.path = wps
+   WP_PE_RT_API.jar.name = wp.pe.rt.api
+   WP_PE_RT_API.jar.vers = 5.1
+
+
+#@ WP_PE_RT_IMPL.jar
+   WP_PE_RT_IMPL.jar.path = wps
+   WP_PE_RT_IMPL.jar.name = wp.pe.rt.impl
+   WP_PE_RT_IMPL.jar.vers = 5.1
+
+
+#@ WP_USER_API.jar
+   WP_USER_API.jar.path = wps
+   WP_USER_API.jar.name = wp.user.api
+   WP_USER_API.jar.vers = 5.1
+
+
+#@ WP_USER_CMD.jar
+   WP_USER_CMD.jar.path = wps
+   WP_USER_CMD.jar.name = wp.user.cmd
+   WP_USER_CMD.jar.vers = 5.1
+
+
+#@ WP_USER_LEGACY.jar
+   WP_USER_LEGACY.jar.path = wps
+   WP_USER_LEGACY.jar.name = wp.user.legacy
+   WP_USER_LEGACY.jar.vers = 5.1
+
+
+#@ WSDL4J.jar
+   WSDL4J.jar.path = wsdl4j
+   WSDL4J.jar.name = wsdl4j
+   WSDL4J.jar.vers = 1.6.1
+
+
+#@ WSDL4J_QNAME.jar
+   WSDL4J_QNAME.jar.path = wsdl4j
+   WSDL4J_QNAME.jar.name = wsdl4j-qname
+   WSDL4J_QNAME.jar.vers = 1.6.1
+
+
+#@ WSSEC.jar
+   WSSEC.jar.path = websphere
+   WSSEC.jar.name = wssec
+   WSSEC.jar.vers = 5.1
+
+
+#@ XALAN.jar
+   XALAN.jar.path = xalan
+   XALAN.jar.name = xalan
+   XALAN.jar.vers = 2.6.0
+
+
+#@ XERCESIMPL.jar
+   XERCESIMPL.jar.path = xerces
+   XERCESIMPL.jar.name = xercesImpl
+   XERCESIMPL.jar.vers = 2.6.2
+
+
+#@ XMLPARSERAPIS.jar
+   XMLPARSERAPIS.jar.path = xerces
+   XMLPARSERAPIS.jar.name = xmlParserAPIs
+   XMLPARSERAPIS.jar.vers = 2.6.2
+
+
+#@ XMLRPC.jar
+   XMLRPC.jar.path = xmlrpc
+   XMLRPC.jar.name = xmlrpc
+   XMLRPC.jar.vers = 1.2
+
+
+#@ XMLUNIT.jar
+   XMLUNIT.jar.path = xmlunit
+   XMLUNIT.jar.name = xmlunit
+   XMLUNIT.jar.vers = 1.0
+
+
+#@ XML_RESOLVER.jar
+   XML_RESOLVER.jar.path = xml-resolver
+   XML_RESOLVER.jar.name = xml-resolver
+   XML_RESOLVER.jar.vers = 1.1
+
+
+#@ XREPORTER_EXPRESSION.jar
+   XREPORTER_EXPRESSION.jar.path = org.outerj.xreporter
+   XREPORTER_EXPRESSION.jar.name = xreporter-expression
+   XREPORTER_EXPRESSION.jar.vers = 1.2.1
+
+
+#@ XSDBEANS.jar
+   XSDBEANS.jar.path = xsdbeans
+   XSDBEANS.jar.name = xsdbeans
+   XSDBEANS.jar.vers = 5.0.2
+
+
+#@ XSDLIB.jar
+   XSDLIB.jar.path = xsdlib
+   XSDLIB.jar.name = xsdlib
+   XSDLIB.jar.vers = 20041112
+
+
+

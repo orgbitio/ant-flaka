@@ -1,0 +1,6 @@
+<project xmlns:f="antlib:net.haefelingerit.flaka">
+  <f:dependencies>
+    <f:dependency org="org.jdom" name="jdom" version="1.1" />
+  </f:dependencies>
+  <f:init />
+</project>

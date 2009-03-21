@@ -1,0 +1,16 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:echo>
+    #{"a'c'} -- illegal :recover from here =>"}
+    #{"abc"} -- abc
+    #{'abc'} -- abc
+    #{"a'c"} -- a'c
+    #{'a\'c'} -- a'c
+    #{'a\bc'} -- a\bc
+    #{'a\\bc'} -- a\bc
+    #{'a\"bc'} -- a\"bc
+    #{'a\'bc'} -- a'bc
+    #{'ab\'} -- illegal  :recover from here =>'}
+    #{'\\ab\\'} -- \ab\   (todo: ab\\ should stop continuation line!!)
+  </c:echo>
+
+</project>

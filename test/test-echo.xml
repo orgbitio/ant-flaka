@@ -1,0 +1,67 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka">
+  <c:echo />
+  <echo>foobar
+</echo>
+  <c:echo>
+    foo
+</c:echo>
+  <c:echo>
+    foo
+</c:echo>
+  <c:echo comment=";" ic="." shift=" 0* ">
+    ; ignore \
+    me (still a comment here)
+    Hello\
+    ,
+    ..World.
+</c:echo>
+  <echo>=======</echo>
+  <echo>=======</echo>
+  <c:echo shift="0">[1a]</c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0"> [1b]</c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0">[2a]
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0"> [2b]
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0">[3a]
+    2ndline
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0"> [3b]
+    2ndline
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0">
+    [4a]
+    2ndline
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0">
+    [4b]
+    2ndline
+  </c:echo>
+  <c:echo shift="0"> \
+    [4c]
+    2ndline
+  </c:echo>
+  <c:echo shift="0">a
+    b
+  </c:echo>
+  <echo>=======</echo>
+  <c:echo shift="0">
+    aa
+    b b
+  </c:echo>
+  <c:echo shift="0">
+    aa
+    b b
+  </c:echo>
+  <echo>=======</echo>
+  <c:set>
+    f = ''.tofile
+  </c:set>
+</project>
