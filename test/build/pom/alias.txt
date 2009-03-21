@@ -1,2 +1,0 @@
-# Aliases (symbolic dependencies) used
-LOG4J.jar

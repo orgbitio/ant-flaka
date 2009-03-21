@@ -1,3 +1,0 @@
-# Maven 2 paths
-/log4j/log4j/1.2.8/log4j-1.2.8.jar
-/log4j/log4j/1.2.13/log4j-1.2.13.jar
