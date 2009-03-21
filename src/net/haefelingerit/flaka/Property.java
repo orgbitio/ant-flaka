@@ -1,84 +1,122 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
-import java.io.ByteArrayInputStream;
-import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.haefelingerit.flaka.util.Static;
+import net.haefelingerit.flaka.util.TextReader;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
-public class Property extends org.apache.tools.ant.taskdefs.Property
+/**
+ * A task to set multiple properties at once.
+ * 
+ * 
+ * @author geronimo
+ * 
+ */
+public class Property extends Task
 {
   protected String text;
+  protected String comment;
+  protected boolean debug = false;
 
-  /**
-   * The name of the property to set.
-   * 
-   * @param name
-   *          property name
-   */
+  public void setComment(String s)
+  {
+    this.comment = Static.trim2(s, null);
+  }
 
-  public static String normalize(String text) {
-    /*
-     * replace every occurrance of '\' by '/', except '\\' which maps as '\'
-     */
-    char c, c1;
-    StringBuffer buf = new StringBuffer();
-    int len = text.length();
+  public void setDebug(boolean b)
+  {
+    this.debug = b;
+  }
 
-    for (int i = 0; i < len; ++i) {
-      c = text.charAt(i);
-      if (c != '\\') {
-        buf.append(c);
+  public void addText(String text)
+  {
+    this.text = text;
+  }
+
+  protected Pattern makeregex(String s)
+  {
+    Pattern re = null;
+    try
+    {
+      re = Pattern.compile(s);
+    } catch (Exception e)
+    {
+      /* TODO: error */
+      Static.debug(getProject(), "error compiling regex '" + s + "'", e);
+    }
+    return re;
+  }
+
+  protected Pattern getPropRegex()
+  {
+    return makeregex("([^=:]+)[:=](.*)");
+  }
+
+  public void execute() throws BuildException
+  {
+    Project project;
+    Pattern regex;
+    TextReader tr;
+    Matcher M;
+    String line, k, v;
+
+    project = this.getProject();
+
+    if (this.text == null)
+      return;
+
+    regex = this.getPropRegex();
+
+    tr = new TextReader(this.text).setComment(this.comment);
+    // TODO: set proper line number
+    tr.skipempty = true;
+
+    while ((line = tr.readLine()) != null)
+    {
+      if (!(M = regex.matcher(line)).matches())
+      {
+        Static.debug(getProject(), "line " + tr.lineno + ": bad property line '" + line + "'");
         continue;
       }
-      if (i + 1 >= len) {
-        buf.append('/');
-        continue;
+      // otherwise:
+      k = M.group(1);
+      v = M.group(2).trim();
+      try
+      {
+        k = project.replaceProperties(k);
+        k = Static.el2str(project, k);
+        v = project.replaceProperties(v);
+        v = Static.el2str(project, v);
+      } catch (Exception e)
+      {
+        int where = tr.lineno;
+        Static.debug(project, "line " + where + ": error evaluating EL expression (ignored) in "
+            + Static.q(v));
       }
-      c1 = text.charAt(i + 1);
-      if (c1 != '\\') {
-        buf.append('/');
-        buf.append(c1);
-        i += 1;
-        continue;
-      }
-      // we have '\\' => '\'
-      buf.append('\\');
-      i += 1;
-    }
-    return buf.toString();
-  }
-
-  public void setText(String text) {
-    this.text = normalize(text);
-  }
-
-  public String getText() {
-    return this.text;
-  }
-
-  /**
-   * set the property in the project to the value. if the task was give a file,
-   * resource or env attribute here is where it is loaded
-   */
-  public void execute() throws BuildException {
-    if (getProject() == null) {
-      throw new IllegalStateException("project has not been set");
-    }
-
-    if (this.text != null) {
-      byte[] buf = this.text.getBytes();
-      ByteArrayInputStream S = new ByteArrayInputStream(buf);
-      Properties P = new Properties();
-      try {
-        P.load(S);
-        addProperties(P);
-      }
-      catch (Exception e) {
-        Static.throwbx("setting properties failed", e);
-        return;
-      }
-    } else {
-      super.execute();
+      Static.assign(project, k, v, Static.PROPTY);
     }
   }
+
 }

@@ -5,17 +5,9 @@
   <!-- used to determine whether trycatch/throw works as expected.            -->
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   
-  <c:when test="-P mustbeset">
-    <fail message="** property 'mustbeset' already defined??" />
-  </c:when>
-  <c:set var="mustbeset" value="true" />
-  <c:unless test="-P mustbeset">
-    <fail message="** property 'mustbeset' not defined as expected ??" />
-  </c:unless>
-  <c:unset var="mustbeset" />
-  <c:when test="-P mustbeset">
-    <fail message="** property 'mustbeset' should not be defined??" />
-  </c:when>
+  <fail message="[a] ** property 'mustbeset' already defined??" if="mustbeset"/>
+  <property name="mustbeset" value="" />
+  <fail message="[b] ** property 'mustbeset' not defined as expected ??" unless="mustbeset"/>
 
   <macrodef name="fail-if-undefined">
     <attribute name="property" />
@@ -34,8 +26,14 @@
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!-- Tests are starting here ..                                             -->
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <c:unset var="mustbeset mustbeset2" />
-
+  <c:unset>
+  	mustbeset
+  	mustbeset2
+  </c:unset>
+  <fail-if-defined property="mustbeset" />
+  <fail-if-defined property="mustbeset2" />
+	
+	
   <c:trycatch property="trycatch.errmsg">
     <try>
       <c:trycatch>
@@ -43,18 +41,18 @@
           <fail message="4711" />
         </try>
         <catch>
-          <c:set var="before-throw" />
+          <property name="before-throw" value="true"/>
           <c:throw />
-          <c:set var="after-throw" />
+          <property name="after-throw" value="true"/>
         </catch>
         <finally>
-          <c:set var="finally" />
+          <property name="finally" value="true"/>
         </finally>
       </c:trycatch>
     </try>
     <catch match="*4711*">
       <echo>errmsg = |${trycatch.errmsg}|</echo>
-      <c:set var="4711" />
+      <property name="4711" value="true"/>
     </catch>
     <catch>
       <fail message="error in throw .." />

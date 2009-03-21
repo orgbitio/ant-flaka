@@ -1,8 +1,28 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
+
+import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.BuildException;
@@ -16,17 +36,16 @@ import org.apache.tools.ant.UnknownElement;
  * This whole class just exists to get rid of some anoying warnings * issued by
  * Ant. Here's an example situation: * * <code>
  **  <presetdef name="javac"> <javac debug="on" /> </presetdef>
- ** </code> * *
- * Executing this command would issue a warning like * * <code>
+ ** </code> Executing this command would
+ * issue a warning like * * <code>
  ** Overriding previous definition of type javac
- ** </code> * *
- * Unfortunatly there is no easy way to remove such warnings. Looking * how this
- * is implemented, it appears that method * * <code>
+ ** </code> Unfortunatly there is no easy way to
+ * remove such warnings. Looking * how this is implemented, it appears that
+ * method * * <code>
  ** ComponentHelper.updateDataTypeDefinition()
- ** </code> * *
- * is the guilty part. It is rather easy to exchange this faulty *
- * ComponentHelper instance by a customized on. All that needs to be * done is
- * to save a reference to a customized instance via property * name
+ ** </code> is the guilty part. It is rather easy to exchange this
+ * faulty * ComponentHelper instance by a customized on. All that needs to be *
+ * done is to save a reference to a customized instance via property * name
  * "ant.ComponentHelper". Unfortunatly our faulty method is made * private. So
  * how can we change the behaviour? This is how it's done: * * 1. Make a new
  * class using ComponentHelper as base class. * 2. The new class contains a
@@ -48,27 +67,27 @@ import org.apache.tools.ant.UnknownElement;
 
 public class CompH extends ComponentHelper
 {
-  protected static Field    project                     = null;
-  protected static Field    rebuildTaskClassDefinitions = null;
-  protected static Field    rebuildTypeClassDefinitions = null;
-  protected static Method   invalidateCreatedTasks      = null;
-  protected static Method   sameDefinition              = null;
-  protected static boolean  applicable                  = false;
+  protected static Field project = null;
+  protected static Field rebuildTaskClassDefinitions = null;
+  protected static Field rebuildTypeClassDefinitions = null;
+  protected static Method invalidateCreatedTasks = null;
+  protected static Method sameDefinition = null;
+  protected static boolean applicable = false;
 
-  static {
-    try {
+  static
+  {
+    try
+    {
       Class C = ComponentHelper.class;
       Class rtype;
       /* check whether field "project" exists .. */
       project = Static.fieldbyname(C, "project");
-      rebuildTaskClassDefinitions = Static.fieldbyname(C,
-          "rebuildTaskClassDefinitions");
-      rebuildTypeClassDefinitions = Static.fieldbyname(C,
-          "rebuildTypeClassDefinitions");
-      invalidateCreatedTasks = Static.methodbyname(C, "invalidateCreatedTasks",
-          new Class[] { String.class });
+      rebuildTaskClassDefinitions = Static.fieldbyname(C, "rebuildTaskClassDefinitions");
+      rebuildTypeClassDefinitions = Static.fieldbyname(C, "rebuildTypeClassDefinitions");
+      invalidateCreatedTasks = Static.methodbyname(
+        C, "invalidateCreatedTasks", new Class[] { String.class });
       sameDefinition = Static.methodbyname(C, "sameDefinition", new Class[] {
-      AntTypeDefinition.class, AntTypeDefinition.class });
+          AntTypeDefinition.class, AntTypeDefinition.class });
 
       /* tweak permissions */
       project.setAccessible(true);
@@ -79,14 +98,15 @@ public class CompH extends ComponentHelper
 
       /* check return type of `sameDefinition' .. */
       rtype = sameDefinition.getReturnType();
-      if (!rtype.getName().equals("boolean")) {
+      if (!rtype.getName().equals("boolean"))
+      {
         throw new Exception("sameDefinition() does not return `boolean' ..");
       }
 
       /* all right then .. */
       applicable = true;
-    }
-    catch (Exception e) { /* ignored */
+    } catch (Exception e)
+    { /* ignored */
     }
   }
 
@@ -98,7 +118,8 @@ public class CompH extends ComponentHelper
    * @param next
    *          the next chained component helper.
    */
-  public void setNext(ComponentHelper next) {
+  public void setNext(ComponentHelper next)
+  {
     super.setNext(next);
     this.dlgt = super.getNext();
   }
@@ -108,7 +129,8 @@ public class CompH extends ComponentHelper
    * 
    * @return the next chained component helper.
    */
-  public ComponentHelper getNext() {
+  public ComponentHelper getNext()
+  {
     return this.dlgt;
   }
 
@@ -118,7 +140,8 @@ public class CompH extends ComponentHelper
    * @param project
    *          the project for this helper.
    */
-  public void setProject(Project project) {
+  public void setProject(Project project)
+  {
     this.dlgt.setProject(project);
   }
 
@@ -129,7 +152,8 @@ public class CompH extends ComponentHelper
    * @param helper
    *          the component helper of the parent project.
    */
-  public void initSubProject(ComponentHelper helper) {
+  public void initSubProject(ComponentHelper helper)
+  {
     this.dlgt.initSubProject(helper);
   }
 
@@ -148,8 +172,9 @@ public class CompH extends ComponentHelper
    * @throws BuildException
    *           if an error occurs.
    */
-  public Object createComponent(UnknownElement ue, String ns,
-      String componentType) throws BuildException {
+  public Object createComponent(UnknownElement ue, String ns, String componentType)
+      throws BuildException
+  {
     return this.dlgt.createComponent(ue, ns, componentType);
   }
 
@@ -161,7 +186,8 @@ public class CompH extends ComponentHelper
    *          name is prefixed with the namespace uri and ":".
    * @return the class if found or null if not.
    */
-  public Object createComponent(String componentName) {
+  public Object createComponent(String componentName)
+  {
     return this.dlgt.createComponent(componentName);
   }
 
@@ -173,7 +199,8 @@ public class CompH extends ComponentHelper
    *          name is prefixed with the namespace uri and ":".
    * @return the class if found or null if not.
    */
-  public Class getComponentClass(String componentName) {
+  public Class getComponentClass(String componentName)
+  {
     return this.dlgt.getComponentClass(componentName);
   }
 
@@ -184,7 +211,8 @@ public class CompH extends ComponentHelper
    *          the name of the component.
    * @return the ant definition or null if not present.
    */
-  public AntTypeDefinition getDefinition(String componentName) {
+  public AntTypeDefinition getDefinition(String componentName)
+  {
     return this.dlgt.getDefinition(componentName);
   }
 
@@ -193,7 +221,8 @@ public class CompH extends ComponentHelper
    * loading from /org/apache/tools/ant/taskdefs/default.properties and
    * /org/apache/tools/ant/types/default.properties.
    */
-  public void initDefaultDefinitions() {
+  public void initDefaultDefinitions()
+  {
     this.dlgt.initDefaultDefinitions();
   }
 
@@ -209,7 +238,8 @@ public class CompH extends ComponentHelper
    *              if the class is unsuitable for being an Ant task. An error
    *              level message is logged before this exception is thrown.
    */
-  public void checkTaskClass(final Class taskClass) throws BuildException {
+  public void checkTaskClass(final Class taskClass) throws BuildException
+  {
     this.dlgt.checkTaskClass(taskClass);
   }
 
@@ -219,7 +249,8 @@ public class CompH extends ComponentHelper
    * 
    * @return a map of from task name to implementing class (String to Class).
    */
-  public Hashtable getTaskDefinitions() {
+  public Hashtable getTaskDefinitions()
+  {
     return this.dlgt.getTaskDefinitions();
   }
 
@@ -229,7 +260,8 @@ public class CompH extends ComponentHelper
    * 
    * @return a map of from type name to implementing class (String to Class).
    */
-  public Hashtable getDataTypeDefinitions() {
+  public Hashtable getDataTypeDefinitions()
+  {
     return this.dlgt.getDataTypeDefinitions();
   }
 
@@ -240,7 +272,8 @@ public class CompH extends ComponentHelper
    * @return a map of from datatype name to implementing class (String to
    *         Class).
    */
-  public Hashtable getAntTypeTable() {
+  public Hashtable getAntTypeTable()
+  {
     return this.dlgt.getAntTypeTable();
   }
 
@@ -256,13 +289,14 @@ public class CompH extends ComponentHelper
    *          The name of the task to create an instance of. Must not be
    *          <code>null</code>.
    * 
-   * @return an instance of the specified task, or <code>null</code> if the
-   *         task name is not recognised.
+   * @return an instance of the specified task, or <code>null</code> if the task
+   *         name is not recognised.
    * 
    * @exception BuildException
    *              if the task name is recognised but task creation fails.
    */
-  public Task createTask(String taskType) throws BuildException {
+  public Task createTask(String taskType) throws BuildException
+  {
     return this.dlgt.createTask(taskType);
   }
 
@@ -273,14 +307,15 @@ public class CompH extends ComponentHelper
    *          The name of the data type to create an instance of. Must not be
    *          <code>null</code>.
    * 
-   * @return an instance of the specified data type, or <code>null</code> if
-   *         the data type name is not recognised.
+   * @return an instance of the specified data type, or <code>null</code> if the
+   *         data type name is not recognised.
    * 
    * @exception BuildException
    *              if the data type name is recognised but instance creation
    *              fails.
    */
-  public Object createDataType(String typeName) throws BuildException {
+  public Object createDataType(String typeName) throws BuildException
+  {
     return this.dlgt.createDataType(typeName);
   }
 
@@ -296,7 +331,8 @@ public class CompH extends ComponentHelper
    * 
    * @since Ant 1.6
    */
-  public String getElementName(Object element) {
+  public String getElementName(Object element)
+  {
     return this.dlgt.getElementName(element);
   }
 
@@ -306,21 +342,24 @@ public class CompH extends ComponentHelper
    * @param uri
    *          the uri that is associated with this antlib.
    */
-  public void enterAntLib(String uri) {
+  public void enterAntLib(String uri)
+  {
     this.dlgt.enterAntLib(uri);
   }
 
   /**
    * @return the current antlib uri.
    */
-  public String getCurrentAntlibUri() {
+  public String getCurrentAntlibUri()
+  {
     return this.dlgt.getCurrentAntlibUri();
   }
 
   /**
    * Called at the end of processing an antlib.
    */
-  public void exitAntLib() {
+  public void exitAntLib()
+  {
     this.dlgt.exitAntLib();
   }
 
@@ -337,15 +376,15 @@ public class CompH extends ComponentHelper
    *          The full name of the class implementing the datatype. Must not be
    *          <code>null</code>.
    */
-  public void addDataTypeDefinition(String typeName, Class typeClass) {
+  public void addDataTypeDefinition(String typeName, Class typeClass)
+  {
     // this.dlgt.addDataTypeDefinition(typeName,typeClass);
     AntTypeDefinition def = new AntTypeDefinition();
     def.setName(typeName);
     def.setClass(typeClass);
     updateDataTypeDefinition(def);
     getProject().log(
-        " +User datatype: " + typeName + "     " + typeClass.getName(),
-        Project.MSG_DEBUG);
+      " +User datatype: " + typeName + "     " + typeClass.getName(), Project.MSG_DEBUG);
   }
 
   /**
@@ -354,7 +393,8 @@ public class CompH extends ComponentHelper
    * @param def
    *          an <code>AntTypeDefinition</code> value.
    */
-  public void addDataTypeDefinition(AntTypeDefinition def) {
+  public void addDataTypeDefinition(AntTypeDefinition def)
+  {
     updateDataTypeDefinition(def);
   }
 
@@ -378,7 +418,8 @@ public class CompH extends ComponentHelper
    * 
    * @see #checkTaskClass(Class)
    */
-  public void addTaskDefinition(String taskName, Class taskClass) {
+  public void addTaskDefinition(String taskName, Class taskClass)
+  {
     this.dlgt.checkTaskClass(taskClass);
     AntTypeDefinition def = new AntTypeDefinition();
     def.setName(taskName);
@@ -396,15 +437,19 @@ public class CompH extends ComponentHelper
    * @param def
    *          the definition to update or insert.
    */
-  private void updateDataTypeDefinition(AntTypeDefinition def) {
+  private void updateDataTypeDefinition(AntTypeDefinition def)
+  {
     String name = def.getName();
     Hashtable antTypeTable = getAntTypeTable(); // (changed)
-    synchronized (antTypeTable) {
+    synchronized (antTypeTable)
+    {
       setattr(rebuildTaskClassDefinitions, new Boolean(true)); // changed
       setattr(rebuildTypeClassDefinitions, new Boolean(true)); // changed
       AntTypeDefinition old = getDefinition(name); // changed
-      if (old != null) {
-        if (sameDefinition(def, old)) {
+      if (old != null)
+      {
+        if (sameDefinition(def, old))
+        {
           return;
         }
         Class oldClass = getComponentClass(name); // changed
@@ -413,56 +458,65 @@ public class CompH extends ComponentHelper
         // + (isTask ? "task " : "datatype ") + name,
         // (def.similarDefinition(old, project))
         // ? Project.MSG_VERBOSE : Project.MSG_WARN);
-        if (isTask) {
+        if (isTask)
+        {
           invalidateCreatedTasks(name);
         }
       }
-      getProject().log(" +Datatype " + name + " " + def.getClassName(),
-          Project.MSG_DEBUG);
+      getProject().log(" +Datatype " + name + " " + def.getClassName(), Project.MSG_DEBUG);
       antTypeTable.put(name, def);
     }
   }
 
-  Project getProject() {
+  Project getProject()
+  {
     return (Project) getattr(project);
   }
 
-  void invalidateCreatedTasks(String name) {
+  void invalidateCreatedTasks(String name)
+  {
     Object[] args = { name };
     invoke(invalidateCreatedTasks, args);
   }
 
-  protected boolean sameDefinition(AntTypeDefinition def, AntTypeDefinition old) {
+  protected boolean sameDefinition(AntTypeDefinition def, AntTypeDefinition old)
+  {
     Object[] args = { def, old };
     Object r = invoke(sameDefinition, args);
     return ((Boolean) r).booleanValue();
   }
 
-  protected Object invoke(Method method, Object[] args) {
-    try {
+  protected Object invoke(Method method, Object[] args)
+  {
+    try
+    {
       return method.invoke(this.dlgt, args);
-    }
-    catch (Exception e) {
+    } catch (Exception e)
+    {
       System.err.println("error: `" + e + "'.");
     }
     return null;
   }
 
-  protected Object getattr(Field field) {
-    try {
+  protected Object getattr(Field field)
+  {
+    try
+    {
       return field.get(this.dlgt);
-    }
-    catch (Exception e) {
+    } catch (Exception e)
+    {
       System.err.println("error: `" + e + "'.");
     }
     return null;
   }
 
-  protected void setattr(Field field, Object val) {
-    try {
+  protected void setattr(Field field, Object val)
+  {
+    try
+    {
       field.set(this.dlgt, val);
-    }
-    catch (Exception e) {
+    } catch (Exception e)
+    {
       System.err.println("error: `" + e + "'.");
     }
   }
@@ -476,7 +530,8 @@ public class CompH extends ComponentHelper
    *         ComponentHelper.
    */
 
-  static public boolean isapplicable() {
+  static public boolean isapplicable()
+  {
     return applicable;
   }
 
@@ -489,15 +544,18 @@ public class CompH extends ComponentHelper
    *         project.
    */
 
-  static public boolean install(Project P) {
+  static public boolean install(Project P)
+  {
     ComponentHelper prv;
     Static.verbose(P, "installing customized ComponentHelper ..");
     prv = ComponentHelper.getComponentHelper(P);
-    if (prv instanceof CompH) {
+    if (prv instanceof CompH)
+    {
       /* already installed */
       return true;
     }
-    if (isapplicable()) {
+    if (isapplicable())
+    {
       CompH cur;
       cur = new CompH();
       cur.setNext(prv);
@@ -523,11 +581,13 @@ public class CompH extends ComponentHelper
    *         project.
    */
 
-  static public boolean uninstall(Project P) {
+  static public boolean uninstall(Project P)
+  {
     ComponentHelper cur;
     Static.verbose(P, "uninstalling customized ComponentHelper ..");
     cur = ComponentHelper.getComponentHelper(P);
-    if (cur instanceof CompH) {
+    if (cur instanceof CompH)
+    {
       /* uninstall */
       ComponentHelper nxt = cur.getNext();
       P.addReference("ant.ComponentHelper", nxt);

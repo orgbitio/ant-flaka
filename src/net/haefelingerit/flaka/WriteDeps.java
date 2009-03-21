@@ -1,44 +1,76 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+
 import net.haefelingerit.flaka.dep.Dependency;
+import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
-
 
 /**
  * A task which outputs a CLASSPATH ..
  * 
- * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang H&auml;felinger</a>
+ * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang
+ *         H&auml;felinger</a>
  */
 
 public class WriteDeps extends Task
 {
   /* shall point to a filelist set .. */
-  protected String refid = "deps.object";
-  protected String out   = "-";
-  protected String fmt   = "maven";
+  protected String var = "project.dependencies";
+  protected String out = "-";
+  protected String fmt = "maven";
+  protected String ifs = "\\s+";
+
+  public void setIfs(String s)
+  {
+    this.ifs = Static.trim2(s, this.ifs);
+  }
 
   /**
    * Change the resource variable to be used when reporting dependencies.
    * 
-   * The default variable is <b>deps.object</b>. This variable comes usually
-   * into existence when using task {@link net.haefelingerit.flaka.GetDeps} to retrieve
-   * dependencies from a depot.
+   * The default variable is <b>project.dependencies</b>. This variable comes
+   * usually into existence when using task
+   * {@link net.haefelingerit.flaka.GetDeps} to retrieve dependencies from a
+   * depot.
    * 
-   * @param refid
+   * @param var
    */
-  public void setRefid(String refid) {
-    this.refid = Static.trim2(refid, this.refid);
+  public void setVar(String s)
+  {
+    this.var = Static.trim2(s, this.var);
   }
 
   /**
-   * Write dependencies to file <b>s</b>.
+   * Write dependencies to loc <b>s</b>.
    * 
    * By default dependencies are writen to stdout (denoted by string "-").
    * 
    * @param s
    */
-  public void setOut(String s) {
+  public void setOut(String s)
+  {
     this.out = Static.trim2(s, this.out);
   }
 
@@ -53,57 +85,9 @@ public class WriteDeps extends Task
    * 
    * @param s
    */
-  public void setFmt(String s) {
+  public void setFmt(String s)
+  {
     this.fmt = Static.trim2(s, this.fmt);
-  }
-
-  /**
-   * Alias for method setFmt(String)
-   * 
-   * @param s
-   */
-  public void setFormat(String s) {
-    setFmt(s);
-  }
-
-  /**
-   * Reference variable id supposed to point to an array of dependencies.
-   * 
-   * @param id
-   *          can be null
-   * @return null if var does not exist or can't be converted to an array of
-   *         dependencies either. Otherwise an array of dependencies is
-   *         returned.
-   */
-  protected Dependency[] depsbyid(String id) {
-    Dependency[] L = null;
-
-    try {
-      Object obj;
-      obj = this.getref(id);
-
-      L = (Dependency[]) obj;
-      if (this.debug) {
-        for (int i = 0; L != null && i < L.length; ++i) {
-          if (L[i] == null) {
-            String m;
-            m = "** internal error - null dependency located in reference '";
-            m = m + id + "' at position #" + i;
-            System.err.println(m);
-          }
-        }
-      }
-    }
-    catch (ClassCastException ce) {
-      if (this.debug)
-        System.err.println("reference " + id
-            + " not convertable to Dependency[].");
-      L = null;
-    }
-    catch (Exception e) {
-      L = null;
-    }
-    return L;
   }
 
   /*
@@ -111,34 +95,64 @@ public class WriteDeps extends Task
    * 
    * @see org.apache.tools.ant.Task#execute()
    */
-  public void execute() throws BuildException {
-    int i;
-    String s;
-    StringBuffer B;
-    Dependency d;
-    Dependency[] D;
+  public void execute() throws BuildException
+  {
+    String s = null;
+    Dependency d = null;
+    Collection D = null;
 
-    B = null;
-    D = depsbyid(this.refid);
-
-    /* warning message if no dependency referenced */
-    if (D == null && this.debug)
-      System.err.println(this.refid + " does not hold dependency references.");
+    try
+    {
+      this.info("ref: |" + this.var + "|");
+      D = (Collection) this.getref(this.var);
+      /* warning message if no dependency referenced */
+      if (D == null && this.debug)
+        this.info(this.var + " does not hold (dependency) references.");
+      if (D != null && this.debug)
+      {
+        this.info("found #" + D.size());
+        System.out.println("found #" + D.size() + " {" + D.hashCode() + "}");
+      }
+    } catch (Exception e)
+    {
+      if (this.debug)
+      {
+        this.info(this.var + ": collection expected");
+      }
+    }
+    Iterator i;
 
     // Report dependencies in Maven style
-    if (this.fmt.matches("(?i:maven)")) {
-      B = new StringBuffer();
-      if (D == null || D.length <= 0)
-        B.append("<dependencies />");
-      else {
-        B.append("<dependencies>\n");
-        for (i = 0; i < D.length; ++i) {
-          d = D[i];
-          B.append(d.toAliased());
-          B.append('\n');
+    if (this.fmt.matches("(?i:maven)"))
+    {
+      boolean gotone = false;
+      s = "";
+      if (D != null && D.size() > 0)
+      {
+        i = D.iterator();
+        while (i.hasNext())
+        {
+          Object o = i.next();
+          String p;
+          if (o instanceof Dependency)
+          {
+            d = (Dependency) o;
+            p = d.toAliased();
+            if (p != null)
+            {
+              gotone = true;
+              s += p;
+            }
+          }
         }
-        B.append("</dependencies>\n");
       }
+      if (gotone == false)
+      {
+        s = "<dependencies />";
+      } else
+        s = "<dependencies>\n" + s + "</dependencies>";
+      this.write(s);
+      return;
     }
 
     // This format shall report dependencies as "files". Together with
@@ -148,22 +162,63 @@ public class WriteDeps extends Task
     // <dependency name="log4j">
     // => external/log4j/jars/log4j-1.2.8.jar
 
-    if (this.fmt.matches("(?i:flat|depotpath)")) {
-      B = new StringBuffer();
-      for (i = 0; D != null && i < D.length; ++i) {
-        d = D[i];
-        if (d != null) {
-          s = d.depotpath();
-          if (s != null) {
-            B.append(d.depotpath());
-            B.append('\n');
+    if (this.fmt.matches("(?i:m1|m1path)"))
+    {
+      /*
+       * Make sure to writesomething out, otherwise some stupid Ant task
+       * complain (like loadfile).
+       */
+      s = "# Maven 1 paths\n";
+      if (D != null && D.size() > 0)
+      {
+        i = D.iterator();
+        while (i.hasNext())
+        {
+          Object o = i.next();
+          String p;
+          if (o instanceof Dependency)
+          {
+            d = (Dependency) o;
+            p = d.m1path();
+            if (p != null)
+            {
+              s += p;
+              s += '\n';
+            }
           }
         }
       }
-      B.append('\n');
+      this.write(s);
+      return;
     }
 
-    // An "Ant-Epoline" dependency has an "alias" name. This is the name
+    if (this.fmt.matches("(?i:m2|m2path)"))
+    {
+      s = "# Maven 2 paths\n";
+      if (D != null && D.size() > 0)
+      {
+        i = D.iterator();
+        while (i.hasNext())
+        {
+          Object o = i.next();
+          String p = null;
+          if (o instanceof Dependency)
+          {
+            d = (Dependency) o;
+            p = d.m2path();
+            if (p != null)
+            {
+              s += p;
+              s += '\n';
+            }
+          }
+        }
+      }
+      this.write(s);
+      return;
+    }
+
+    // An "Flaka" dependency has an "alias" name. This is the name
     // used to lookup the dependency in the Baseline. When updating the
     // Baseline, a project will get asked to report dependencies which
     // are part of the Baseline.
@@ -171,64 +226,93 @@ public class WriteDeps extends Task
     // Example:
     // <dependency name="log4j" />
     // => LOG4J
-    if (this.fmt.matches("(?i:var|alias)")) {
-      String v;
-      B = new StringBuffer();
-      for (i = 0; D != null && i < D.length; ++i) {
-        d = D[i];
-        if (d != null) {
-          v = d.getAlias();
-          if (v != null) {
-            B.append(v);
-            B.append('\n');
+    if (this.fmt.matches("(?i:var|alias)"))
+    {
+      s = "# Aliases (symbolic dependencies) used\n";
+      if (D != null && D.size() > 0)
+      {
+        i = D.iterator();
+        while (i.hasNext())
+        {
+          Object o = i.next();
+          String p;
+          if (o instanceof Dependency)
+          {
+            d = (Dependency) o;
+            System.out.println(d);
+            p = d.getAlias();
+            if (p != null)
+            {
+              s += p;
+              s += '\n';
+            }
           }
         }
       }
-      B.append('\n');
-    }
-
-    if (B == null) {
-      throwbx("format `" + this.fmt
-          + "' not supported for listing dependencies.");
+      this.write(s);
       return;
     }
 
-    write(B);
+    /* unknown format */
+    throwbx("format `" + this.fmt + "' not supported for listing dependencies.");
   }
 
-  static public String[] splitbyws(String s) {
+  public String[] splitbyifs(String s)
+  {
     String[] argv = null;
-    try {
-      argv = s != null ? s.split("\\s+") : null;
-    }
-    catch (Exception e) {
-      argv = null;
+    try
+    {
+      argv = s.split(this.ifs);
+    } catch (Exception e)
+    {
+      if (this.debug)
+      {
+        this.log(e.getCause().getMessage());
+      }
     }
     return argv;
   }
 
-  protected void write(StringBuffer b) throws BuildException {
+  protected void write(String buf) throws BuildException
+  {
     String[] argv = null;
-    boolean seen = false;
+    boolean stdout = true;
+    boolean stderr = true;
     String s;
 
-    argv = splitbyws(this.out);
+    argv = splitbyifs(this.out);
 
-    for (int j = 0; argv != null && j < argv.length; ++j) {
+    for (int j = 0; j < argv.length; ++j)
+    {
       s = argv[j].trim();
-      if (seen == false && (s == null || s.equals("") || s.equals("-"))) {
-        log(b.toString());
-        seen = true;
-      } else {
-        try {
-          Static.writex(s, b.toString(), false);
-          if (this.debug)
-            log("wrote dependencies into file `" + s + "' using format `"
-              + this.fmt + "'.");
+      if (s == null || s.equals("") || s.equals("-"))
+      {
+        if (stdout)
+        {
+          System.out.println(buf);
+          stdout = false;
         }
-        catch (Exception e) {
-          throwbx("failed to write dependencies to file `" + this.out + "'", e);
+        continue;
+      }
+      if (s.equals("--"))
+      {
+        if (stderr)
+        {
+          System.err.println(buf);
+          stderr = false;
         }
+        continue;
+      }
+      File file = toFile(s);
+      try
+      {
+        Static.writex(file, buf, false);
+        if (this.debug)
+          log("wrote dependencies into loc `" + s + "' using format `" + this.fmt + "'.");
+      } catch (Exception e)
+      {
+        String fname = file.getAbsolutePath();
+        throwbx("failed to writing to `" + fname + "'", e);
       }
     }
   }

@@ -7,7 +7,7 @@
     <c:dependency groupId="log4j" artifactId="log4j" version="1.2.8" />
   </c:dependencies>
 
-  <!-- Retrieve dependencies in order to create reference deps.object -->
+  <!-- Retrieve dependencies in order to create reference project.dependencies -->
   <c:getdeps dst="${basedir}/lib" />
 
   <echo>** Example V</echo>

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.io.File;
@@ -23,16 +41,17 @@ public class HttpUpload
   protected static final Pattern SUBMI_P;
 
   // protected static String DEPOTBASE;
-  protected static String        ENDPOINT;
-  protected static String        TIMEOUT;
-  protected static String        TESTONLY;
-  protected static String        USER;
-  protected static String        PASSWD;
+  protected static String ENDPOINT;
+  protected static String TIMEOUT;
+  protected static String TESTONLY;
+  protected static String USER;
+  protected static String PASSWD;
 
-  protected Properties           param = new Properties();
-  protected boolean              debug = false;
+  protected Properties param = new Properties();
+  protected boolean debug = false;
 
-  public HttpUpload() {
+  public HttpUpload()
+  {
     reset();
   }
 
@@ -53,14 +72,12 @@ public class HttpUpload
     /* default test mode */
     PASSWD = "sesame";
 
- 
-    SUBMI_P =
-      Pattern
-          .compile("(?:Accepted into depot|Submission would have been stored) as"
-              + "\\s+([^\\s<]+)");
+    SUBMI_P = Pattern.compile("(?:Accepted into depot|Submission would have been stored) as"
+        + "\\s+([^\\s<]+)");
   }
 
-  public void reset() {
+  public void reset()
+  {
     this.param.clear();
     set("testonly", TESTONLY);
     set("endpoint", ENDPOINT);
@@ -83,19 +100,20 @@ public class HttpUpload
    * @name or
    * @otherwise if not available.
    */
-  public String get(String name, String otherwise) {
+  public String get(String name, String otherwise)
+  {
     return this.param.getProperty(name, otherwise);
   }
 
-  public String set(String name, String value) {
+  public String set(String name, String value)
+  {
     String before;
 
     before = this.param.getProperty(name);
     if (value != null)
     {
       this.param.put(name, value);
-    }
-    else
+    } else
     {
       /* remove key */
       if (before != null)
@@ -104,35 +122,36 @@ public class HttpUpload
     return before;
   }
 
-  protected static void syslog(String s) {
+  protected static void syslog(String s)
+  {
     System.err.println(s);
     System.err.flush();
   }
 
-  public void setDebug(boolean b) {
+  public void setDebug(boolean b)
+  {
     this.debug = b;
     HttpUpload.debug(b);
   }
 
-  static protected void debug(boolean b) {
+  static protected void debug(boolean b)
+  {
     /* set debug properties */
-    System.setProperty("org.apache.commons.logging.Log",
-        "org.apache.commons.logging.impl.SimpleLog");
+    System.setProperty(
+      "org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
 
-    System.setProperty("org.apache.commons.logging.simplelog.showdatetime",
-        "true");
+    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
 
     System.setProperty(
-        "org.apache.commons.logging.simplelog.log.httpclient.wire.header",
-        b ? "debug" : "info");
+      "org.apache.commons.logging.simplelog.log.httpclient.wire.header", b ? "debug" : "info");
 
-    System
-        .setProperty(
-            "org.apache.commons.logging.simplelog.log.org.apache.commons.httpclient",
-            b ? "debug" : "info");
+    System.setProperty(
+      "org.apache.commons.logging.simplelog.log.org.apache.commons.httpclient", b ? "debug"
+          : "info");
   }
 
-  static private String getp(String p) {
+  static private String getp(String p)
+  {
     String s = System.getProperties().getProperty(p);
     if (s == null && !p.equals("httpupload.debug"))
     {
@@ -142,44 +161,49 @@ public class HttpUpload
     return s != null ? s.trim() : null;
   }
 
-  static private String getp(String p, String otherwise) {
+  static private String getp(String p, String otherwise)
+  {
     String s = System.getProperties().getProperty(p);
     return (s == null) ? otherwise : s.trim();
   }
 
-  private String passwd() {
+  private String passwd()
+  {
     return get("passwd", HttpUpload.PASSWD);
   }
 
-  private String user() {
+  private String user()
+  {
     return get("user", HttpUpload.USER);
   }
 
-  static private FilePart filepart(File file) {
+  static private FilePart filepart(File file)
+  {
     FilePart p = null;
     try
     {
       p = new FilePart("jarfile", file);
-    }
-    catch (Exception e)
+    } catch (Exception e)
     {
-      System.err.println("error reading file `" + file.getName() + "'.");
+      System.err.println("error reading loc `" + file.getName() + "'.");
       System.exit(1);
     }
     return p;
   }
 
-  private void setError(String msg) {
+  private void setError(String msg)
+  {
     set("errmsg", msg);
   }
 
-  public String getError() {
+  public String getError()
+  {
     return get("errmsg", null);
   }
 
-  protected static void xmlattr(StringBuffer buf, String key, String val) {
-    if (buf != null && key != null && val != null
-        && val.matches("\\s*") == false)
+  protected static void xmlattr(StringBuffer buf, String key, String val)
+  {
+    if (buf != null && key != null && val != null && val.matches("\\s*") == false)
     {
       buf.append(" ");
       buf.append(key);
@@ -189,9 +213,9 @@ public class HttpUpload
     }
   }
 
-  protected static void xmldata(StringBuffer buf, String elm, String val) {
-    if (buf != null && elm != null && val != null
-        && val.matches("\\s*") == false)
+  protected static void xmldata(StringBuffer buf, String elm, String val)
+  {
+    if (buf != null && elm != null && val != null && val.matches("\\s*") == false)
     {
       buf.append("<");
       buf.append(elm);
@@ -203,13 +227,13 @@ public class HttpUpload
     }
   }
 
-  protected static String getResponseFrom(HttpMethod meth) {
+  protected static String getResponseFrom(HttpMethod meth)
+  {
     String r = null;
     try
     {
       r = meth.getResponseBodyAsString();
-    }
-    catch (Exception e)
+    } catch (Exception e)
     {
       syslog("error reading HTTP response .." + e.getMessage());
     }
@@ -232,7 +256,8 @@ public class HttpUpload
    *          not null
    * @return true if all went well
    */
-  protected boolean eval(HttpMethod meth) {
+  protected boolean eval(HttpMethod meth)
+  {
     Matcher regex;
     String response = null;
     StringBuffer buf = new StringBuffer("");
@@ -244,7 +269,7 @@ public class HttpUpload
     xmlattr(buf, "endpoint", get("endpoint", ENDPOINT));
     xmlattr(buf, "timeout", get("timeout", TIMEOUT));
     xmlattr(buf, "user", get("user", USER));
-    xmlattr(buf, "file", get("filepath", null));
+    xmlattr(buf, "loc", get("filepath", null));
     xmlattr(buf, "size", get("filesize", null));
 
     /* If there was already an error, handle it now */
@@ -283,7 +308,8 @@ public class HttpUpload
     /* save response for later usage */
     this.set("resbuf", response);
 
-    /* We assume that everything went well, if respone text contains an
+    /*
+     * We assume that everything went well, if respone text contains an
      * acceptance message.
      */
     regex = SUBMI_P.matcher(response);
@@ -317,7 +343,8 @@ public class HttpUpload
     return true;
   }
 
-  protected void setcred(HttpClient client) {
+  protected void setcred(HttpClient client)
+  {
     AuthScope scope;
     UsernamePasswordCredentials creds;
     scope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT);
@@ -325,23 +352,23 @@ public class HttpUpload
     client.getState().setCredentials(scope, creds);
   }
 
-  protected void settimeout(HttpClient client) {
+  protected void settimeout(HttpClient client)
+  {
     String s = get("timeout", HttpUpload.TIMEOUT);
     try
     {
       int timeout;
       timeout = Integer.parseInt(s);
       /* set default timeout */
-      client.getHttpConnectionManager().getParams().setConnectionTimeout(
-          timeout);
-    }
-    catch (Exception e)
+      client.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);
+    } catch (Exception e)
     {
       syslog("* unable to set standard connection timeout to `" + s + "'.");
     }
   }
 
-  protected boolean exec(HttpMethod meth) {
+  protected boolean exec(HttpMethod meth)
+  {
     HttpClient client;
     boolean rc = false;
 
@@ -357,12 +384,10 @@ public class HttpUpload
       {
         setError(meth.getStatusLine().toString());
       }
-    }
-    catch (java.net.UnknownHostException ex)
+    } catch (java.net.UnknownHostException ex)
     {
       set("errmsg", "unable to resolve host `" + ex.getMessage() + "'.");
-    }
-    catch (Exception ex)
+    } catch (Exception ex)
     {
       setError(ex.getClass().getName() + " " + ex.getMessage());
       if (this.debug)
@@ -375,7 +400,8 @@ public class HttpUpload
     return rc;
   }
 
-  public boolean upload() {
+  public boolean upload()
+  {
     File file = null;
     String endpoint = get("endpoint", HttpUpload.ENDPOINT);
     String testonly = get("testonly", HttpUpload.TESTONLY);
@@ -404,8 +430,7 @@ public class HttpUpload
       if (testonly == null || testonly.matches("\\s*false\\s*"))
       {
         testonly = "x-do-not-test";
-      }
-      else
+      } else
       {
         testonly = "test";
       }
@@ -416,44 +441,38 @@ public class HttpUpload
         return true;
       }
 
-      /* file to upload */
+      /* loc to upload */
       file = new File(filepath);
       if (file.exists() == false)
       {
-        setError("file `" + file.getPath() + "' does not exist.");
+        setError("loc `" + file.getPath() + "' does not exist.");
         return false;
       }
       if (file.isFile() == false)
       {
-        setError("file `" + file.getPath() + "' exists but not a file.");
+        setError("loc `" + file.getPath() + "' exists but not a loc.");
         return false;
       }
       if (file.canRead() == false)
       {
-        setError("file `" + file.getPath() + "' can't be read.");
+        setError("loc `" + file.getPath() + "' can't be read.");
         return false;
       }
 
-      set("filesize",""+file.length());
-      
+      set("filesize", "" + file.length());
+
       /* create HTTP method */
       filePost = new PostMethod(endpoint);
 
-      Part[] parts =
-        {
-            new StringPart(testonly, "(opaque)"), filepart(file)
-        };
+      Part[] parts = { new StringPart(testonly, "(opaque)"), filepart(file) };
 
-      filePost.getParams().setBooleanParameter(
-          HttpMethodParams.USE_EXPECT_CONTINUE, false);
+      filePost.getParams().setBooleanParameter(HttpMethodParams.USE_EXPECT_CONTINUE, false);
 
-      filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost
-          .getParams()));
+      filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost.getParams()));
 
       /* execute method */
       rc = exec(filePost) && eval(filePost);
-    }
-    finally
+    } finally
     {
       /* release resources in just any case */
       if (filePost != null)
@@ -462,11 +481,12 @@ public class HttpUpload
     return rc;
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+  {
     HttpUpload httpclient = null;
     if (args.length <= 0)
     {
-      System.err.println("usage: <prog> file [file ..]");
+      System.err.println("usage: <prog> loc [loc ..]");
       System.exit(1);
     }
 
@@ -487,12 +507,11 @@ public class HttpUpload
     for (int i = 0; i < args.length; ++i)
     {
       httpclient.set("filepath", args[i]);
-      syslog("uploading file `" + args[i] + "'..");
+      syslog("uploading loc `" + args[i] + "'..");
       if (!httpclient.upload())
       {
         syslog("upload failed `" + httpclient.getError() + "'");
-      }
-      else
+      } else
       {
         System.out.println(httpclient.get("xmlbuf", ""));
       }

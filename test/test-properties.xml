@@ -1,12 +1,18 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <c:set var="foobar" value="foobar" />
-  <c:inline-properties>
-    foobar = yoyo
-  </c:inline-properties>
-  <echo>${foobar}</echo>
+  <c:set>
+    foo = 'foo'
+  </c:set>
+  <c:properties>
+    ; this is \
+    a comment
+    bar = bar
+    foobar = \
+    #{foo.toupper}${bar}
+  </c:properties>
 
-  <echo>debug=${debug}</echo>
-  <c:unset var=" debug " />
-  <fail message="debug defined via command line .." if="debug" />
-  <echo>debug=${debug}</echo>
+  <echo>foobar = ${foobar}</echo>
+  <c:when test="not (property.foobar == 'FOObar')">
+    <c:fail message="unexpected value for property foobar: #{property.foobar}" />
+  </c:when>
+
 </project>

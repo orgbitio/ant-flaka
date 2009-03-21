@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.util.ArrayList;
@@ -5,7 +23,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.haefelingerit.flaka.util.Static;
+
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Sequential;
 
 /**
@@ -14,142 +35,170 @@ import org.apache.tools.ant.taskdefs.Sequential;
  */
 public class Switch extends Task
 {
-  protected String     value     = "";
-  protected List       cases     = new ArrayList();
+  protected String value = "";
+  protected List cases = new ArrayList();
   protected Sequential defaultcase;
-  protected String     stem      = "switch";
+  protected String stem = "switch";
 
-  protected boolean    igcase    = true;
-  protected boolean    dotall    = false;
-  protected boolean    unixlines = false;
-  protected boolean    comments  = false;
-  protected boolean    multiline = false;
-  protected boolean    find      = false;
+  protected boolean igcase = true;
+  protected boolean dotall = false;
+  protected boolean unixlines = false;
+  protected boolean comments = false;
+  protected boolean multiline = false;
+  protected boolean find = false;
 
-  public void setStem(String s) {
+  public void setStem(String s)
+  {
     this.stem = Static.trim2(s, this.stem);
   }
 
-  public void setIgnoreCase(boolean b) {
+  public void setIgnoreCase(boolean b)
+  {
     this.igcase = b;
   }
 
-  public void setFind(boolean b) {
+  public void setFind(boolean b)
+  {
     this.find = b;
   }
 
-  public void setDotAll(boolean b) {
+  public void setDotAll(boolean b)
+  {
     this.dotall = b;
   }
 
-  public void setUnixLines(boolean b) {
+  public void setUnixLines(boolean b)
+  {
     this.unixlines = b;
   }
 
-  public void setComments(boolean b) {
+  public void setComments(boolean b)
+  {
     this.comments = b;
   }
 
-  public void setMultiLine(boolean b) {
+  public void setMultiLine(boolean b)
+  {
     this.multiline = b;
   }
 
-  public void setValue(String value) {
+  public void setValue(String value)
+  {
     this.value = Static.trim2(value, this.value);
   }
 
   /** Case class */
   public final class Case extends Sequential
   {
-    protected String  caseval   = null;
+    protected String caseval = null;
     protected boolean shellglob = false;
-    protected String  cstem;
-    protected boolean viamatch  = false;
+    protected String cstem;
+    protected boolean viamatch = false;
     /* flags */
-    protected boolean igcase    = Switch.this.igcase;
-    protected boolean dotall    = Switch.this.dotall;
+    protected boolean igcase = Switch.this.igcase;
+    protected boolean dotall = Switch.this.dotall;
     protected boolean unixlines = Switch.this.unixlines;
-    protected boolean comments  = Switch.this.comments;
+    protected boolean comments = Switch.this.comments;
     protected boolean multiline = Switch.this.multiline;
-    protected boolean find      = Switch.this.find;
+    protected boolean find = Switch.this.find;
 
-    public Case(String stem) {
+    public Case(String stem)
+    {
       super();
       setStem(stem);
     }
 
-    public void setValue(String value) {
+    public void setValue(String value)
+    {
       this.caseval = value;
       this.viamatch = false;
     }
 
-    public void setMatch(String value) {
+    public void setMatch(String value)
+    {
       this.caseval = value;
       this.viamatch = true;
     }
 
-    public void setIgnoreCase(boolean b) {
+    public void setIgnoreCase(boolean b)
+    {
       this.igcase = b;
     }
 
-    public void setFind(boolean b) {
+    public void setFind(boolean b)
+    {
       this.find = b;
     }
 
-    public void setDotAll(boolean b) {
+    public void setDotAll(boolean b)
+    {
       this.dotall = b;
     }
 
-    public void setUnixLines(boolean b) {
+    public void setUnixLines(boolean b)
+    {
       this.unixlines = b;
     }
 
-    public void setComments(boolean b) {
+    public void setComments(boolean b)
+    {
       this.comments = b;
     }
 
-    public void setMultiLine(boolean b) {
+    public void setMultiLine(boolean b)
+    {
       this.multiline = b;
     }
 
-    public void setShellGlob(boolean b) {
+    public void setShellGlob(boolean b)
+    {
       this.shellglob = b;
     }
 
-    public void setGlob(boolean b) {
+    public void setGlob(boolean b)
+    {
       this.shellglob = b;
     }
 
-    public void setStem(String S) {
+    public void setStem(String S)
+    {
       String s = S;
       s = Static.trim2(s, this.cstem);
-      if (!s.endsWith(".")) {
+      if (!s.endsWith("."))
+      {
         s += '.';
       }
       this.cstem = s;
     }
 
-    public int flags() {
+    public int flags()
+    {
       int flags = 0;
-      if (this.igcase) {
+      if (this.igcase)
+      {
         flags |= Pattern.CASE_INSENSITIVE;
       }
-      if (this.dotall) {
+      if (this.dotall)
+      {
         flags |= Pattern.DOTALL;
       }
-      if (this.multiline) {
+      if (this.multiline)
+      {
         flags |= Pattern.MULTILINE;
       }
-      if (this.comments) {
+      if (this.comments)
+      {
         flags |= Pattern.COMMENTS;
       }
-      if (this.unixlines) {
+      if (this.unixlines)
+      {
         flags |= Pattern.UNIX_LINES;
       }
       return flags;
     }
 
-    protected boolean match(Pattern regex, String value, boolean find) {
+    protected boolean match(Pattern regex, String value, boolean find)
+    {
       int i;
       boolean r = false;
       Matcher M;
@@ -162,21 +211,25 @@ public class Switch extends Task
       set(this.cstem + "n", "" + M.groupCount());
       set(this.cstem + "v", value);
 
-      if (r) {
-        for (i = 0; i <= M.groupCount(); ++i) {
+      if (r)
+      {
+        for (i = 0; i <= M.groupCount(); ++i)
+        {
           set(this.cstem + "g" + i, M.group(i));
           set(this.cstem + "s" + i, "" + M.start(i));
           set(this.cstem + "e" + i, "" + M.end(i));
         }
-      } else {
+      } else
+      {
         set(this.cstem + "g0", "" + value);
         set(this.cstem + "s0", "" + 0);
         set(this.cstem + "e0", "" + value.length());
       }
-      if (Switch.this.debug) {
+      if (Switch.this.debug)
+      {
         String pattern = M.pattern().pattern();
-        System.err.println("matching regex/pat |" + this.caseval
-            + "| against |" + value + "| using regex |" + pattern + "| => " + r);
+        System.err.println("matching regex/pat |" + this.caseval + "| against |" + value
+            + "| using regex |" + pattern + "| => " + r);
       }
       return r;
     }
@@ -185,7 +238,8 @@ public class Switch extends Task
      * @param value
      *          not null
      */
-    public boolean legacymatch(String value) {
+    public boolean legacymatch(String value)
+    {
       boolean r = false;
       Pattern regex;
       int f;
@@ -195,12 +249,14 @@ public class Switch extends Task
       s = this.caseval;
       if (this.shellglob)
         s = Static.patternAsRegex(this.caseval);
-      try {
+      try
+      {
         regex = Pattern.compile(s, f);
         r = match(regex, value, true);
-      }
-      catch (Exception e) {
-        if (Switch.this.debug) {
+      } catch (Exception e)
+      {
+        if (Switch.this.debug)
+        {
           System.err.println("** exception seen: " + e);
         }
       }
@@ -211,7 +267,8 @@ public class Switch extends Task
      * @param value
      *          not null
      */
-    public boolean match(String value) {
+    public boolean match(String value)
+    {
       boolean r = false;
       Pattern P = null;
 
@@ -225,11 +282,16 @@ public class Switch extends Task
      * @param var
      * @param val
      */
-    private void set(String var, String val) {
-      if (var != null) {
-        unset(var);
-        if (val != null) {
-          getProject().setProperty(var, val);
+    private void set(String var, String val)
+    {
+      Project project;
+      if (var != null)
+      {
+        project = getProject();
+        Static.unset(project, var);
+        if (val != null)
+        {
+          project.setProperty(var, val);
         }
       }
     }
@@ -239,9 +301,9 @@ public class Switch extends Task
    * @return
    * @throws BuildException
    */
-  public Switch.Case createCase() throws BuildException {
-    if (this.stem == null || this.stem.length() <= 0
-        || this.stem.matches("^\\s*$"))
+  public Switch.Case createCase() throws BuildException
+  {
+    if (this.stem == null || this.stem.length() <= 0 || this.stem.matches("^\\s*$"))
       throw new BuildException("bad stem `" + this.stem + "'");
     Switch.Case res = new Switch.Case(this.stem);
     this.cases.add(res);
@@ -252,7 +314,8 @@ public class Switch extends Task
    * @param res
    * @throws BuildException
    */
-  public void addDefault(Sequential res) throws BuildException {
+  public void addDefault(Sequential res) throws BuildException
+  {
     if (this.defaultcase != null)
       throw new BuildException("cannot specify multiple default cases");
     this.defaultcase = res;
@@ -262,7 +325,8 @@ public class Switch extends Task
    * @param res
    * @throws BuildException
    */
-  public void addOtherwise(Sequential res) throws BuildException {
+  public void addOtherwise(Sequential res) throws BuildException
+  {
     addDefault(res);
   }
 
@@ -271,18 +335,21 @@ public class Switch extends Task
    * 
    * @see org.apache.tools.ant.Task#execute()
    */
-  public void execute() throws BuildException {
+  public void execute() throws BuildException
+  {
     boolean b;
     Case c;
     Sequential s;
 
     /* we need a value to do something .. */
-    if (this.value == null) {
+    if (this.value == null)
+    {
       debug("no switch value given ..");
       return;
     }
 
-    if (this.cases.size() == 0 && this.defaultcase == null) {
+    if (this.cases.size() == 0 && this.defaultcase == null)
+    {
       debug("no switch cases given ..");
       return;
     }
@@ -290,9 +357,10 @@ public class Switch extends Task
     b = false;
     s = null;
     c = null;
-    for (int i = 0; !b && i < this.cases.size(); i++) {
+    for (int i = 0; !b && i < this.cases.size(); i++)
+    {
       c = (Case) this.cases.get(i);
-      b = c.viamatch ? c.match(this.value) : c.legacymatch(this.value);
+      b = c.match(this.value);
     }
     s = b ? c : this.defaultcase;
     if (s != null)

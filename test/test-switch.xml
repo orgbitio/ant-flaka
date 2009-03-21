@@ -29,10 +29,11 @@
   </c:switch>
 
   <c:switch value="foobar" debug="true">
-    <case value="ob">
+    <case match="ob">
+    	<fail message="test 0x05 fails"/>
     </case>
     <default>
-      <fail message="test 0x05 fails"/>
+      
     </default>
   </c:switch>
 
@@ -82,7 +83,7 @@
     <attribute name="cand" />
     <attribute name="this" />
     <sequential>
-      <c:unless test="'@{this}' = '@{cand}'">
+      <c:unless test=" '@{this}' == '@{cand}' ">
         <fail message="unexpected '@{cand}', expected '@{this}'" />
       </c:unless>
     </sequential>
@@ -90,8 +91,8 @@
   
   <c:switch value="v-uat_3_20_500" stem="g">
     <case match = "/v-(?:([^\d][^_]*)_)?(\d.*)/" stem="g">
-      <expect cand="${g.p}" this="v-(?:([^\d][^_]*)_)?(\d.*)" />
-      <expect cand="${g.n}" this="2" />
+      <expect cand="${g.p}"  this="v-(?:([^\d][^_]*)_)?(\d.*)" />
+      <expect cand="${g.n}"  this="2" />
       <expect cand="${g.g0}" this="v-uat_3_20_500" />
       <expect cand="${g.g1}" this="uat" />
       <expect cand="${g.g2}" this="3_20_500" />

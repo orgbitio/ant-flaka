@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.io.File;
@@ -5,72 +23,87 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.haefelingerit.flaka.util.Static;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 
 public class HttpUploadTask extends Task
 {
-  protected File       rcfile;
+  protected File rcfile;
   protected HttpUpload uploader;
-  protected List       filesets;
-  protected File       logdir;
-  protected String     acceptpat;
-  protected String     errorpat;
+  protected List filesets;
+  protected File logdir;
+  protected String acceptpat;
+  protected String errorpat;
 
-  public HttpUploadTask() {
+  public HttpUploadTask()
+  {
     this.uploader = new HttpUpload();
     this.filesets = new ArrayList();
     this.logdir = null;
   }
 
-  public void setAcceptIf(String s) {
-    this.acceptpat = Static.trim2(s,this.acceptpat);
+  public void setAcceptIf(String s)
+  {
+    this.acceptpat = Static.trim2(s, this.acceptpat);
   }
-  public void setErrorIf(String s) {
-    this.errorpat = Static.trim2(s,this.errorpat);
+
+  public void setErrorIf(String s)
+  {
+    this.errorpat = Static.trim2(s, this.errorpat);
   }
-  
-  public void setLogdir(File logdir) {
+
+  public void setLogdir(File logdir)
+  {
     this.logdir = logdir;
   }
 
-  public void setEndpoint(String S) {
+  public void setEndpoint(String S)
+  {
     String s = Static.trim2(S, null);
     if (s != null)
       this.uploader.set("endpoint", s);
   }
 
-  public void setTest(boolean b) {
+  public void setTest(boolean b)
+  {
     this.uploader.set("testonly", b ? "true" : "false");
   }
 
-  public void setCategory(String S) {
+  public void setCategory(String S)
+  {
     String s = Static.trim2(S, null);
     if (s != null)
       this.uploader.set("category", s);
   }
 
-  public void setRcFile(File file) {
+  public void setRcFile(File file)
+  {
     this.rcfile = file;
   }
 
-  public void setDebug(boolean b) {
+  public void setDebug(boolean b)
+  {
     this.uploader.setDebug(b);
   }
 
-  public void addFileset(FileSet set) {
+  public void addFileset(FileSet set)
+  {
     if (set != null)
     {
       this.filesets.add(set);
     }
   }
 
-  public boolean isTest() {
+  public boolean isTest()
+  {
     return this.uploader.get("testonly", "").matches("\\s*true\\s*");
   }
 
-  public String[] eval(FileSet fs) throws BuildException {
+  public String[] eval(FileSet fs) throws BuildException
+  {
     DirectoryScanner ds;
     File dir;
     String[] files;
@@ -94,7 +127,8 @@ public class HttpUploadTask extends Task
   }
 
   // The method executing the task
-  public void execute() throws BuildException {
+  public void execute() throws BuildException
+  {
     String s;
 
     if (this.debug)
@@ -108,7 +142,7 @@ public class HttpUploadTask extends Task
       throwbx("this task must be used with at least on <fileset>.");
     }
 
-    /* read username and password from a hidden RC file */
+    /* read username and password from a hidden RC loc */
     if (this.rcfile != null)
     {
       String[] words;
@@ -116,13 +150,13 @@ public class HttpUploadTask extends Task
       s = this.rcfile.getAbsolutePath();
       if (!this.rcfile.exists())
       {
-        throwbx("file `" + s + "' does not exist.");
+        throwbx("loc `" + s + "' does not exist.");
       }
-      /* read username and password from this file */
+      /* read username and password from this loc */
       s = Static.readlines(this.rcfile);
       if (s == null)
       {
-        throwbx("unable to read from file `" + s + "'.");
+        throwbx("unable to read from loc `" + s + "'.");
         return;
       }
 
@@ -131,7 +165,7 @@ public class HttpUploadTask extends Task
 
       if (words == null || words.length < 2)
       {
-        throwbx("syntax error while parsing file `" + s + "' -  too few words.");
+        throwbx("syntax error while parsing loc `" + s + "' -  too few words.");
         return;
       }
 
@@ -142,9 +176,9 @@ public class HttpUploadTask extends Task
 
     boolean errorseen = false;
 
-    /* TODO: not used right now ..*/
-    this.uploader.set("accept-if",this.acceptpat);
-    
+    /* TODO: not used right now .. */
+    this.uploader.set("accept-if", this.acceptpat);
+
     for (int i = 0; i < this.filesets.size(); ++i)
     {
       String[] files;
@@ -166,7 +200,7 @@ public class HttpUploadTask extends Task
         if (this.logdir != null)
         {
           String buf;
-          String name = f.getPath().replaceAll("/|\\.\\.|\\\\|:|\\.","_");
+          String name = f.getPath().replaceAll("/|\\.\\.|\\\\|:|\\.", "_");
           buf = this.uploader.get("xmlbuf", null);
           savebuf(buf, "upload-" + name + ".xml");
           buf = this.uploader.get("resbuf", null);
@@ -182,10 +216,9 @@ public class HttpUploadTask extends Task
             info(errmsg);
           else
             throwbx(errmsg);
-        }
-        else
+        } else
         {
-          info("file `" + this.uploader.get("filepath", "") + "' uploaded.");
+          info("loc `" + this.uploader.get("filepath", "") + "' uploaded.");
         }
       }
     }
@@ -202,7 +235,8 @@ public class HttpUploadTask extends Task
    * @param fname
    * @return true if no error occured
    */
-  private boolean savebuf(String buf, String fname) {
+  private boolean savebuf(String buf, String fname)
+  {
     boolean good = true;
     FileOutputStream fo = null;
     File u;
@@ -215,13 +249,11 @@ public class HttpUploadTask extends Task
       {
         fo = new FileOutputStream(u);
         fo.write(buf.getBytes());
-      }
-      catch (Exception e)
+      } catch (Exception e)
       {
         good = false;
         this.error("unable to write upload log report: ", e);
-      }
-      finally
+      } finally
       {
         Static.close(fo);
       }

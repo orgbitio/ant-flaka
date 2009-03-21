@@ -1,9 +1,29 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 public class HttpStatusText
 {
-  final static public String explain(int status) {
-    switch (status) {
+  final static public String explain(int status)
+  {
+    switch (status)
+    {
       case 100:
         return "100 Continue: The client SHOULD continue with its request. This interim response is used to inform the client that the initial part of the request has been received and has not yet been rejected by the server.";
 
@@ -20,7 +40,7 @@ public class HttpStatusText
         return "202 Accepted: The request has been accepted for processing, but the processing has not been completed.";
 
       case 203:
-        return "203 Non-Authoritative Information: The returned metainformation in the entity-header is not the definitive set as available from the origin server, but is gathered from a local or a third-party copy.";
+        return "203 Non-Authoritative Information: The returned metainformation in the entity-header is not the definitive set as available from the origin server, but is gathered from a file or a third-party copy.";
 
       case 204:
         return "204 No Content: The server has fulfilled the request but does not need to return an entity-body, and might want to return updated metainformation.";
@@ -118,8 +138,7 @@ public class HttpStatusText
         return "505 HTTP Version Not Supported: The server does not support, or refuses to support, the HTTP protocol version that was used in the request message.";
 
       default:
-        return status
-            + ": not a status according to RFC 2616, http://www.w3.org/Protocols/rfc2616";
+        return status + ": not a status according to RFC 2616, http://www.w3.org/Protocols/rfc2616";
     }
   }
 }

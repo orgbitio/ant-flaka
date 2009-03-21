@@ -1,10 +1,29 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka.dep;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
+
+import org.apache.tools.ant.Project;
 
 
 // Regarding Maven (1.02) element <jar> within a dependency:
@@ -77,21 +96,91 @@ import java.util.TreeMap;
 //
 public class Dependency
 {
-  protected short    stat        = 0;            /* current status */
-  protected String   alias       = null;         
-  protected String   _version;
-  protected String   _id;
-  protected String   _url;
-  protected String   _type;
-  protected String   _groupid;
-  protected String   _artifactid;
-  protected String   _jar;
-  protected String[] _scope      = { "compile" };
-  protected Map      _properties = new TreeMap(); // properties
-  protected URL      _remote;                    // used for display purposes
-  protected File     _local      = null;
-  protected File     file        = null;
-
+  final static public int UDM_REGULAR = 0;
+  final static public int UDM_SNAPSHOT = 1;
+  final static public int UDM_SNAPSHOT_STRICT = 2;
+  // status codes
+  // This dependency is in it's initial state, no artefact is associated.
+  public static final short UNKOWN                     = 0;
+  // This dependency needs to be resolved against a Baseline, no artefact
+  // associated.
+  public static final short UNRESOLVED                 = 1;
+  // This dependency has been retrieved from a remote location; artefact 
+  // is associated
+  public static final short RETRIEVED_REMOTE           = 2;
+  // The dep was found in the file cache
+  public static final short RETRIEVED_CACHE            = 3;
+  // The dependency exists locally and is up-to-date
+  public static final short ISCURRENT          = 4;
+  // The dependency could not be found either on the network or
+  // in the file cache or file directory
+  public static final short NOTFOUND                   = 5;
+  // The dependency exists but cannot be
+  // downloaded from the given URL
+  public static final short IOERROR_REMOTE             = 6;
+  // The dependency exists in a cache but cannot be
+  // copied over
+  public static final short IOERROR_CACHE              = 7;
+  public static final short ILLEGAL_STATE              = 8;
+  
+  /* The status of this dependency regarding retrieval */
+  protected short    stat        = UNKOWN;
+  /* The logical name of this dependency (if any) */
+  protected String   alias       = null;
+  /* The revision/version */
+  protected String   rev;
+  /* The type */
+  protected String   type;
+  /* The group */
+  protected String   group;
+  /* The name */
+  protected String   name;
+  /* The alternative name-rev for irregular typed names */
+  protected String   jar;
+  /* The usage scopes of this dependency */
+  protected String[] scope      = { "compile" };
+  /* Additional properties */
+  protected Map      props = null;
+  /* The materialized dependency */
+  protected File     file      = null;
+  /* The location of this dependency's declaration */
+  protected String   loc        = null;
+  /* The alternative location from where to get the artifact */
+  protected String   alt;
+  /* The url used for remote retrieval */
+  protected URL      url;
+  /* The update mode */
+  public byte mode = UDM_REGULAR;
+  /* Error message */
+  public String errmsg = null;
+  /* This is the task which created this dependency */
+  public Project proj;
+  
+  public Dependency(Project proj) {
+    super();
+    this.proj = proj;
+  }
+  
+  public Object clone() {
+    Dependency d = new Dependency(this.proj);
+    d.alias = this.alias;
+    d.stat  = this.stat;
+    d.rev   = this.rev;
+    d.type  = this.type;
+    d.group = this.group;
+    d.name  = this.name;
+    d.jar   = this.jar;
+    d.scope = this.scope;
+    d.props = this.props;
+    d.file  = this.file;
+    d.loc   = this.loc;
+    d.alt   = this.alt;
+    d.url   = this.url;
+    d.mode  = this.mode;
+    d.errmsg= this.errmsg;
+    return d;
+  }
+  
   public void setStatus(short x) {
     this.stat = x;
   }
@@ -113,57 +202,54 @@ public class Dependency
       return;
     /* we don't normalize here, we take the alias as is */
     this.alias = s;
-  }
-
- 
-
-  /**
-   * @return id
-   */
-  public String getId() {
-    return this._id;
+    this.stat = UNRESOLVED;
   }
 
   /**
-   * @return url
+   * @return alt
    */
-  public String getUrl() {
-    return this._url;
+  public URL getURL() {
+    return this.url;
+  }
+
+  public void setURL(URL url) {
+    this.url = url;
+  }
+
+  /**
+   * @return alt
+   */
+  public String getAlt() {
+    return this.alt;
   }
 
   /**
    * @return version
    */
   public String getVersion() {
-    return this._version;
+    return this.rev;
   }
 
-  /**
-   * @param string
-   */
-  public void setId(String string) {
-    this._id = string;
-  }
-
+  
   /**
    * @param string
    */
   public void setUrl(String string) {
-    this._url = string;
+    this.alt = string;
   }
 
   /**
    * @param string
    */
   public void setVersion(String string) {
-    this._version = string;
+    this.rev = string;
   }
 
   /**
    * @return the type (or extension) of the dependency
    */
   public String getType() {
-    return this._type;
+    return this.type;
   }
 
   /**
@@ -172,89 +258,89 @@ public class Dependency
    * @param string
    */
   public void setType(String string) {
-    this._type = string;
+    this.type = string;
   }
 
   /**
    * @return artifact name
    */
   public String getArtifactId() {
-    return this._artifactid;
+    return this.name;
   }
 
   /**
    * @return group name
    */
   public String getGroupId() {
-    return this._groupid;
+    return this.group;
   }
 
   /**
    * @return jar
    */
   public String getJar() {
-    return this._jar;
+    return this.jar;
   }
 
   /**
    * @param string
    */
   public void setArtifactId(String string) {
-    this._artifactid = string;
+    this.name = string;
   }
 
   /**
    * @param string
    */
   public void setGroupId(String string) {
-    this._groupid = string;
+    this.group = string;
   }
 
   /**
    * @param string
    */
   public void setJar(String string) {
-    this._jar = string;
+    this.jar = string;
   }
 
   public String[] getScope() {
-    return this._scope;
+    return this.scope;
   }
 
   public void setScope(String s) {
     if (s != null) {
-      this._scope = s.split("\\s");
+      this.scope = s.split("\\s");
     }
   }
 
   /**
-   * @return file where this dependency has been declared
+   * @return loc where this dependency has been declared
    */
-  public File getFile() {
-    return this.file;
+  public String getLocation() {
+    return this.loc;
   }
 
   /**
    * @param x
-   *          this dependency has been declared in file <code>x</code>.
+   *          this dependency has been declared in loc <code>x</code>.
    */
-  public void setFile(File x) {
-    this.file = x;
+  public void setLocation(String x) {
+    this.loc = x;
   }
 
   /**
-   * @param file
+   * @param loc
    */
-  public void setLocalFile(File file) {
-    this._local = file;
+  public void setFile(File file) {
+    this.file = file;
   }
 
-  public File getLocalFile() {
-    return this._local;
+  public File getFile() {
+    return this.file;
   }
 
   /*
-   * Returns the basename of the calculated 'file name'. Example: Assume that we
+   * Returns the basename of the calculated 'loc name'. Example: Assume that we
    * have a dependency for
    * 
    * log4j/jars/log4j-1.2.8.jar
@@ -269,34 +355,23 @@ public class Dependency
     /*
      * According to Maven's behaviour, "<jar>" overrides any other setting.
      */
-    if (this._jar != null) {
-      return this._jar;
+    if (this.jar != null) {
+      return this.jar;
     }
     s = null;
-    if (this._artifactid != null)
-      s = this._artifactid;
-
+    if (this.name != null)
+      s = this.name;
     if (s == null)
-      s = this._id;
-
-    /***************************************************************************
-     * we need to have either this._artifactid or this.id to * keep on going.
-     * Having neither of them is actually a * illegal dependency, however we
-     * cope with it by retur- ing an empty string. *
-     **************************************************************************/
-    if (s == null)
-      return "";
-
-    if (this._version != null) {
+      s="?";
+    if (this.rev != null) {
       s += "-";
-      s += this._version;
+      s += this.rev;
     }
-    if (this._type != null) {
-      s += ".";
-      s += this._type;
-    } else {
-      s += ".jar";
-    }
+    s += ".";
+    if (this.type != null)
+      s += this.type;
+    else 
+      s += "jar";
     return s;
   }
 
@@ -305,25 +380,26 @@ public class Dependency
    * 
    * @return the path which will be used on a remote repository
    */
-  public String depotpath() {
+  public String m1path() {
     String s;
+    String b = basename();
 
     /* must have either id or (groupd and (artifact or jar)) */
-    if (this._id == null && (this._groupid == null || basename().equals("")))
+    if (this.group == null || b == null || b.equals(""))
       return null;
 
     s = "/";
-    if (this._groupid != null)
-      s += this._groupid;
+    if (this.group != null)
+      s += this.group;
     else
-      s += this._id;
+      s += "?";
     s += "/";
-    if (this._type != null)
-      s += this._type;
+    if (this.type != null)
+      s += this.type;
     else
       s += "jar";
     s += "s/";
-    s += basename();
+    s += b;
     return s;
   }
 
@@ -332,27 +408,26 @@ public class Dependency
    * 
    * @return the path which will be used on a remote repository
    */
-  public String depotpath2dotnull() {
+  public String m2path() {
     String s;
+    String b = basename();
 
-    /* must have either id or (groupd and (artifact or jar)) */
-    if (this._id == null && (this._groupid == null || basename().equals("")))
+    /* must have either id or (group and (artifact or jar)) */
+    if (this.group == null || b==null || b.equals(""))
       return null;
 
     s = "/";
-    if (this._groupid != null)
-      s += this._groupid.replace('.', '/');
-    else {
-      if (this._id != null)
-        s += this._id.replace('.', '/');
-    }
+    if (this.group != null)
+      s += this.group.replace('.', '/');
+    else 
+      s = "?";
     s += "/";
-    if (this._artifactid != null) {
-      s += this._artifactid;
+    if (this.name != null) {
+      s += this.name;
       s += "/";
     }
-    if (this._version != null) {
-      s += this._version;
+    if (this.rev != null) {
+      s += this.rev;
       s += "/";
     }
     s += basename();
@@ -379,47 +454,46 @@ public class Dependency
     }
     s += ">\n";
 
-    if (this._id != null)
-      s += "<id>" + this._id + "</id>\n";
-    if (this._groupid != null)
-      s += "<groupId>" + this._groupid + "</groupId>\n";
-    if (this._jar != null)
-      s += "<jar>" + this._jar + "</jar>\n";
-    if (this._artifactid != null)
-      s += "<artifactId>" + this._artifactid + "</artifactId>\n";
-    if (this._version != null)
-      s += "<version>" + this._version + "</version>\n";
-    if (this._type != null)
-      s += "<type>" + this._type + "</type>\n";
+  
+    if (this.group != null)
+      s += "<groupId>" + this.group + "</groupId>\n";
+    if (this.jar != null)
+      s += "<jar>" + this.jar + "</jar>\n";
+    if (this.name != null)
+      s += "<artifactId>" + this.name + "</artifactId>\n";
+    if (this.rev != null)
+      s += "<version>" + this.rev + "</version>\n";
+    if (this.type != null)
+      s += "<type>" + this.type + "</type>\n";
     else
       s += "<type>jar</type>\n";
-    if (this._url != null)
-      s += "<url>" + this._url + "</url>\n";
-    if (this._scope != null) {
+    if (this.alt != null)
+      s += "<url>" + this.alt + "</url>\n";
+    if (this.scope != null) {
       s += "<scope>";
-      for (int i = 0; i < this._scope.length; ++i) {
-        s += this._scope[i];
-        if (i + 1 < this._scope.length) {
+      for (int i = 0; i < this.scope.length; ++i) {
+        s += this.scope[i];
+        if (i + 1 < this.scope.length) {
           s += " ";
         }
       }
       s += "</scope>\n";
     }
-    if (this._properties.size() > 0) {
-      Object keyset[] = this._properties.keySet().toArray();
+    if (this.props != null && this.props.size() > 0) {
+      Object keyset[] = this.props.keySet().toArray();
       s += "<properties>\n";
       for (int i = 0; i < keyset.length; ++i) {
         Object k, v;
         String ks, vs;
         k = keyset[i];
         try {
-          v = this._properties.get(k);
+          v = this.props.get(k);
           ks = k.toString();
           vs = v.toString();
           s += "<" + ks + ">" + vs + "</" + ks + ">\n";
         }
         catch (Exception e) {
-          debug("problems while dumping a dependency property.");
+          this.proj.log("problems while dumping a dependency property.",Project.MSG_DEBUG);
           s += "<!-- error on getting a property -->\n";
         }
       }
@@ -442,7 +516,9 @@ public class Dependency
     if (key == null) {
       return null;
     }
-    return (String) this._properties.put(key, value);
+    if (this.props == null)
+      this.props = new Properties();
+    return (String) this.props.put(key, value);
   }
 
   /**
@@ -453,31 +529,14 @@ public class Dependency
    * @return a property value, or null if not found
    */
   public String getProperty(String key) {
-    if (key == null) {
+    if (key == null || this.props == null) {
       return null;
     }
-    return (String) this._properties.get(key);
+    return (String) this.props.get(key);
   }
 
-  public int numProperties() {
-    return this._properties.size();
-  }
-
-  /**
-   * @return Returns the downloadSource.
-   */
-  public URL getDownloadSource() {
-    return this._remote;
-  }
-
-  /**
-   * @param downloadSource
-   *          The downloadSource to set.
-   */
-  public void setDownloadSource(URL downloadSource) {
-    this._remote = downloadSource;
-  }
-
+ 
+ 
   /**
    * Checks this Dep against another dependency for equality
    */
@@ -515,34 +574,31 @@ public class Dependency
     if (this.alias == null)
       return c;
 
-    if (this._groupid == null) {
-      this._groupid = P.getProperty(this.alias + ".path", null);
-      c += (this._groupid == null) ? 0 : 1;
+    if (this.group == null) {
+      this.group = P.getProperty(this.alias + ".path", null);
+      c += (this.group == null) ? 0 : 1;
     }
-    if (this._artifactid == null) {
-      this._artifactid = P.getProperty(this.alias + ".name", null);
-      c += (this._artifactid == null) ? 0 : 1;
+    if (this.name == null) {
+      this.name = P.getProperty(this.alias + ".name", null);
+      c += (this.name == null) ? 0 : 1;
     }
-    if (this._version == null) {
-      this._version = P.getProperty(this.alias + ".vers", null);
-      c += (this._version == null) ? 0 : 1;
+    if (this.rev == null) {
+      this.rev = P.getProperty(this.alias + ".vers", null);
+      c += (this.rev == null) ? 0 : 1;
     }
-    if (this._url == null) {
-      this._url = P.getProperty(this.alias + ".url", null);
-      c += (this._url == null) ? 0 : 1;
+    if (this.alt == null) {
+      this.alt = P.getProperty(this.alias + ".url", null);
+      c += (this.alt == null) ? 0 : 1;
     }
-    if (this._type == null) {
-      this._type = P.getProperty(this.alias + ".type", null);
-      c += (this._type == null) ? 0 : 1;
+    if (this.type == null) {
+      this.type = P.getProperty(this.alias + ".type", null);
+      c += (this.type == null) ? 0 : 1;
     }
-    if (this._jar == null) {
-      this._jar = P.getProperty(this.alias + ".jar", null);
-      c += (this._jar == null) ? 0 : 1;
+    if (this.jar == null) {
+      this.jar = P.getProperty(this.alias + ".jar", null);
+      c += (this.jar == null) ? 0 : 1;
     }
-    if (this._id == null) {
-      this._id = P.getProperty(this.alias + ".id", null);
-      c += (this._id == null) ? 0 : 1;
-    }
+ 
  
 
     /*
@@ -551,31 +607,30 @@ public class Dependency
      * (should have * the format "<alias>.<type>".
      */
 
-    if (this._type == null) {
+    if (this.type == null) {
       int index;
-      this._type = "";
+      this.type = "";
 
       index = this.alias.lastIndexOf('.');
       if (index >= 0) {
         try {
           /* index+1 could be out-of-range */
-          this._type = this.alias.substring(index + 1);
+          this.type = this.alias.substring(index + 1);
         }
         catch (Exception e) {
           // do nothing
         }
       }
       /* if we can't derive a type, fall back to "jar" */
-      this._type = this._type.trim();
-      if (this._type.length() <= 0) {
-        this._type = "jar";
+      this.type = this.type.trim();
+      if (this.type.length() <= 0) {
+        this.type = "jar";
       }
     }
-
+    
+    /* This dependency is resolved, set proper status now */
+    this.setStatus(UNKOWN);
     return c;
   }
 
-  protected void debug(String s) {
-    System.err.println("error: " + s);
-  }
 }

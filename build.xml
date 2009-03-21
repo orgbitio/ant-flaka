@@ -1,8 +1,8 @@
 <project xmlns:f="antlib:net.haefelingerit.flaka" name="flaka">
-  <f:inline-properties>
+  <f:properties>
     baseline = HEAD
     res.dir =   
-  </f:inline-properties>
+  </f:properties>
 
   <!-- Initialize Framework -->
   <f:init />
@@ -38,7 +38,7 @@
   </presetdef>
 
   <presetdef name="javac">
-      <javac source="1.4" debug="true">
+      <javac source="1.5" debug="true">
         <!-- elements -->
       </javac>
   </presetdef>
@@ -50,6 +50,10 @@
     <dependency alias="commons-codec" scope="compile inline" />
     <dependency alias="commons-logging" scope="compile inline" version="1.1"/>
     <dependency alias="jdom" scope="compile inline"/>
+    <dependency alias="juel" scope="compile inline"/>
+    <!-- Not required for building, but running Ant scripts -->
+    <!-- within Eclipse -->
+    <dependency name="ant-launcher" scope="eclipse"/>
   </dependencies>
 
   <macrodef name="package">
@@ -104,7 +108,7 @@
   </target>
 	
   <target name="copy-resources">
-    <f:copy-and-replace src="${basedir}/ant" dst="${obj.dir}" />
+    <f:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
   </target>
 
 

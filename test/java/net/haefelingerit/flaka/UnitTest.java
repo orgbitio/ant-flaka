@@ -1,9 +1,31 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.haefelingerit.flaka.tel.TestEL;
+import net.haefelingerit.flaka.el.EL;
+import net.haefelingerit.flaka.el.Functions;
+import net.haefelingerit.flaka.util.Static;
+
+import org.apache.tools.ant.Project;
 
 public class UnitTest extends TestCase 
 { 
@@ -11,12 +33,13 @@ public class UnitTest extends TestCase
   static String gt = ">";
   static String eq = "=";
 
-  static private void 
-  log(String msg)
-  {
-    System.out.println(msg);
-  }
-  
+  protected EL el;
+//  static private void 
+//  log(String msg)
+//  {
+//    System.out.println(msg);
+//  }
+//  
   public UnitTest(String name)
   {
     super(name);
@@ -33,6 +56,11 @@ public class UnitTest extends TestCase
     return new TestSuite(UnitTest.class);
   }
 
+  protected void setUp()
+  {
+    Project project = new Project();
+    this.el = new EL(project);
+  }
 
   void vercmp(String va,String op, String vb)
   {
@@ -412,231 +440,6 @@ public class UnitTest extends TestCase
     jar2var("a_1.jar","A_");
   }  
 
-  static public boolean evaluate(String[] argv) throws Exception {
-    return new TestEL(null,null).eval(argv);
-  }
-
-  static public boolean evaluate(String s, char quote) throws Exception {
-    return new TestEL(null,null).eval(Static.split0x1(s, quote));
-  }
-
-  
-  
-  private void good(String s)
-  {
-    String m;
-    boolean b;
-
-    m = "got false";
-    b = false;
-
-    try {
-      b = evaluate(s,'\'');
-    }
-    catch(Exception ex)
-    {
-      m = "throws excption `" + ex + "'";
-      b = false;
-    }
-    if(b == false)
-    {
-      fail("test `" + s + "' => expected true, " + m + ".");
-    }
-  }
-
-  private void wrong(String s)
-  {
-    String m;
-    boolean b;
-
-    log(s);
-
-    m = "got true";
-    b = true;
-
-    try {
-      b = evaluate(s,'\'');
-    }
-    catch(Exception ex)
-    {
-      m = "throws excption `" + ex + "'";
-      b = true;
-    }
-    if(b == true)
-    {
-      fail("test `" + s + "' => expected false, " + m + ".");
-    }
-  }
-  
-  private void synerr(String s)
-  {
-    boolean b;
-
-    b = false;
-
-    try {
-      evaluate(s,'\'');
-    }
-    catch(Exception ex)
-    {
-      b = true;
-    }
-    if(b == false)
-    {
-      fail("test `" + s + "' => expected to throw an exception.");
-    }
-  }
-  
-  
-
-  public void test_jtest_01() { good(  "-f build.xml"); }
-  public void test_jtest_02() { good(  "-d ."); }
-  public void test_jtest_03() { good(  "-d .."); }
-  public void test_jtest_04() { good(  "-e ."); }
-  public void test_jtest_05() { good(  "-e .."); }
-  public void test_jtest_06() { good(  "-e build.xml"); }
-  public void test_jtest_07() { synerr("-e . -f . "); }
-  public void test_jtest_08() { wrong(  "-e . -a -f . "); }
-  public void test_jtest_09() { good(  "-e . -a -d . "); }
-  public void test_jtest_10() { good(  "-e . -a -d . -a -d ..  "); }
-  public void test_jtest_11() { wrong(  "-e . -a -d . -a -f ..  "); }
-  public void test_jtest_12() { good(  "-e . -a -d . -a -e ..  "); }
-  public void test_jtest_13() { wrong(  "5 -gt 6  "); }
-  public void test_jtest_14() { wrong(  "5 -gt 5  "); }
-  public void test_jtest_15() { good(  "5 -gt 4  "); }
-  public void test_jtest_16() { good(  "5 -ge 4  "); }
-  public void test_jtest_17() { good(  "5 -ge 5  "); }
-  public void test_jtest_18() { wrong(  "5 -ge 6  "); }
-  public void test_jtest_19() { wrong(  "a = b  "); }
-  public void test_jtest_20() { good(  "a = a  "); }
-  public void test_jtest_21() { wrong(  "a != a  "); }
-  public void test_jtest_22() { good(  "a != b  "); }
-  public void test_jtest_23() { good(  "-l x -ge -l y  "); }
-  public void test_jtest_24() { wrong(  "-l x -gt -l y  "); }
-  public void test_jtest_25() { wrong(  "-l x -lt -l y  "); }
-  public void test_jtest_26() { wrong( "-f ."); }
-  public void test_jtest_27() { wrong( "-f .."); }
-  public void test_jtest_28() { synerr("-1 build.xml"); }
-  public void test_jtest_29() { synerr("-z -a -d ."); }
-  public void test_jtest_30() { good("-z '' -a -d ."); }
-  public void test_jtest_31() { good("-z '' "); }
-  public void test_jtest_32() { good("-z"); }
-  public void test_jtest_33() { good("-z "); }
-  public void test_jtest_34() { wrong("-z x"); }
-  public void test_jtest_35() { wrong("-z ' '"); }
-
-  public void test_jtest_40() { synerr("-n -a -d ."); }
-  public void test_jtest_41() { wrong("-n '' -a -d ."); }
-  public void test_jtest_42() { wrong("-n '' "); }
-  public void test_jtest_43() { good("-n"); }  
-  public void test_jtest_44() { good("-n "); }
-  public void test_jtest_45() { good("-n x"); }
-  public void test_jtest_46() { good("-n ' '"); }
-
-  public void test_jtest_50() { synerr("(-n x -a -n y)"); }
-  public void test_jtest_51() { synerr("(-n x -o -n y)"); }
-  public void test_jtest_52() { good("( -n x -a -n y )"); }
-  public void test_jtest_53() { good("( -n x -o -n y )"); }
-  public void test_jtest_54() { good("( -n x -a ( -n y ) )"); }
-  // fails ..
-  //public void test_jtest_55() { good("( ( -n x ) -a ( -n y ) )"); }
-  
-
-  void split(String s,String[] expd)
-  {
-    String[] argv = new String[] {};
-    boolean eq;
-    String r = "";
-    String E = "";
-    int i;
-
-    for(i=0;i< expd.length;++i)
-    {
-      E += "[" + expd[i] + "] "; 
-    }
- 
-    eq = false;
-    try {
-      argv = Static.split0x1(s,'\'');
-    }
-    catch(Exception e)
-    {
-      r  = e.toString();
-      fail("error in splitting `" + s + "', got " + r);
-    }
-    
-    if(argv == null) {
-      fail("error in splitting `" + s + "', got (null)");
-      return;
-    }
-
-    for(i=0;i< argv.length;++i)
-      r += "[" + argv[i] + "] "; 
-    
-    if(argv.length != expd.length) 
-      fail("error in splitting `" + s + "', got " + r + " expected " + E);
-    
-    eq = true;
-    for(i = 0;eq && i< expd.length;++i)
-      eq = argv[i].equals(expd[i]);
-
-    if(eq == false)
-    {
-      fail("error in splitting `" + s + "', got " + r+ " expected " + E);
-    }
-  }
-  
-  public void test_jtest_split() 
-  {
-    String   argv;
-    String[] expd;
-
-    argv = "-z ''";
-    expd = new String[] { "-z","" };
-    split(argv,expd);
-
-    argv = "-z ' '";
-    expd = new String[] { "-z"," "};
-    split(argv,expd);
-
-    argv = "-z''";
-    expd = new String[] {"-z" };
-    split(argv,expd);
-
-    argv = "-z' '";
-    expd = new String[] {"-z "};
-    split(argv,expd);
-
-    argv = "\\'a";
-    expd = new String[] {"'a"};
-    split(argv,expd);
-
-    argv = "\\a";
-    expd = new String[] {"a"};
-    split(argv,expd);
-
-
-    argv = "'a b c' d e";          // [a b c]  [d]      [e]
-    expd = new String[] { "a b c","d","e" };
-    split(argv,expd);
-
-    argv = "'ab\\'c' '\\\\' d";       // [ab"c]    [\]      [d]
-    expd = new String[] { "ab'c","\\","d" };
-    split(argv,expd);
-
-    argv = "a\\\\\\b d'e f'g h";      // [a\b]    [de fg]  [h]
-    expd = new String[] { "a\\b","de fg","h" };
-    split(argv,expd);
-
-    argv = "a\\\\\\'b c d";          // [a\"b]    [c]      [d]
-    expd = new String[] {"a\\'b","c","d" };
-    split(argv,expd);
-
-    argv = "a\\\\\\\\'b c' d e";      // [a\\b c]  [d]      [e]
-    expd = new String[] { "a\\\\b c","d","e" };
-    split(argv,expd);
-
-  }
 
   void _expect(String glob,String regex)
   {
@@ -663,6 +466,54 @@ public class UnitTest extends TestCase
   public void test_glob2regex_07() { _expect( "[^a]",  "[\\^a]"   ); }
   public void test_glob2regex_08() { _expect( "[!a]",  "[^a]"     ); }
   public void test_glob2regex_09() { _expect( "[!]",   "\\[\\!\\]"); }
+  
+  
+  void expect(String orig,String expected) {
+    String s = "";
+    
+    try {
+      s = Functions.quote(orig);
+      if (s.equals(expected) == false) {
+        fail("Functions.quote(\""+orig+"\")=>\""+s+"\", expected \""+expected+"\"");
+      }
+    }
+    catch(Exception e) {
+      fail("Functions.quote(\""+orig+"\") throws unexpected exception: "+e);
+    }
+  }
+  
+  public void test_el_0x01() {
+    try {
+      assertEquals("\\d",this.el.tostr("\\d"));
+    }
+    catch(Exception e) {
+      fail("unexptected el exception: "+e);
+    }
+  }
+  public void test_el_0x02() {
+    try {
+      assertEquals("\\d",this.el.tostr("#{'\\\\d'}"));
+    }
+    catch(Exception e) {
+      fail("unexptected el exception: "+e);
+    }
+  }
+  public void test_quote_0x01() {    expect("","");    }
+  public void test_quote_0x02() {    expect("'","'");  }
+  public void test_quote_0x03() {    expect("\\'","\\'");    }
+  public void test_quote_0x04() {    expect("\\","\\");    }
+  public void test_quote_0x05() {    expect("\\\\","\\\\");    }
+  public void test_quote_0x06() {    expect("\\a","\\\\a");    }
+  public void test_quote_0x07() {    expect("a\\","a\\");    }
+  public void test_quote_0x08() {    expect("a'","a'");    }
+  public void test_quote_0x09() {    expect("a\\'","a\\'");    }
+  public void test_quote_0x0a() {    expect("a\\\\","a\\\\");    }
+  public void test_quote_0x0b() {    expect("ab","ab");    }
+  public void test_quote_0x0c() {    expect("'a","'a");    }
+  public void test_quote_0x0d() {    expect("\\'","\\'");    }
+  public void test_quote_0x0e() {    expect("\"","\"");    }
+  public void test_quote_0x0f() {    expect("a\"","a\"");    }
+   
 }
 
 

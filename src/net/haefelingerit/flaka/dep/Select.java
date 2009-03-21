@@ -1,9 +1,27 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka.dep;
 
 import java.io.File;
 import java.util.regex.Pattern;
 
-import net.haefelingerit.flaka.Static;
+import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.types.selectors.BaseSelector;
 
@@ -37,7 +55,7 @@ public class Select extends BaseSelector
 
   protected String             errmsg        = null;
   /* The reference holding all known dependencies */
-  protected String             refid         = "deps.object";
+  protected String             refid         = "project.dependencies";
 
   /**
    * Use attribute <code>refid</code> to change the reference holding all
@@ -253,7 +271,7 @@ public class Select extends BaseSelector
 
   /**
    * Implements a selector which can be used to restrict a given fileset. When
-   * used without any attributes, a file in a file set is selected if that file
+   * used without any attributes, a loc in a loc set is selected if that loc
    * is the basename of a dependency. Further checks are carried out if given.
    * For example, if a regular expression has been set to match the scope of a
    * dependency, then the matching dependency must also match that regular
@@ -324,7 +342,7 @@ public class Select extends BaseSelector
       r = match(this.gid, d.getGroupId());
 
     if (r && this.path != null)
-      r = match(this.path, d.depotpath());
+      r = match(this.path, d.m1path());
 
     if (r && this.version != null)
       r = match(this.version, d.getVersion());

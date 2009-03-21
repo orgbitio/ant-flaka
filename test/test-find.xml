@@ -2,10 +2,12 @@
 
   <c:property-handler/>
 
-  <c:set var="basefolder"  value="${dirname ${ant.file}}" />
-  <echo>
-    basefolder = ${basefolder}
-  </echo>
-  <c:find dir="${basefolder}" />
+  <c:set>
+      basefolder = '${ant.file}'.tofile.parent
+  </c:set>
+  <c:echo>
+    basefolder = #{basefolder}
+  </c:echo>
+  <c:find dir=" basefolder " />
  
 </project>

@@ -1,29 +1,43 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.io.File;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.ComponentHelper;
+import net.haefelingerit.flaka.util.Static;
+
 import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 
 public class Task extends org.apache.tools.ant.Task
 {
+  public boolean el = true;
   public boolean debug = false;
 
-  public void setDebug(boolean b) {
+  public void setEl(boolean b)
+  {
+    this.el = b;
+  }
+
+  public void setDebug(boolean b)
+  {
     this.debug = b;
-  }
-
-  final public Project project() throws BuildException {
-    Project P;
-    P = super.getProject();
-    return P;
-  }
-
-  public void init() {
-    super.init();
-    Static.setProject(project());
   }
 
   /**
@@ -37,17 +51,9 @@ public class Task extends org.apache.tools.ant.Task
    *          may be null
    * @return object denoted by <code>s</code> or null if not existing.
    */
-  final public Object getref(String s) {
-    return s == null ? null : project().getReference(s);
-  }
-
-  final protected Object setref(String s, Object ref) {
-    Object r = null;
-    if (s != null) {
-      r = getref(s);
-      project().addReference(s, ref);
-    }
-    return r;
+  final public Object getref(String s)
+  {
+    return s == null ? null : getProject().getReference(s);
   }
 
   /**
@@ -58,59 +64,68 @@ public class Task extends org.apache.tools.ant.Task
    * @return value of property <code>s</code> or null if such a property does
    *         not exist or if no project is associated with this task.
    */
-  final public String getProperty(String s) {
-    Project P = project();
+  final public String getProperty(String s)
+  {
+    Project P = getProject();
     return P != null ? P.getProperty(s) : null;
   }
 
-  final public void logo(String msg, int width) {
-    log(Static.logo(msg, width));
-  }
-
-  final public void logo(String msg) {
-    log(Static.logo(msg));
-  }
-
-  final protected void throwbx(String s) {
+  final protected void throwbx(String s)
+  {
     Static.throwbx(s);
   }
 
-  final protected void throwbx(boolean c, String s) {
-    if (c == true) {
-      Static.throwbx(s);
-    }
+  final public File toFile(String s)
+  {
+    return Static.toFile(this.getProject(), s);
   }
 
-  final protected void throwbx(String s, Exception e) {
+  final protected void throwbx(String s, Exception e)
+  {
     Static.throwbx(s, e);
   }
 
-  final public void log(String msg) {
-    if (msg != null) {
+  final public void log(String msg)
+  {
+    if (msg != null)
+    {
       Static.log(getProject(), msg);
     }
   }
 
-  final protected void debug(String msg) {
-    if (msg != null) {
+  final public void debug(String msg)
+  {
+    if (this.debug)
+    {
+      System.err.println(msg);
+      return;
+    }
+    if (msg != null)
+    {
       Static.debug(getProject(), msg);
     }
   }
 
-  final protected void debug(String msg, Exception e) {
-    if (msg != null) {
+  final public void debug(String msg, Exception e)
+  {
+    if (msg != null)
+    {
       Static.debug(getProject(), msg, e);
     }
   }
 
-  final protected void verbose(String msg) {
-    if (msg != null) {
+  final public void verbose(String msg)
+  {
+    if (msg != null)
+    {
       Static.verbose(getProject(), msg);
     }
   }
 
-  protected void warn(String msg) {
-    if (msg != null) {
+  final public void warn(String msg)
+  {
+    if (msg != null)
+    {
       StringBuffer buf;
       Location where;
       String bname;
@@ -135,98 +150,36 @@ public class Task extends org.apache.tools.ant.Task
     }
   }
 
-  protected void warn(String msg, Exception e) {
-    if (msg != null && e != null) {
-      Static._log_(getProject(), msg + ", got " + e.getMessage(),
-          Project.MSG_WARN);
+  public void warn(String msg, Exception e)
+  {
+    if (msg != null && e != null)
+    {
+      Static._log_(getProject(), msg + ", got " + e.getMessage(), Project.MSG_WARN);
     }
   }
 
-  final protected void warning(String msg) {
-    warn(msg);
-  }
-
-  final protected void error(String msg) {
-    if (msg != null) {
+  final public void error(String msg)
+  {
+    if (msg != null)
+    {
       Static._log_(getProject(), msg, Project.MSG_ERR);
     }
   }
 
-  final protected void error(String msg, Exception e) {
-    if (msg != null && e != null) {
-      Static._log_(getProject(), msg + ", got " + e.getMessage(),
-          Project.MSG_ERR);
+  final public void error(String msg, Exception e)
+  {
+    if (msg != null && e != null)
+    {
+      Static._log_(getProject(), msg + ", got " + e.getMessage(), Project.MSG_ERR);
     }
   }
 
-  final protected void info(String msg) {
-    if (msg != null) {
+  final public void info(String msg)
+  {
+    if (msg != null)
+    {
       super.log(msg, Project.MSG_INFO);
     }
-  }
-
-  final public ComponentHelper getcomph() {
-    return Static.getcomph(project());
-  }
-
-  /** shortcut to create a component */
-  final public Object getcomp(String s) {
-    return Static.getcomp(project(), s);
-  }
-
-  /** shortcut to get a component's class */
-  final public Object getclass(String s) {
-    return Static.getclass(project(), s);
-  }
-
-  /** check whether we are a target */
-  final public boolean istarget(String s) {
-    return Static.istarget(project(), s);
-  }
-
-  /** check whether we are a macro (and not a task) */
-  final public boolean ismacro(String s) {
-    return Static.ismacro(project(), s);
-  }
-
-  /** check whether we are a task (and not a macro) */
-  final public boolean istask(String s) {
-    return Static.istask(project(), s);
-  }
-
-  /** check whether we are a task or macro) */
-  final public boolean ismacroOrtask(String s) {
-    return Static.ismacroOrtask(project(), s);
-  }
-
-  final protected void setid(String id, Object obj) {
-    Project P = this.getProject();
-    if (P != null && id != null && id.trim().length() > 0) {
-      debug("set reference `" + id + "' in current project");
-      P.addReference(id, obj);
-    }
-  }
-
-  final protected void makeref(String id, Object obj) {
-    setid(id, obj);
-  }
-
-  final protected void makevar(String id, Object obj) {
-    setid(id, obj);
-  }
-
-  final protected void unset(String[] property) {
-    Object obj;
-    obj = getref("ant.PropertyHelper");
-    for (int i = 0; i < property.length; ++i) {
-      Static.htabremove(obj, "properties", property[i]);
-      Static.htabremove(obj, "userProperties", property[i]);
-    }
-  }
-
-  final protected void unset(String property) {
-    String[] tmp = { property };
-    unset(tmp);
   }
 
 }

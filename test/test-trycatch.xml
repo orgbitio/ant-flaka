@@ -1,64 +1,49 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
 
-  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!-- Initial test to check whether set/unset works properly. Both tasks are -->
-  <!-- used to determine whether trycatch/throw works as expected.            -->
-  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  
-  <c:when test="-P mustbeset">
-    <fail message="** property 'mustbeset' already defined??" />
-  </c:when>
-  <c:set var="mustbeset" value="true" />
-  <c:unless test="-P mustbeset">
-    <fail message="** property 'mustbeset' not defined as expected ??" />
-  </c:unless>
-  <c:unset var="mustbeset" />
-  <c:when test="-P mustbeset">
-    <fail message="** property 'mustbeset' should not be defined??" />
-  </c:when>
+	<macrodef name="fail-if-undefined">
+		<attribute name="property" />
+		<sequential>
+			<fail message="property @{property} not defined" unless="@{property}" />
+		</sequential>
+	</macrodef>
 
-  <macrodef name="fail-if-undefined">
-    <attribute name="property" />
-    <sequential>
-      <fail message="property @{property} not defined" unless="@{property}" />
-    </sequential>
-  </macrodef>
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- Tests are starting here ..                                             -->
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!-- Tests are starting here ..                                             -->
-  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<c:unset>
+		mustbeset-try
+	mustbeset-catch
+	mustbeset-finally
+	mustbeset-outer-catch
+		</c:unset>
 
-  <c:unset var="mustbeset-try" />
-  <c:unset var="mustbeset-catch" />
-  <c:unset var="mustbeset-finally" />
-  <c:unset var="mustbeset-outer-catch" />
+	<c:trycatch>
+		<try>
+			<c:trycatch>
+				<try>
+					<echo>try ..</echo>
+					<property name="mustbeset-try" value="true" />
+					<fail message="fail within try" />
+				</try>
+				<catch>
+					<echo>catch ..</echo>
+					<property name="mustbeset-catch" value="true" />
+					<fail message="fail within catch" />
+				</catch>
+				<finally>
+					<echo>finally ..</echo>
+					<property property="mustbeset-finally" value="true" />
+					<fail message="fail within finally" />
+				</finally>
+			</c:trycatch>
+		</try>
+		<catch>
+			<property name="mustbeset-outer-catch" value="true" />
+		</catch>
+	</c:trycatch>
 
-  <c:trycatch>
-    <try>
-      <c:trycatch>
-        <try>
-          <echo>try ..</echo>
-          <c:set var="mustbeset-try" />
-          <fail message="fail within try" />
-        </try>
-        <catch>
-          <echo>catch ..</echo>
-          <c:set var="mustbeset-catch" />
-          <fail message="fail within catch" />
-        </catch>
-        <finally>
-          <echo>finally ..</echo>
-          <c:set var="mustbeset-finally" />
-          <fail message="fail within finally" />
-        </finally>
-      </c:trycatch>
-    </try>
-    <catch>
-      <c:set var="mustbeset-outer-catch" />
-    </catch>
-  </c:trycatch>
-  
-  <echo>
+	<echo>
     mustbeset-try = ${mustbeset-try}
     mustbeset-catch = ${mustbeset-catch}
     mustbeset-finally = ${mustbeset-finally}
@@ -67,122 +52,140 @@
 
 
 
+	<c:unset>
+		mustbeset
+		mustbeset2
+	</c:unset>
 
-  <c:unset var="mustbeset mustbeset2" />
+	<c:trycatch>
+		<try>
+			<property name="mustbeset" value="true"/>
+		</try>
+	</c:trycatch>
 
-  <c:trycatch>
-    <try>
-      <c:set var="mustbeset" value="true" />
-    </try>
-  </c:trycatch>
+	<fail-if-undefined property="mustbeset" />
+	<c:unset>
+		mustbeset
+		mustbeset2
+	</c:unset>
 
-  <fail-if-undefined property="mustbeset" />
-  <c:unset var="mustbeset mustbeset2" />
+	<c:trycatch>
+		<catch>
+			<!-- never executed -->
+		</catch>
+	</c:trycatch>
 
-  <c:trycatch>
-    <catch>
-      <!-- never executed -->
-    </catch>
-  </c:trycatch>
-  
-  <c:unset var="mustbeset mustbeset2" />
-  
-  <c:trycatch>
-    <finally>
-      <c:set var="mustbeset" value="true" />
-    </finally>
-  </c:trycatch>
+	<c:unset>
+		mustbeset
+		mustbeset2
+	</c:unset>
 
-  <fail-if-undefined property="mustbeset" />
-  <c:unset var="mustbeset mustbeset2" />
+	<c:trycatch>
+		<finally>
+			<property name="mustbeset" value="true" />
+		</finally>
+	</c:trycatch>
 
- <c:trycatch>
-   <try>
-   </try>
-   <try>
-   </try>
-   <catch>
-   </catch>
-    <catch>
-   </catch>
-    <finally>
-   </finally>
-   <finally>
-   </finally>
-  </c:trycatch>
+	<fail-if-undefined property="mustbeset" />
+	<c:unset>
+		mustbeset
+		mustbeset2
+	</c:unset>
 
-  <c:unset var="mustbeset-try" />
-  <c:unset var="mustbeset-catch" />
-  <c:unset var="mustbeset-finally" />
-  <c:unset var="mustbeset-outer-catch" />
+	<c:trycatch>
+		<try>
+		</try>
+		<try>
+		</try>
+		<catch>
+		</catch>
+		<catch>
+		</catch>
+		<finally>
+		</finally>
+		<finally>
+		</finally>
+	</c:trycatch>
 
-  <c:trycatch>
-    <try>
-      <c:trycatch>
-        <try>
-          <c:set var="mustbeset-try" />
-          <fail message="fail within try" />
-        </try>
-        <catch>
-          <c:set var="mustbeset-catch" />
-          <fail message="fail within catch" />
-        </catch>
-        <finally>
-          <c:set var="mustbeset-finally" />
-          <fail message="fail within finally" />
-        </finally>
-      </c:trycatch>
-    </try>
-    <catch>
-      <c:set var="mustbeset-outer-catch" />
-    </catch>
-  </c:trycatch>
-  
-  <echo>
+	<c:unset>
+		mustbeset-try
+		mustbeset-catch
+		mustbeset-finally
+		mustbeset-outer-catch
+	</c:unset>
+	<c:trycatch>
+		<try>
+			<c:trycatch>
+				<try>
+					<property name="mustbeset-try" value="true" />
+					<fail message="fail within try" />
+				</try>
+				<catch>
+					<property name="mustbeset-catch" value="true" />
+					<fail message="fail within catch" />
+				</catch>
+				<finally>
+					<property name="mustbeset-finally" value="true" />
+					<fail message="fail within finally" />
+				</finally>
+			</c:trycatch>
+		</try>
+		<catch>
+			<property name="mustbeset-outer-catch" value="true" />
+		</catch>
+	</c:trycatch>
+
+	<echo>
     mustbeset-try = ${mustbeset-try}
     mustbeset-catch = ${mustbeset-catch}
     mustbeset-finally = ${mustbeset-finally}
     mustbeset-outer-catch = ${mustbeset-outer-catch}
   </echo>
 
-  <fail-if-undefined property="mustbeset-try" />
-  <fail-if-undefined property="mustbeset-catch" />
-  <fail-if-undefined property="mustbeset-finally" />
-  <fail-if-undefined property="mustbeset-outer-catch" />
+	<c:unset>
+		mustbeset-try
+		mustbeset-catch
+		mustbeset-finally
+		mustbeset-outer-catch
+	</c:unset>
+	
+	<c:trycatch property="reason">
+		<try>
+			<echo>1st try ..</echo>
+		</try>
+		<try>
+			<echo>2nd try ..</echo>
+			<fail message="fail within 2nd try" />
+		</try>
+		<try>
+			<fail message="fail within 3rd try" />
+		</try>
+		<catch>
+			<echo>..caught : ${reason}</echo>
+		</catch>
+		<finally>
+			<echo>..finally</echo>
+		</finally>
+	</c:trycatch>
 
-  <c:trycatch property="reason">
-   <try>
-     <echo>1st try ..</echo>
-   </try>
-   <try>
-     <echo>2nd try ..</echo>
-     <fail message="fail within 2nd try" />
-   </try>
-   <try>
-     <fail message="fail within 3rd try" />
-   </try>
-   <catch>
-     <echo>..caught : ${reason}</echo>
-   </catch>
-   <finally>
-     <echo>..finally</echo>   
-   </finally>
- </c:trycatch>
- 
- <c:unset var="reason caught-whatever caught-panic" />
- 
- <c:trycatch>
-   <try>
-     <fail message="this is a panic message" />
-   </try>
-   <catch match="*whatever*">
-     <c:set var="caught-whatever" />
-   </catch>
-   <catch type="*" match="*panic*">
-     <c:set var="caught-panic" />
-   </catch>
- </c:trycatch>
- <fail-if-undefined property="caught-panic" />
- 
-  
+	<c:unset>
+		reason
+		caught-whatever
+		caught-panic
+	</c:unset>
+
+	<c:trycatch>
+		<try>
+			<fail message="this is a panic message" />
+		</try>
+		<catch match="*whatever*">
+			<property name="caught-whatever" value="true" />
+		</catch>
+		<catch type="*" match="*panic*">
+			<property name="caught-panic" value="true" />
+		</catch>
+	</c:trycatch>
+	<fail-if-undefined property="caught-panic" />
+
+
 </project>

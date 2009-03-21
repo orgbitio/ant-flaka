@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2009 Haefelinger IT 
+ *
+ * Licensed  under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required  by  applicable  law  or  agreed  to in writing, 
+ * software distributed under the License is distributed on an "AS 
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * express or implied.
+ 
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package net.haefelingerit.flaka;
 
 import java.io.File;
@@ -6,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.haefelingerit.flaka.dep.Dependency;
+import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -17,41 +36,41 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 /**
- * A task to execute operations on a .classpath file.
+ * A task to execute operations on a .classpath loc.
  * 
  * This task implements opertations like append, remove and query on a
- * .classpath file.
+ * .classpath loc.
  * 
- * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang H&auml;felinger</a>
+ * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang
+ *         H&auml;felinger</a>
  */
 
 public class DotClassPath extends Task
 {
   /** internal list of (logical) classpath entries */
-  protected List          list     = new ArrayList();
-  /** the file to operate on */
-  protected File          file     = new File(".classpath");
+  protected List list = new ArrayList();
+  /** the loc to operate on */
+  protected File file = new File(".classpath");
   /** my base folder */
-  protected File          base     = null;
+  protected File base = null;
   /** Eclipse's workspace */
-  protected File          wsfolder = null;
+  protected File wsfolder = null;
   /** sort content */
-  protected boolean       sort     = true;
+  protected boolean sort = true;
   /** operation */
-  protected char          opc      = 'u';                   /* u=update,r=remove,q=query */
+  protected char opc = 'u'; /* u=update,r=remove,q=query */
   /** dump content */
-  protected boolean       echo     = false;
+  protected boolean echo = false;
   /** query result var */
-  protected String        qvar     = null;
+  protected String qvar = null;
   /** dependencies to be used */
-  protected String        refid    = "deps.object";
+  protected String refid = "project.dependencies";
   /** query logic */
-  protected int           logic    = DotClassPath.AND;
+  protected int logic = DotClassPath.AND;
 
-  static final public int AND      = 0;
-  static final public int OR       = 1;
+  static final public int AND = 0;
+  static final public int OR = 1;
 
   /**
    * Use this attribute to specify the query logic. By default each entry must
@@ -65,12 +84,15 @@ public class DotClassPath extends Task
    *          default value gets applied.
    */
 
-  public void setLogic(String s) {
-    if (s.matches("(?i)\\s*(?:and|&|&&)\\s*")) {
+  public void setLogic(String s)
+  {
+    if (s.matches("(?i)\\s*(?:and|&|&&)\\s*"))
+    {
       this.logic = DotClassPath.AND;
       return;
     }
-    if (s.matches("(?i)\\s*(?:or|\\||\\|\\|)\\s*")) {
+    if (s.matches("(?i)\\s*(?:or|\\||\\|\\|)\\s*"))
+    {
       this.logic = DotClassPath.OR;
       return;
     }
@@ -79,12 +101,13 @@ public class DotClassPath extends Task
   /**
    * Use attribute refid to specify another variable holding an array of
    * Dependencies. This dependencies are used to figure out the project ( if
-   * known) of a lib entry. Default: deps.object.
+   * known) of a lib entry. Default: project.dependencies.
    * 
    * @param s
    *          null allowed
    */
-  public void setRefId(String s) {
+  public void setRefId(String s)
+  {
     this.refid = Static.trim2(s, this.refid);
   }
 
@@ -96,18 +119,20 @@ public class DotClassPath extends Task
    * @param s
    *          The name of the property to set if a query evaluates to true.
    */
-  public void setVar(String s) {
+  public void setVar(String s)
+  {
     this.qvar = Static.trim2(s, this.qvar);
   }
 
   /**
-   * Use this attribute to dump the content of the .classpath file on stdout. By
+   * Use this attribute to dump the content of the .classpath loc on stdout. By
    * default, content is not dumped.
    * 
    * @param b
    *          If true, dump the content of .classpath.
    */
-  public void setEcho(boolean b) {
+  public void setEcho(boolean b)
+  {
     this.echo = b;
   }
 
@@ -118,32 +143,36 @@ public class DotClassPath extends Task
    * 
    * @param s
    */
-  public void setOp(String s) {
+  public void setOp(String s)
+  {
     String p = Static.trim2(s, null);
-    if (p != null) {
+    if (p != null)
+    {
       this.opc = p.charAt(0);
     }
   }
 
   /**
-   * Use this attribute to set the file to operate on. By default, .classpath is
+   * Use this attribute to set the loc to operate on. By default, .classpath is
    * used.
    * 
-   * @param file
-   *          The file to operate on.
+   * @param loc
+   *          The loc to operate on.
    */
-  public void setFile(File file) {
+  public void setFile(File file)
+  {
     this.file = file;
   }
 
   /**
    * Use this attribute to specify the base directory. By default, the base
-   * directory is the folder containing the build file.
+   * directory is the folder containing the build loc.
    * 
-   * @param file
+   * @param loc
    *          The base folder.
    */
-  public void setBase(File file) {
+  public void setBase(File file)
+  {
     this.base = file;
   }
 
@@ -151,10 +180,11 @@ public class DotClassPath extends Task
    * Use this attribute to specify the workspace folder of Eclipse. If not
    * given, then the workspace folder will be the parent of base directory.
    * 
-   * @param file
+   * @param loc
    *          Eclipse workspace folder.
    */
-  public void setWsFolder(File file) {
+  public void setWsFolder(File file)
+  {
     this.wsfolder = file;
   }
 
@@ -162,7 +192,8 @@ public class DotClassPath extends Task
    * Use this attribute to sort the final .classpath. This attribute has no
    * effect when executing a query.
    */
-  public void setSort(boolean b) {
+  public void setSort(boolean b)
+  {
     this.sort = b;
   }
 
@@ -172,7 +203,8 @@ public class DotClassPath extends Task
    * @deprecated
    * @param b
    */
-  public void setUnique(boolean b) {
+  public void setUnique(boolean b)
+  {
     /* deprecated but kept for legacy reasons */
     debug("usage of attribute 'unique' is deprecated");
   }
@@ -183,7 +215,8 @@ public class DotClassPath extends Task
    * @deprecated
    * @param b
    */
-  public void setValidate(boolean b) {
+  public void setValidate(boolean b)
+  {
     /* deprecated but kept for legacy reasons */
     debug("usage of attribute 'validate' is deprecated");
   }
@@ -194,7 +227,8 @@ public class DotClassPath extends Task
    * @deprecated
    * @param b
    */
-  public void setFlush(boolean b) {
+  public void setFlush(boolean b)
+  {
     /* deprecated but kept for legacy reasons */
     debug("usage of attribute 'flush' is deprecated");
   }
@@ -209,7 +243,8 @@ public class DotClassPath extends Task
   /**
    * @param s
    */
-  public void setSrcDir(String s) {
+  public void setSrcDir(String s)
+  {
     /* deprecated but kept for legacy reasons */
     debug("usage of attribute 'srcdir' is deprecated");
   }
@@ -224,7 +259,8 @@ public class DotClassPath extends Task
   /**
    * @param s
    */
-  public void setResDir(String s) {
+  public void setResDir(String s)
+  {
     /* deprecated but kept for legacy reasons */
     debug("usage of attribute 'resdir' is deprecated");
   }
@@ -239,8 +275,10 @@ public class DotClassPath extends Task
    * @param v
    *          (attribute value)
    */
-  static protected void attr2buf(StringBuffer buf, String v, String name) {
-    if (name != null && v != null) {
+  static protected void attr2buf(StringBuffer buf, String v, String name)
+  {
+    if (name != null && v != null)
+    {
       buf.append(" ");
       buf.append(name);
       buf.append("=\"");
@@ -264,41 +302,47 @@ public class DotClassPath extends Task
   /**
    * A class representing a "real" classpathentry element.
    */
-  final public class ClassPathEntry implements LogicalClassPathEntry,
-      Comparable
+  final public class ClassPathEntry implements LogicalClassPathEntry, Comparable
   {
-    protected String     path;
-    protected String     kind;
-    protected String     excluding;
-    protected String     output, sourcepath;
-    protected String     protec, epop;
+    protected String path;
+    protected String kind;
+    protected String excluding;
+    protected String output, sourcepath;
+    protected String protec, epop;
     protected Dependency dependency;
 
-    public void setKind(String s) {
+    public void setKind(String s)
+    {
       this.kind = Static.trim2(s, null);
     }
 
-    public void setPath(String s) {
+    public void setPath(String s)
+    {
       this.path = Static.trim2(s, null);
     }
 
-    public void setExcluding(String s) {
+    public void setExcluding(String s)
+    {
       this.excluding = Static.trim2(s, null);
     }
 
-    public void setOutput(String s) {
+    public void setOutput(String s)
+    {
       this.output = Static.trim2(s, null);
     }
 
-    public void setSourcePath(String s) {
+    public void setSourcePath(String s)
+    {
       this.sourcepath = Static.trim2(s, null);
     }
 
-    public void setProtected(String s) {
+    public void setProtected(String s)
+    {
       this.protec = Static.trim2(s, null);
     }
 
-    public void setEpop(String s) {
+    public void setEpop(String s)
+    {
       this.epop = Static.trim2(s, null);
     }
 
@@ -307,7 +351,8 @@ public class DotClassPath extends Task
      * use this method to generate XML (or risk to get a not wellformed XML
      * document).
      */
-    public String toString() {
+    public String toString()
+    {
       StringBuffer b;
       b = new StringBuffer();
       b.append("{classpathentry:");
@@ -341,29 +386,32 @@ public class DotClassPath extends Task
      * @return true if matching
      */
 
-    protected boolean match(String id, String regpat, String value) {
+    protected boolean match(String id, String regpat, String value)
+    {
       boolean r;
       r = match(regpat, value);
       if (DotClassPath.this.debug)
-        System.err.print("id=" + id + " regpat:" + regpat + " value:" + value
-            + ":" + r);
+        System.err.print("id=" + id + " regpat:" + regpat + " value:" + value + ":" + r);
       return r;
     }
 
-    protected boolean match(String Regpat, String value) {
+    protected boolean match(String Regpat, String value)
+    {
       boolean r = false;
       String regpat = Regpat;
       /*
-       * if first and last char of regpat are equal, then regpat is a true *
-       * regular expression (except those two chars), otherwise regpat is * a
+       * if first and last char of regpat are equal, then regpat is a true
+       * regular expression (except those two chars), otherwise regpat is a
        * pattern expression.
        */
 
-      if (regpat == null) {
+      if (regpat == null)
+      {
         r = value == null;
         return r;
       }
-      if (value == null) {
+      if (value == null)
+      {
         r = false;
         return r;
       }
@@ -371,14 +419,16 @@ public class DotClassPath extends Task
       int sz = regpat.length();
 
       /* handle trivial case where regpat is empty */
-      if (sz <= 0) {
+      if (sz <= 0)
+      {
         r = value.length() == sz;
       }
 
       /* regpat not empty here */
       if (sz <= 2)
         regpat = Static.patternAsRegex(regpat);
-      else {
+      else
+      {
         char c1, c2;
 
         c1 = regpat.charAt(0);
@@ -403,9 +453,11 @@ public class DotClassPath extends Task
      * 
      * @return true if protected.
      */
-    protected boolean isprotected() {
+    protected boolean isprotected()
+    {
       boolean r = false;
-      if (this.protec != null) {
+      if (this.protec != null)
+      {
         r = this.protec.matches("\\s*(1|true)\\s*");
       }
       return r;
@@ -421,24 +473,24 @@ public class DotClassPath extends Task
      * @return true if this entry matches a given one. If c is null, false is
      *         returned.
      */
-    public boolean match(ClassPathEntry c) {
+    public boolean match(ClassPathEntry c)
+    {
       boolean r = false;
-      r = c != null
-          && (this.kind != null ? match("k", this.kind, c.kind) : true)
+      r = c != null && (this.kind != null ? match("k", this.kind, c.kind) : true)
           && (this.path != null ? match("p", this.path, c.path) : true)
-          && (this.excluding != null ? match("e", this.excluding, c.excluding)
-              : true)
+          && (this.excluding != null ? match("e", this.excluding, c.excluding) : true)
           && (this.output != null ? match("o", this.output, c.output) : true)
-          && (this.sourcepath != null ? match("s", this.sourcepath,
-              c.sourcepath) : true)
+          && (this.sourcepath != null ? match("s", this.sourcepath, c.sourcepath) : true)
           && (this.epop != null ? match("P", this.epop, c.epop) : true);
-      if (DotClassPath.this.debug) {
+      if (DotClassPath.this.debug)
+      {
         System.err.println("matching:" + this + "," + c + ":" + r);
       }
       return r;
     }
 
-    protected String get(String kind) {
+    protected String get(String kind)
+    {
       if (kind.equals("kind"))
         return this.kind;
       if (kind.equals("path"))
@@ -469,7 +521,8 @@ public class DotClassPath extends Task
      *          not null
      * @return true if equal
      */
-    protected boolean iseq(ClassPathEntry other, String kind) {
+    protected boolean iseq(ClassPathEntry other, String kind)
+    {
       boolean r = false;
       String ts = get(kind);
       String os = other.get(kind);
@@ -480,14 +533,16 @@ public class DotClassPath extends Task
       if (ts.equals(os))
         return true;
 
-      if (kind.equals("path")) {
+      if (kind.equals("path"))
+      {
         File tf, of;
         tf = new File(ts);
         of = new File(os);
-        try {
+        try
+        {
           r = tf.getCanonicalPath().equals(of.getCanonicalPath());
-        }
-        catch (Exception e) {
+        } catch (Exception e)
+        {
           if (DotClassPath.this.debug)
             System.err.println("**exception: comparing paths via absolute path names ..");
           r = tf.equals(of);
@@ -506,7 +561,8 @@ public class DotClassPath extends Task
      * @param src
      * @return true if attribute src and lib are should be treated equal
      */
-    protected boolean cmplibsrc(ClassPathEntry lib, ClassPathEntry src) {
+    protected boolean cmplibsrc(ClassPathEntry lib, ClassPathEntry src)
+    {
       boolean r = false;
 
       if (lib.path == null || src.path == null)
@@ -519,7 +575,8 @@ public class DotClassPath extends Task
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
       ClassPathEntry other = (ClassPathEntry) obj;
       if (iseq(other, "kind") && iseq(other, "path"))
         return true;
@@ -534,7 +591,8 @@ public class DotClassPath extends Task
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object obj) {
+    public int compareTo(Object obj)
+    {
       int r;
       ClassPathEntry other = (ClassPathEntry) obj;
 
@@ -554,7 +612,8 @@ public class DotClassPath extends Task
       r = this.path.compareTo(other.path);
       if (r != 0)
         return r;
-      if (this.excluding == null || other.excluding == null) {
+      if (this.excluding == null || other.excluding == null)
+      {
         r = (this.excluding == other.excluding) ? 0 : -1;
         r = (r == 0) ? r : (this.excluding == null) ? -1 : 1;
         return r;
@@ -575,28 +634,32 @@ public class DotClassPath extends Task
      * @param bucket
      *          not null
      */
-    public void eval(List bucket) {
-      if (this.path != null) {
-        try {
+    public void eval(List bucket)
+    {
+      if (this.path != null)
+      {
+        try
+        {
           Dependency[] deps;
           String basename;
-          deps = (Dependency[]) getProject().getReference(
-              DotClassPath.this.refid);
+          deps = (Dependency[]) getProject().getReference(DotClassPath.this.refid);
           basename = new File(this.path).getName();
-          for (int i = 0; (deps != null) && i < deps.length; ++i) {
+          for (int i = 0; (deps != null) && i < deps.length; ++i)
+          {
             String s = deps[i].basename();
-            if (s != null && s.equals(basename)) {
+            if (s != null && s.equals(basename))
+            {
               this.dependency = deps[i];
               break;
             }
           }
-        }
-        catch (ClassCastException e0) {
+        } catch (ClassCastException e0)
+        {
           if (DotClassPath.this.debug)
             System.err.println("variable \"" + DotClassPath.this.refid
                 + "\" not pointing to dependency array object");
-        }
-        catch (Exception e) {
+        } catch (Exception e)
+        {
           if (DotClassPath.this.debug)
             System.err.println("**exception: " + e);
         }
@@ -612,11 +675,13 @@ public class DotClassPath extends Task
   {
     public AbstractFileSet fileset;
 
-    public FileSetEntry(AbstractFileSet fileset) {
+    public FileSetEntry(AbstractFileSet fileset)
+    {
       this.fileset = fileset;
     }
 
-    public String toString() {
+    public String toString()
+    {
       StringBuffer sb;
       ArrayList bucket;
 
@@ -624,7 +689,8 @@ public class DotClassPath extends Task
       sb = new StringBuffer();
 
       this.eval(bucket);
-      for (int i = 0; i < bucket.size(); i++) {
+      for (int i = 0; i < bucket.size(); i++)
+      {
         sb.append("\n  ");
         sb.append(bucket.get(i).toString());
       }
@@ -634,14 +700,15 @@ public class DotClassPath extends Task
     /**
      * Evaluate this fileset and create instance of type
      * 
-     * @Entry for each resolved file. Each
+     * @Entry for each resolved loc. Each
      * @Entry instance will be appended to
      * @bucket.
      * 
      * @param bucket
      *          not null, resolved entries appended
      */
-    public void eval(List bucket) {
+    public void eval(List bucket)
+    {
       ClassPathEntry c;
       DirectoryScanner S;
       String[] files;
@@ -651,7 +718,8 @@ public class DotClassPath extends Task
       files = S.getIncludedFiles();
       base = S.getBasedir().getAbsolutePath().replace('\\', '/');
 
-      for (int i = 0; i < files.length; i++) {
+      for (int i = 0; i < files.length; i++)
+      {
         c = new ClassPathEntry();
         c.setKind("lib");
         c.setPath(base + "/" + files[i]);
@@ -660,7 +728,8 @@ public class DotClassPath extends Task
     }
   }
 
-  public ClassPathEntry createClassPathEntry() throws BuildException {
+  public ClassPathEntry createClassPathEntry() throws BuildException
+  {
     ClassPathEntry entry = new ClassPathEntry();
     this.list.add(entry);
     return entry;
@@ -672,14 +741,17 @@ public class DotClassPath extends Task
    * build script being executed.
    */
 
-  protected File basedir() {
+  protected File basedir()
+  {
     return new File(getProject().getProperty("basedir"));
   }
 
   /* allows to add just an arbitrary fileset */
-  public void addFileSet(FileSet item) throws BuildException {
+  public void addFileSet(FileSet item) throws BuildException
+  {
     FileSetEntry entry;
-    if (item != null) {
+    if (item != null)
+    {
       entry = new FileSetEntry(item);
       this.list.add(entry);
     }
@@ -690,11 +762,14 @@ public class DotClassPath extends Task
    * a physical entries. Those physical entries are appended to given bucket
    * list.
    */
-  protected void eval(List bucket) {
+  protected void eval(List bucket)
+  {
     LogicalClassPathEntry entry;
 
-    if (bucket != null) {
-      for (int j = 0; j < this.list.size(); ++j) {
+    if (bucket != null)
+    {
+      for (int j = 0; j < this.list.size(); ++j)
+      {
         entry = (LogicalClassPathEntry) this.list.get(j);
         entry.eval(bucket);
       }
@@ -703,10 +778,11 @@ public class DotClassPath extends Task
 
   /**
    * This method will render a string representation of all physical classpath
-   * entries. It will not render a .classpath file nor does it update or touch
-   * any file. It's main purpose is for debugging.
+   * entries. It will not render a .classpath loc nor does it update or touch
+   * any loc. It's main purpose is for debugging.
    */
-  public String toString() {
+  public String toString()
+  {
     LogicalClassPathEntry entry;
     StringBuffer buf;
     List bucket;
@@ -718,10 +794,12 @@ public class DotClassPath extends Task
     /* Collect entries */
     eval(bucket);
 
-    for (int i = 0; i < bucket.size(); ++i) {
+    for (int i = 0; i < bucket.size(); ++i)
+    {
       entry = (ClassPathEntry) bucket.get(i);
       s = entry.toString();
-      if (s != null && s.trim().length() > 0) {
+      if (s != null && s.trim().length() > 0)
+      {
         buf.append("\n  ");
         buf.append(s);
       }
@@ -736,7 +814,8 @@ public class DotClassPath extends Task
    * @param d
    * @return
    */
-  static boolean isInternal(ClassPathEntry d) {
+  static boolean isInternal(ClassPathEntry d)
+  {
     return false;
   }
 
@@ -749,7 +828,8 @@ public class DotClassPath extends Task
    * @param d
    * @return
    */
-  static String projectname(ClassPathEntry d) {
+  static String projectname(ClassPathEntry d)
+  {
     return null;
   }
 
@@ -757,59 +837,75 @@ public class DotClassPath extends Task
    * Iterates of each child element of root, turing each into a classpath entry
    * and adding such an entry to bucket.
    */
-  protected void collect(Element root, List bucket) {
-    if (root != null && bucket != null) {
+  protected void collect(Element root, List bucket)
+  {
+    if (root != null && bucket != null)
+    {
       Element e;
       NodeList kids;
       ClassPathEntry c;
 
       kids = root.getChildNodes();
-      for (int i = 0; i < kids.getLength(); ++i) {
-        try {
+      for (int i = 0; i < kids.getLength(); ++i)
+      {
+        try
+        {
           e = (Element) kids.item(i);
           if (!e.getTagName().equals("classpathentry"))
             continue;
           c = new ClassPathEntry();
-          if (e.hasAttribute("kind")) {
+          if (e.hasAttribute("kind"))
+          {
             c.setKind(e.getAttribute("kind"));
           }
-          if (e.hasAttribute("path")) {
+          if (e.hasAttribute("path"))
+          {
             c.setPath(e.getAttribute("path"));
           }
-          if (e.hasAttribute("excluding")) {
+          if (e.hasAttribute("excluding"))
+          {
             c.setExcluding(e.getAttribute("excluding"));
           }
-          if (e.hasAttribute("output")) {
+          if (e.hasAttribute("output"))
+          {
             c.setOutput(e.getAttribute("output"));
           }
-          if (e.hasAttribute("sourcepath")) {
+          if (e.hasAttribute("sourcepath"))
+          {
             c.setSourcePath(e.getAttribute("sourcepath"));
           }
-          if (e.hasAttribute("protected")) {
+          if (e.hasAttribute("protected"))
+          {
             c.setProtected(e.getAttribute("protected"));
           }
           c.eval(bucket);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex)
+        {
           /* ignore */
         }
       }
     }
   }
 
-  protected void update(ClassPathEntry c, Element e) {
-    if (e != null && c != null) {
-      if (c.kind != null) {
+  protected void update(ClassPathEntry c, Element e)
+  {
+    if (e != null && c != null)
+    {
+      if (c.kind != null)
+      {
         e.setAttribute("kind", c.kind);
       }
-      if (c.path != null) {
+      if (c.path != null)
+      {
         String path = c.path.replace('\\', '/');
-        if (this.base != null) {
+        if (this.base != null)
+        {
           String base;
-          try {
+          try
+          {
             base = this.base.getCanonicalPath();
-          }
-          catch (Exception ex) {
+          } catch (Exception ex)
+          {
             base = this.base.getAbsolutePath();
           }
           base = base.replace('\\', '/') + "/";
@@ -818,19 +914,24 @@ public class DotClassPath extends Task
         }
         e.setAttribute("path", path);
       }
-      if (c.excluding != null) {
+      if (c.excluding != null)
+      {
         e.setAttribute("excluding", c.excluding);
       }
-      if (c.output != null) {
+      if (c.output != null)
+      {
         e.setAttribute("output", c.output);
       }
-      if (c.sourcepath != null) {
+      if (c.sourcepath != null)
+      {
         e.setAttribute("sourcepath", c.sourcepath);
       }
-      if (c.protec != null) {
+      if (c.protec != null)
+      {
         e.setAttribute("protected", c.protec);
       }
-      if (c.epop != null) {
+      if (c.epop != null)
+      {
         e.setAttribute("epop", c.epop);
       }
     }
@@ -846,7 +947,8 @@ public class DotClassPath extends Task
    * @return true if well formed.
    */
 
-  protected boolean good(ClassPathEntry c) {
+  protected boolean good(ClassPathEntry c)
+  {
     File file = null;
     boolean r = true;
 
@@ -858,32 +960,39 @@ public class DotClassPath extends Task
     if (c.kind == null || c.kind.matches("\\s*"))
       return false;
 
-    if (!c.kind.equals("con")) {
+    if (!c.kind.equals("con"))
+    {
       file = new File(c.path);
       r = file.exists();
       // Entries starting with a "/" are interpreted by Eclipse as being
       // relative
       // to the workspace. If no workspace folder is given, we assume that the
-      if (!r && this.wsfolder != null) {
+      if (!r && this.wsfolder != null)
+      {
         file = new File(this.wsfolder, c.path);
         r = file.exists();
       }
-      if (!r && this.base != null) {
+      if (!r && this.base != null)
+      {
         file = new File(this.base, "..");
         file = new File(file, c.path);
         r = file.exists();
       }
     }
-    if (!r && this.debug) {
+    if (!r && this.debug)
+    {
       System.err.println("** classpath entry invalid: " + c);
     }
     return r;
   }
 
-  protected boolean contains(List Q, ClassPathEntry c) {
+  protected boolean contains(List Q, ClassPathEntry c)
+  {
     boolean r = false;
-    if (Q.contains(c)) {
-      if (this.debug) {
+    if (Q.contains(c))
+    {
+      if (this.debug)
+      {
         int idx = Q.indexOf(c);
         Object obj = Q.get(idx);
         System.err.println("entry " + c + " already seen (" + obj + ")");
@@ -899,30 +1008,39 @@ public class DotClassPath extends Task
    * @param root
    *          can be null
    */
-  protected void opUpdate(List clazzpath) throws BuildException {
-    if (clazzpath != null && this.list != null && this.list.size() > 0) {
+  protected void opUpdate(List clazzpath) throws BuildException
+  {
+    if (clazzpath != null && this.list != null && this.list.size() > 0)
+    {
       ClassPathEntry c;
 
-      for (int i = 0; i < this.list.size(); i++) {
+      for (int i = 0; i < this.list.size(); i++)
+      {
         c = (ClassPathEntry) this.list.get(i);
-        if (good(c) && !contains(clazzpath, c)) {
+        if (good(c) && !contains(clazzpath, c))
+        {
           clazzpath.add(c);
         }
       }
     }
   }
 
-  protected void opQuery(List clazzpath) throws BuildException {
+  protected void opQuery(List clazzpath) throws BuildException
+  {
     boolean m = true;
 
-    if (this.debug) {
+    if (this.debug)
+    {
       String logic = "unkown";
-      switch (this.logic) {
-        case AND: {
+      switch (this.logic)
+      {
+        case AND:
+        {
           logic = "and";
           break;
         }
-        case OR: {
+        case OR:
+        {
           logic = "or";
           break;
         }
@@ -930,14 +1048,17 @@ public class DotClassPath extends Task
       System.err.println("applying query logic: " + logic);
     }
 
-    if (clazzpath != null && this.list != null) {
+    if (clazzpath != null && this.list != null)
+    {
       ClassPathEntry c, x;
       boolean b;
 
-      for (int i = 0; i < this.list.size(); ++i) {
+      for (int i = 0; i < this.list.size(); ++i)
+      {
         x = (ClassPathEntry) this.list.get(i);
         m = false;
-        for (int j = 0; !m && j < clazzpath.size(); ++j) {
+        for (int j = 0; !m && j < clazzpath.size(); ++j)
+        {
           c = (ClassPathEntry) clazzpath.get(j);
           b = x.match(c);
           if (this.debug)
@@ -948,12 +1069,14 @@ public class DotClassPath extends Task
           break;
       }
     }
-    if (m) {
+    if (m)
+    {
       getProject().setProperty(this.qvar, "true");
     }
   }
 
-  protected void opRemove(List clazzpath) throws BuildException {
+  protected void opRemove(List clazzpath) throws BuildException
+  {
     Object[] array;
     ClassPathEntry c, x;
     boolean b;
@@ -961,36 +1084,44 @@ public class DotClassPath extends Task
     array = clazzpath.toArray();
     clazzpath.clear();
 
-    for (int i = 0; i < array.length; ++i) {
+    for (int i = 0; i < array.length; ++i)
+    {
       c = (ClassPathEntry) array[i];
       b = false;
 
-      for (int j = 0; !b && j < this.list.size(); ++j) {
+      for (int j = 0; !b && j < this.list.size(); ++j)
+      {
         x = (ClassPathEntry) this.list.get(j);
         b = x.match(c);
-        if (this.debug) {
+        if (this.debug)
+        {
           System.err.println("matching:" + x + "," + c + ":" + b);
         }
       }
 
       /* if matching but protected, do not remove */
-      if (b && c.isprotected()) {
-        if (this.debug) {
+      if (b && c.isprotected())
+      {
+        if (this.debug)
+        {
           System.err.println("not removing protected entry:" + c);
         }
         clazzpath.add(c);
       }
       if (!b)
         clazzpath.add(c);
-      else {
-        if (this.debug) {
+      else
+      {
+        if (this.debug)
+        {
           System.err.println("removing entry:" + c);
         }
       }
     }
   }
 
-  public void execute() throws BuildException {
+  public void execute() throws BuildException
+  {
     Project P;
     Element root = null;
     Document d;
@@ -1000,24 +1131,27 @@ public class DotClassPath extends Task
     P = getProject();
 
     /* Set my basedir if not set */
-    if (this.base == null) {
+    if (this.base == null)
+    {
       this.base = basedir();
     }
 
     /* Validate */
-    switch (this.opc) {
+    switch (this.opc)
+    {
       case 'u':
       case 'a':
       case 'r':
         break;
       case 'q':
-        if (this.qvar == null) {
-          warning("variable name required for query operation");
+        if (this.qvar == null)
+        {
+          warn("variable name required for query operation");
           return;
         }
         break;
       default:
-        warning("operation '" + this.opc + "' unsupported");
+        warn("operation '" + this.opc + "' unsupported");
         return;
     }
 
@@ -1036,7 +1170,8 @@ public class DotClassPath extends Task
     eval(bucket);
     this.list = bucket;
 
-    switch (this.opc) {
+    switch (this.opc)
+    {
       case 'u':
       case 'a':
         opUpdate(clazzpath);
@@ -1049,10 +1184,12 @@ public class DotClassPath extends Task
         break;
     }
 
-    switch (this.opc) {
+    switch (this.opc)
+    {
       case 'a':
       case 'u':
-      case 'r': {
+      case 'r':
+      {
         d = root.getOwnerDocument();
         Node nl = d.createTextNode("\n");
 
@@ -1060,11 +1197,13 @@ public class DotClassPath extends Task
           Collections.sort(clazzpath);
 
         /* remove all elements */
-        while (root.hasChildNodes()) {
+        while (root.hasChildNodes())
+        {
           root.removeChild(root.getFirstChild());
         }
         /* update root with my elements */
-        for (int i = 0; i < clazzpath.size(); ++i) {
+        for (int i = 0; i < clazzpath.size(); ++i)
+        {
           c = (ClassPathEntry) clazzpath.get(i);
           e = d.createElement("classpathentry");
           update(c, e);
@@ -1074,7 +1213,7 @@ public class DotClassPath extends Task
         if (clazzpath.size() > 0)
           root.appendChild(nl);
 
-        // Flush my node as XML document to file
+        // Flush my node as XML document to loc
         Static.flushxml(P, root, this.file);
       }
     }

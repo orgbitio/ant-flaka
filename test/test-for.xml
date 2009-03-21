@@ -1,58 +1,74 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka" xmlns:foo="foobar">
 
   <c:for />
+  <c:for in="" />
+  <c:for var="x" />
+  <c:for var="x" in="" />
+  <c:for var="x" in="5" />
+  <c:for var="x" in="'a'" />
+  <c:for var="x" in="null" />
+  <c:for var="x" in="true" />
+  <c:for var="x" in="y" />
+  <c:for var="x" in="list(a, b, c)" />
+  
 
-  <c:for in="a b c">
-     <sequential>
-       <echo>x = @{x}</echo>
-     </sequential>
+  <c:for var="i" in=" ''.tofile.list ">
+    <c:echo>#{i} => #{i.mtime}</c:echo>
   </c:for>
-  
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!-- This loop should not be iterated more than 3 times.                   -->
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <c:for var="i" in=" 1  2  3  4  5  6 ">
-    <sequential>
-      <echo>i = @{i} (break test)</echo>
-      <c:set var="X@{i}" value="@{i}" />
-     <c:when test="@{i} = '3'">
-        <c:break />
-      </c:when>
-    </sequential>
+
+  <!--
+    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  -->
+  <!--
+    This loop should not be iterated more than 3 times.
+  -->
+  <!--
+    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  -->
+  <c:for var="i" in=" list(1,2,3,4,5) ">
+    <c:echo>i = #{i} (break test)</c:echo>
+    <c:set>
+      X#{i} := #{i} 
+    </c:set>
+    <c:when test=" i gt 2">
+      <c:break />
+    </c:when>
   </c:for>
-  
-  <fail message="X1 not defined"  unless="X1" />
-  <fail message="X2 not defined"  unless="X2" />
-  <fail message="X3 not defined"  unless="X3" />
+
+  <c:fail test="has.var.i" message="i must not be defined here" />
+  <c:echo>i=> |#{i}|</c:echo>
+
+  <fail message="X1 not defined" unless="X1" />
+  <fail message="X2 not defined" unless="X2" />
+  <fail message="X3 not defined" unless="X3" />
   <fail message="X4 *is* defined" if="X4" />
   <fail message="X5 *is* defined" if="X5" />
   <fail message="X6 *is* defined" if="X6" />
-   
-  <c:unset var="X1 X2 X3 X4 X5 X6" />
 
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!-- The part after the when should only be executed three times.          -->
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <c:unset>
+    X1 
+    X2 
+    X3 
+    X4 
+    X5 
+    X6
+  </c:unset>
 
-  <c:for var="i" in=" 1  2  3  4  5  6 ">
-    <sequential>
-      <c:when test="@{i} -gt '3'">
+  <c:for var="i" in=" list(1,2,3,4,5,6) ">
+      <c:when test=" i lt 4">
         <c:continue />
       </c:when>
-      <echo>i = @{i} (continue test)</echo>
-      <c:set var="X@{i}" value="@{i}" />
-    </sequential>
+      <c:echo>i = #{i} (continue test)</c:echo>
+      <c:set>
+        X#{i} := #{i}
+      </c:set>
   </c:for>
- 
-  <fail message="X1 not defined"  unless="X1" />
-  <fail message="X2 not defined"  unless="X2" />
-  <fail message="X3 not defined"  unless="X3" />
-  <fail message="X4 *is* defined" if="X4" />
-  <fail message="X5 *is* defined" if="X5" />
-  <fail message="X6 *is* defined" if="X6" />
-   
 
-  
-  
+  <fail message="X1 *is* defined"  if="X1" />
+  <fail message="X2 *is* defined"  if="X2" />
+  <fail message="X3 *is* defined"  if="X3" />
+  <fail message="X4 *not* defined" unless="X4" />
+  <fail message="X5 *not* defined" unless="X5" />
+  <fail message="X6 *not* defined" unless="X6" />
 
 </project>
