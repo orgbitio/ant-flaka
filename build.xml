@@ -82,21 +82,27 @@
     <f:dotclasspath />
   </target>		
 
-  <target name="javadoc">
-    <mkdir dir="${build.dir}/javadoc/obj" />
+  <presetdef name="javadoc">
     <javadoc
         packagenames    = "net.haefelingerit.flaka.*"
         sourcepath      = "${src.dir}"
-        destdir         = "${build.dir}/javadoc/obj"
+        classpathref    = "javac.classpath"
         >
-      <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-      <link>http://www.jdom.org/docs/apidocs</link>
-      <link>http://logging.apache.org/log4j/1.2/apidocs</link>
-      <link>http://javadoc.haefelingerit.net/org.apache.ant/1.7.1</link>
-      <link>http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol</link>
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
+      <link href="http://www.jdom.org/docs/apidocs" />
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://javadoc.haefelingerit.net/org.apache.ant/1.7.1" />
+      <link href="http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol/2.8.2" />
+      <link href="http://javadoc.haefelingerit.net/net.sourceforge.juel/2.1" />
       <link href="http://logging.apache.org/log4j/1.2/apidocs" />
       <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
     </javadoc>
+  </presetdef>
+
+  
+  <target name="javadoc">
+    <mkdir dir="${build.dir}/javadoc" />
+    <javadoc destdir= "${build.dir}/javadoc"  />
   </target>
   
   <target name="install-javadoc" depends="javadoc">
