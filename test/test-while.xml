@@ -1,0 +1,17 @@
+<project xmlns:c="antlib:net.haefelingerit.flaka" xmlns:foo="foobar">
+
+  <c:set>
+    i = 0
+    n = 9
+ </c:set>
+  <c:while test=" i lt n ">
+    <c:echo>
+      #{i}
+  </c:echo>
+    <c:break test="i>=3" />
+    <c:set>
+       i = i + 1 
+  </c:set>
+  </c:while>
+
+</project>

@@ -31,7 +31,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 
-public class For2 extends net.haefelingerit.flaka.Task implements TaskContainer
+public class For extends net.haefelingerit.flaka.Task implements TaskContainer
 {
   protected String expr;
   protected String var;
@@ -39,7 +39,7 @@ public class For2 extends net.haefelingerit.flaka.Task implements TaskContainer
   protected Vector tasks = new Vector();
   protected Object saved = null;
 
-  public For2()
+  public For()
   {
     super();
   }

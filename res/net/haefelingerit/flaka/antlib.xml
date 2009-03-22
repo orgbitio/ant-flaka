@@ -14,6 +14,7 @@
   <!--                         TASKS                               -->
   <!--=============================================================-->
 
+  <taskdef name="while" classname="net.haefelingerit.flaka.While" />
   <taskdef name="rescue" classname="net.haefelingerit.flaka.Rescue" />
   <taskdef name="list" classname="net.haefelingerit.flaka.List" />
   <taskdef name="fail" classname="net.haefelingerit.flaka.Fail" />
@@ -28,7 +29,7 @@
   <taskdef name="export" classname="net.haefelingerit.flaka.Export" />
   <taskdef name="export-task" classname="net.haefelingerit.flaka.Export" />
   <taskdef name="find" classname="net.haefelingerit.flaka.Find" />
-  <taskdef name="for" classname="net.haefelingerit.flaka.For2" />
+  <taskdef name="for" classname="net.haefelingerit.flaka.For" />
   <taskdef name="getdeps" classname="net.haefelingerit.flaka.GetDeps" />
   <taskdef name="initssl" classname="net.haefelingerit.flaka.InitSSL" />
   <taskdef name="logo" classname="net.haefelingerit.flaka.Logo" />
