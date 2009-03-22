@@ -68,6 +68,7 @@ public class Resolver extends ELResolver
     cr.add(new StringELResolver(project));
     cr.add(new FileELResolver());
     cr.add(new AntELResolver());
+    cr.add(new MatchResolver(project));
     cr.add(new ArrayELResolver(false));
     cr.add(new ListELResolver(false));
     cr.add(new MapELResolver(false));

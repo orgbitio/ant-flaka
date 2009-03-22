@@ -39,43 +39,35 @@ public class Switch extends Task
   protected Sequential defaultcase;
   protected String var;
   protected int flags;
-  protected boolean find = false;
 
   public void setVar(String s)
   {
     this.var = Static.trim3(getProject(), s, this.var);
   }
 
-  
- 
   public void setIgnoreCase(boolean b)
   {
-    this.flags = Static.bitset(this.flags,Pattern.CASE_INSENSITIVE,b);
+    this.flags = Static.bitset(this.flags, Pattern.CASE_INSENSITIVE, b);
   }
 
   public void setDotAll(boolean b)
   {
-    this.flags = Static.bitset(this.flags,Pattern.DOTALL,b);
+    this.flags = Static.bitset(this.flags, Pattern.DOTALL, b);
   }
 
   public void setUnixLines(boolean b)
   {
-    this.flags = Static.bitset(this.flags,Pattern.UNIX_LINES,b);
+    this.flags = Static.bitset(this.flags, Pattern.UNIX_LINES, b);
   }
 
   public void setComments(boolean b)
   {
-    this.flags = Static.bitset(this.flags,Pattern.COMMENTS,b);
+    this.flags = Static.bitset(this.flags, Pattern.COMMENTS, b);
   }
 
   public void setMultiLine(boolean b)
   {
-    this.flags = Static.bitset(this.flags,Pattern.MULTILINE,b);
-  }
-
-  public void setFind(boolean b)
-  {
-    this.find = b;
+    this.flags = Static.bitset(this.flags, Pattern.MULTILINE, b);
   }
 
   public void setValue(String value)
@@ -89,21 +81,8 @@ public class Switch extends Task
     public String var;
     public String regexstr = null;
     public int flags;
-    public boolean find;
     public boolean debug;
     public boolean ispattern = false;
-
-    @SuppressWarnings("unused")
-    private Match()
-    {
-      /* make sure this one is not used */
-    }
-
-    public Match(String var)
-    {
-      super();
-      this.var = var;
-    }
 
     public void setRE(String value)
     {
@@ -117,34 +96,29 @@ public class Switch extends Task
       this.ispattern = true;
     }
 
-    public void setFind(boolean b)
-    {
-      this.find = b;
-    }
-
     public void setIgnoreCase(boolean b)
     {
-      this.flags = Static.bitset(this.flags,Pattern.CASE_INSENSITIVE,b);
+      this.flags = Static.bitset(this.flags, Pattern.CASE_INSENSITIVE, b);
     }
 
     public void setDotAll(boolean b)
     {
-      this.flags = Static.bitset(this.flags,Pattern.DOTALL,b);
+      this.flags = Static.bitset(this.flags, Pattern.DOTALL, b);
     }
 
     public void setUnixLines(boolean b)
     {
-      this.flags = Static.bitset(this.flags,Pattern.UNIX_LINES,b);
+      this.flags = Static.bitset(this.flags, Pattern.UNIX_LINES, b);
     }
 
     public void setComments(boolean b)
     {
-      this.flags = Static.bitset(this.flags,Pattern.COMMENTS,b);
+      this.flags = Static.bitset(this.flags, Pattern.COMMENTS, b);
     }
 
     public void setMultiLine(boolean b)
     {
-      this.flags = Static.bitset(this.flags,Pattern.MULTILINE,b);
+      this.flags = Static.bitset(this.flags, Pattern.MULTILINE, b);
     }
 
     protected boolean match(Pattern regex, String value)
@@ -154,10 +128,10 @@ public class Switch extends Task
 
       /* match it */
       M = regex.matcher(value);
-      r = this.find ? M.find() : M.matches();
-      if (r)
+      r = M.find();
+      if (r && this.var != null)
       {
-        Static.assign(getProject(), this.var, M, Static.VARREF);
+        Static.assign(getProject(), this.var,new MatcherBean(M), Static.VARREF);
       }
       if (this.debug)
       {
@@ -195,11 +169,78 @@ public class Switch extends Task
     }
   }
 
+  /**
+   * The sole purpose of this class is to answer questions on
+   * <em>properties</em> asked by a resolver, usually a bean resolver (hence the
+   * name BeanMatcher).
+   * 
+   * 
+   * @author merzedes
+   * @since 1.0
+   */
+  static public class MatcherBean
+  {
+    final Matcher m;
+
+    public MatcherBean(Matcher m)
+    {
+      this.m = m;
+    }
+
+    public Matcher getBean() {
+      return this.m;
+    }
+    
+    public int getStart()
+    {
+      return this.m.start();
+    }
+
+    public int getEnd()
+    {
+      return this.m.end();
+    }
+
+    public String getPattern()
+    {
+      return this.m.pattern().pattern();
+    }
+    public String getP()
+    {
+      return this.m.pattern().pattern();
+    }
+
+    public int getGroups()
+    {
+      return this.m.groupCount();
+    }
+
+    public int getN()
+    {
+      return this.m.groupCount();
+    }
+
+    public int getLength()
+    {
+      return this.m.groupCount();
+    }
+
+    public int getSize()
+    {
+      return this.m.groupCount();
+    }
+    
+    public String toString() {
+      return this.m.group();
+    }
+
+  }
+
   public Switch.Match createMatches() throws BuildException
   {
-    Switch.Match res = new Switch.Match(this.var);
+    Switch.Match res = new Switch.Match();
+    res.var = this.var;
     res.flags = this.flags;
-    res.find = this.find;
     res.debug = this.debug;
     this.cases.add(res);
     return res;

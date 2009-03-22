@@ -11,14 +11,18 @@
   
   <c:switch value="v-uat_3_20_500" var="g">
     <matches re="v-(?:([^\d][^_]*)_)?(\d.*)">
-      <expect cand="#{g.p}"  this="v-(?:([^\d][^_]*)_)?(\d.*)" />
-      <expect cand="#{g.n}"  this="2" />
-      <expect cand="#{g[0]}" this="v-uat_3_20_500" />
-      <expect cand="#{g[1]}" this="uat" />
-      <expect cand="#{g[2]}" this="3_20_500" />
-      <expect cand="#{g[3]}" this="$${g.g3}" />
-      <expect cand="#{g[1].b}" this="2" />
+      <c:echo>
+        #{g[0]}
+      </c:echo>
+      <expect cand="#{g}"      this="v-uat_3_20_500" />
+      <expect cand="#{g.n}"    this="2" />
+      <expect cand="#{g[0]}"   this="v-uat_3_20_500" />
+      <expect cand="#{g[1]}"   this="uat" />
+      <expect cand="#{g[2]}"   this="3_20_500" />
+      <expect cand="#{g[3]}"   this="" />
+      <expect cand="#{g[1].s}" this="2" />
       <expect cand="#{g[1].e}" this="5" />
+      <expect cand="#{g.p}"    this="v-(?:([^\d][^_]*)_)?(\d.*)" />
     </matches>
   </c:switch>
 </project>
