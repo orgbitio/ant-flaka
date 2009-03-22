@@ -85,7 +85,7 @@ final public class Static
    *          must be either Static.VARREF, Static.PROPTY or Static.WRITEPROPTY
    * @return project
    */
-  public static Project assign(Project project, String key, Object obj, int type)
+  final public static Project assign(Project project, String key, Object obj, int type)
   {
     /* need a proper key */
     if (key == null || (key = key.trim()).equalsIgnoreCase(""))
@@ -126,7 +126,7 @@ final public class Static
     return project;
   }
 
-  public static void _log_(Project P, String msg, int type)
+  final public static void _log_(Project P, String msg, int type)
   {
     Project p = P;
     if (msg == null)
@@ -147,7 +147,7 @@ final public class Static
     p.log(msg, type);
   }
 
-  public static void log(Project P, String msg, Exception e)
+  final public static void log(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -155,12 +155,12 @@ final public class Static
     _log_(P, m, Project.MSG_INFO);
   }
 
-  public static void log(Project P, String msg)
+  final public static void log(Project P, String msg)
   {
     log(P, msg, null);
   }
 
-  public static void info(Project P, String msg, Exception e)
+  final public static void info(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -168,12 +168,12 @@ final public class Static
     _log_(P, m, Project.MSG_INFO);
   }
 
-  public static void info(Project P, String msg)
+  final public static void info(Project P, String msg)
   {
     log(P, msg, null);
   }
 
-  public static void verbose(Project P, String msg, Exception e)
+  final public static void verbose(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -181,12 +181,12 @@ final public class Static
     _log_(P, m, Project.MSG_VERBOSE);
   }
 
-  public static void verbose(Project P, String msg)
+  final public static void verbose(Project P, String msg)
   {
     verbose(P, msg, null);
   }
 
-  public static void debug(Project P, String msg, Exception e)
+  final public static void debug(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -194,12 +194,12 @@ final public class Static
     _log_(P, m, Project.MSG_DEBUG);
   }
 
-  public static void debug(Project P, String msg)
+  final public static void debug(Project P, String msg)
   {
     debug(P, msg, null);
   }
 
-  public static void error(Project P, String msg, Exception e)
+  final public static void error(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -207,12 +207,12 @@ final public class Static
     _log_(P, m, Project.MSG_ERR);
   }
 
-  public static void error(Project P, String msg)
+  final public static void error(Project P, String msg)
   {
     error(P, msg, null);
   }
 
-  public static void warning(Project P, String msg, Exception e)
+  final public static void warning(Project P, String msg, Exception e)
   {
     String m = msg;
     if (e != null)
@@ -220,12 +220,12 @@ final public class Static
     _log_(P, m, Project.MSG_WARN);
   }
 
-  public static void warning(Project P, String msg)
+  final public static void warning(Project P, String msg)
   {
     warning(P, msg, null);
   }
 
-  public static void writex(File f, String buf, boolean append) throws IOException
+  final public static void writex(File f, String buf, boolean append) throws IOException
   {
     FileWriter out = null;
     try
@@ -244,7 +244,7 @@ final public class Static
     }
   }
 
-  public static void close(Writer w)
+  final public static void close(Writer w)
   {
     /* silently close a writer */
     if (w != null)
@@ -259,7 +259,7 @@ final public class Static
     }
   }
 
-  public static void close(OutputStream os)
+  final public static void close(OutputStream os)
   {
     if (os != null)
       try
@@ -271,7 +271,7 @@ final public class Static
       }
   }
 
-  public static void close(InputStream is)
+  final public static void close(InputStream is)
   {
     if (is != null)
       try
@@ -283,7 +283,7 @@ final public class Static
       }
   }
 
-  public static void close(Reader r)
+  final public static void close(Reader r)
   {
     if (r != null)
       try
@@ -295,7 +295,7 @@ final public class Static
       }
   }
 
-  public static int write(File name, String s, boolean mode)
+  final public static int write(File name, String s, boolean mode)
   {
     int r = 1;
     try
@@ -308,7 +308,7 @@ final public class Static
     return r;
   }
 
-  public static void writex(InputStream cin, String fname, boolean mode) throws IOException
+  final public static void writex(InputStream cin, String fname, boolean mode) throws IOException
   {
     FileOutputStream out = null;
     byte[] buf = new byte[4098];
@@ -370,7 +370,7 @@ final public class Static
     return r;
   }
 
-  public static String readlines(InputStream src)
+  final public static String readlines(InputStream src)
   {
     String r = null;
     if (src != null)
@@ -378,7 +378,7 @@ final public class Static
     return r;
   }
 
-  public static String readlines(String src)
+  final public static String readlines(String src)
   {
     String r = null;
     if (src != null)
@@ -393,7 +393,7 @@ final public class Static
     return r;
   }
 
-  public static String readlines(File src)
+  final public static String readlines(File src)
   {
     String r = null;
     if (src != null)
@@ -401,93 +401,20 @@ final public class Static
     return r;
   }
 
-  public static String[] bufread(String buf)
+  final public static String[] bufread(String buf)
   {
     if (buf != null)
       return split(buf, "\n");
     return null;
   }
 
-  public static String[] bufread(File fname)
+  final public static String[] bufread(File fname)
   {
     return bufread(readlines(fname));
   }
 
-  /*
-   * add a property to the project: => property is not added in case property
-   * already exists => property is not RESOLVED.
-   */
-  // static public void addProperty(Project P, String k, String v)
-  // {
-  // // exactly the same as Project.setNewProperty() but avoids to
-  // // log any comment as Ant is doing by default.
-  // if (P.getProperty(k) == null)
-  // P.setProperty(k, v);
-  // }
-
-  // static public String concat(String[] argv, int I, int E, String Sep)
-  // {
-  // StringBuffer buf;
-  // int i = I;
-  // int e = E;
-  // String sep = Sep;
-  // if (argv == null)
-  // return "";
-  // if (e > argv.length)
-  // e = argv.length;
-  // if (i >= e)
-  // return "";
-  // if (sep == null)
-  // sep = " ";
-  //
-  // buf = new StringBuffer();
-  // while (i + 1 < e)
-  // {
-  // buf.append(argv[i]);
-  // buf.append(sep);
-  // i += 1;
-  // }
-  // buf.append(argv[e - 1]);
-  // return buf.toString();
-  // }
-  //
-  // static public String concat(String[] argv, String sep)
-  // {
-  // return concat(argv, 0, argv.length, sep);
-  // }
-  // static public int xendOf(String v, int Pos, int end)
-  // {
-  // int open = 0;
-  // int close = 0;
-  // char c;
-  // int pos = Pos;
-  // while (pos < end)
-  // {
-  // c = v.charAt(pos);
-  // if (c == '}')
-  // {
-  // close += 1;
-  // if (open == close)
-  // return pos;
-  // }
-  // if (c == '$')
-  // {
-  // if (pos + 1 < end)
-  // {
-  // pos += 1;
-  // c = v.charAt(pos);
-  // if (c == '{')
-  // {
-  // open += 1;
-  // }
-  // }
-  // }
-  // pos += 1;
-  // }
-  //
-  // return pos;
-  // }
-  static public String[] split(String v, String c)
+ 
+  final static public String[] split(String v, String c)
   {
     if (v == null)
       return null;
@@ -520,19 +447,9 @@ final public class Static
     return str;
   }
 
-  // static public String xdirname(String name)
-  // {
-  // File F = new File(name);
-  // return F.getParent();
-  // }
-  //
-  // static public String xbasename(String name)
-  // {
-  // File F = new File(name);
-  // return F.getName();
-  // }
+ 
 
-  static public String trimNonDigit(String V)
+  final static public String trimNonDigit(String V)
   {
     int i, e;
     char c;
@@ -553,7 +470,7 @@ final public class Static
     return v;
   }
 
-  static public int contains(String v, char c)
+  final static public int contains(String v, char c)
   {
     int i, j, e, n;
 
@@ -578,7 +495,7 @@ final public class Static
     return n;
   }
 
-  static public String tag2ver(String V)
+  final static public String tag2ver(String V)
   {
     /* tag is given - derive `project.version' */
     // strip everything till first digit.
@@ -612,7 +529,7 @@ final public class Static
   /**
    * Translates a given loc name in it's official dependency name.
    */
-  static public String jar2var(String V)
+  final static public String jar2var(String V)
   {
     char c;
     String s;
@@ -645,7 +562,7 @@ final public class Static
     return s;
   }
 
-  public static String mkchrseq(char c, int n)
+  final public static String mkchrseq(char c, int n)
   {
     String s = "";
     /* terrible inefficient */
@@ -654,7 +571,7 @@ final public class Static
     return s;
   }
 
-  private static String center(String S, int width, char chr)
+  final private static String center(String S, int width, char chr)
   {
     int w;
     String s = S;
@@ -673,7 +590,7 @@ final public class Static
     return s;
   }
 
-  public static String logo(String msg, int width)
+  final public static String logo(String msg, int width)
   {
     String s = "";
     String h;
@@ -695,12 +612,12 @@ final public class Static
     return s;
   }
 
-  public static String logo(String msg)
+  final public static String logo(String msg)
   {
     return logo(msg, 65);
   }
 
-  public static void throwbx(String S)
+  final public static void throwbx(String S)
   {
     String s = S;
     if (s == null)
@@ -710,7 +627,7 @@ final public class Static
     throw new BuildException(s);
   }
 
-  public static void throwbx(String S, Exception e)
+  final public static void throwbx(String S, Exception e)
   {
     String s = S;
     if (s == null)
@@ -727,7 +644,7 @@ final public class Static
    * 1.1,1.0.9 => -1 1.0,1.1 => 1 1.1,1.1.0.1 => 1
    */
 
-  public static int vercmp(String va, String vb)
+  final public static int vercmp(String va, String vb)
   {
     int i, na, nb;
     int a_i, b_i;
@@ -924,7 +841,7 @@ final public class Static
     return s.substring(0, i);
   }
 
-  public static void fcopy(File src, File dst) throws Exception
+  final public static void fcopy(File src, File dst) throws Exception
   {
     byte[] buffer = new byte[512];
     InputStream in = new FileInputStream(src);
@@ -939,7 +856,7 @@ final public class Static
     out.close();
   }
 
-  public static void copy(InputStream src, OutputStream dst) throws Exception
+  final public static void copy(InputStream src, OutputStream dst) throws Exception
   {
     byte[] buffer;
     int n;
@@ -961,7 +878,7 @@ final public class Static
     dst.flush();
   }
 
-  public static String[] grep(Project project, String regexpr) throws Exception
+  final public static String[] grep(Project project, String regexpr) throws Exception
   {
     String[] R;
     Pattern P;
@@ -1021,13 +938,13 @@ final public class Static
     return R;
   }
 
-  static public Method methodbyname(Class C, String name, Class[] type)
+  final static public Method methodbyname(Class C, String name, Class[] type)
       throws NoSuchMethodException, SecurityException
   {
     return C.getDeclaredMethod(name, type);
   }
 
-  static public Object invoke(Object obj, String name, Class type[], Object[] args)
+  final static public Object invoke(Object obj, String name, Class type[], Object[] args)
       throws Exception
   {
     Method M;
@@ -1035,7 +952,7 @@ final public class Static
     return M.invoke(obj, args);
   }
 
-  static public Field fieldbyname(Class clazz, String name)
+  final static public Field fieldbyname(Class clazz, String name)
   {
     Field F = null;
     Class C = clazz;
@@ -1052,21 +969,21 @@ final public class Static
     return F;
   }
 
-  static public Object getattr(Object obj, String name) throws IllegalAccessException
+  final static public Object getattr(Object obj, String name) throws IllegalAccessException
   {
     Field F;
     F = fieldbyname(obj.getClass(), name);
     return F.get(obj);
   }
 
-  static public void setattr(Object obj, String name, Object val) throws IllegalAccessException
+  final static public void setattr(Object obj, String name, Object val) throws IllegalAccessException
   {
     Field F;
     F = fieldbyname(obj.getClass(), name);
     F.set(obj, val);
   }
 
-  static public Object valueof(Object obj, String name) throws IllegalAccessException
+  final static public Object valueof(Object obj, String name) throws IllegalAccessException
   {
     Field F;
     F = fieldbyname(obj.getClass(), name);
@@ -1090,7 +1007,7 @@ final public class Static
    * @return true in case key could be removed from Hashtable denoted * by
    *         attribute <code>att</code>.
    */
-  static public boolean htabremove(Object obj, String att, String key)
+  final static public boolean htabremove(Object obj, String att, String key)
   {
     boolean b = false;
     if (obj != null)
@@ -1218,7 +1135,7 @@ final public class Static
    * * MacroInstance</code>.
    */
 
-  static public boolean ismacro(Project P, String s)
+  final static public boolean ismacro(Project P, String s)
   {
     boolean b = false;
     if (s != null && P != null)
@@ -1237,7 +1154,7 @@ final public class Static
    * @return true if <code>s<code> is Taskdef.
    */
 
-  static public boolean istask(Project P, String s)
+  final static public boolean istask(Project P, String s)
   {
     boolean b = false;
     if (s != null && P != null)
@@ -1253,21 +1170,8 @@ final public class Static
     return b;
   }
 
-  /**
-   * Translates a <i>Unix Shell</i> loc matching pattern into a regular
-   * expression. A Unix Shell pattern may consist of: * matches everything ?
-   * matches any single character [seq] matches any character in seq [!seq]
-   * matches any char not in seq
-   * 
-   * Note that there's no way to quote meta-characters.
-   */
-
-  static public String glob2regex(String pat)
-  {
-    return patternAsRegex(pat) + '$';
-  }
-
-  static public String patternAsRegex(String glob)
+ 
+  final static public String patternAsRegex(String glob)
   {
     char c;
     int i, j, n;
@@ -1332,7 +1236,7 @@ final public class Static
    * @param s
    *          not null
    */
-  static protected String escape(String s, char esc)
+  final static protected String escape(String s, char esc)
   {
     String r = "";
     char c;
@@ -1359,7 +1263,7 @@ final public class Static
    * @return <code>c</code> if <code>c</code> is alpanumeric character otherwise
    *         return <code>esc</code>.
    */
-  static protected String escape(char c, char esc)
+  final static protected String escape(char c, char esc)
   {
     return "" + (Character.isLetterOrDigit(c) ? c : esc);
   }
@@ -1371,7 +1275,7 @@ final public class Static
    * @param s
    *          not null
    */
-  static protected String replace(String s, char c, String sub)
+  final static protected String replace(String s, char c, String sub)
   {
     char x;
     String r = "";
@@ -1395,7 +1299,7 @@ final public class Static
    * @param s
    *          not null
    */
-  static protected String substring(String s, int i, int J)
+  final static protected String substring(String s, int i, int J)
   {
     String r = null;
     int L;
@@ -1529,7 +1433,7 @@ final public class Static
     return (s == null) || s.matches("\\s*");
   }
 
-  static public String cat(Project P, File file)
+  final static public String cat(Project P, File file)
   {
     String buf = null;
     if (P != null && file != null)
@@ -1541,12 +1445,12 @@ final public class Static
     return buf;
   }
 
-  static public Document xmldoc(File file) throws Exception
+  final static public Document xmldoc(File file) throws Exception
   {
     return Static.getxmldoc(new FileInputStream(file));
   }
 
-  static public Element loadxml(Project P, File file)
+  final static public Element loadxml(Project P, File file)
   {
     Element r = null;
     try
@@ -1578,7 +1482,7 @@ final public class Static
     return r;
   }
 
-  static public String stripEmptyLines(String buf)
+  final static public String stripEmptyLines(String buf)
   {
     final Pattern p = Pattern.compile("\\s*$", Pattern.MULTILINE);
     Matcher m = p.matcher(buf);
@@ -1590,7 +1494,7 @@ final public class Static
    * 
    * @param source
    */
-  protected static void tidyxml(DOMSource source)
+  final protected static void tidyxml(DOMSource source)
   {
     Node current = null;
     String cv = null;
@@ -1617,7 +1521,7 @@ final public class Static
     }
   }
 
-  static public String flushxml(Project P, Element root, StringBuffer buf)
+  final static public String flushxml(Project P, Element root, StringBuffer buf)
   {
     String s = null;
     if (P != null && root != null)
@@ -1644,7 +1548,7 @@ final public class Static
     return s;
   }
 
-  static public String flushxml(Project P, Element root, File file)
+  final static public String flushxml(Project P, Element root, File file)
   {
     String s = null;
     if (P != null && root != null && file != null)
@@ -1663,7 +1567,7 @@ final public class Static
     return s;
   }
 
-  static public String nodeattribute(Node node, String name, String otherwise)
+  final static public String nodeattribute(Node node, String name, String otherwise)
   {
     NamedNodeMap attributes;
 
@@ -1700,7 +1604,7 @@ final public class Static
     return otherwise;
   }
 
-  static public Document getxmldoc(InputStream stream) throws Exception
+  final static public Document getxmldoc(InputStream stream) throws Exception
   {
     Document doc = null;
     DocumentBuilderFactory dbf = null;
@@ -1714,12 +1618,12 @@ final public class Static
     return doc;
   }
 
-  static public boolean isregexchar(char c)
+  final static public boolean isregexchar(char c)
   {
     return c == '/';
   }
 
-  static public boolean ispatternchar(char c)
+  final static public boolean ispatternchar(char c)
   {
     return c == '%';
   }
@@ -1738,7 +1642,7 @@ final public class Static
    * characters above, then a pattern expression is assumed.</li>
    * </ul>
    */
-  static public Pattern patterncompile(String S, int f)
+  final static public Pattern patterncompile(String S, int f)
   {
     char c1, c2;
     Pattern P = null;
@@ -1778,7 +1682,7 @@ final public class Static
    * To disable EL, property (not reference) "ant.el" must be explicitly set to
    * <code>false</code>.
    */
-  static public boolean haveEL(Project project)
+  final static public boolean haveEL(Project project)
   {
     String p = project.getProperty(Static.EL);
     return p == null ? true : (p.matches("false") ? false : true);
@@ -1792,7 +1696,7 @@ final public class Static
    * that the embedded EL expression is evaluated into an object and
    * stringized in a second step. 
    */
-  static public String elresolve(Project project, String text)
+  final static public String elresolve(Project project, String text)
   {
     EL ctxref = el(project);
     return ctxref == null ? text : ctxref.tostr(text);
@@ -1803,7 +1707,7 @@ final public class Static
    * 
    * The given expression is evaluated and in a second step stringized.
    */
-  static public String el2str(Project project, String expr)
+  final static public String el2str(Project project, String expr)
   {
     EL ctxref = el(project);
     return ctxref == null ? expr : ctxref.tostr("#{"+expr+"}");
@@ -1816,7 +1720,7 @@ final public class Static
   * embedded {@code #{}} references. The expression is simply evaluated and
   * not coerced.
    */
-  static public Object el2obj(Project project, String expr)
+  final static public Object el2obj(Project project, String expr)
   {
     EL ctxref = el(project);
     return ctxref == null ? expr : ctxref.toobj("#{"+expr+"}");
@@ -1828,7 +1732,7 @@ final public class Static
    * Important: The expr given is evaluated as true EL expression. Thus 
    * it may not contain EL references like {@code #{..}}.
    */
-  static public boolean el2bool(Project project, String expr)
+  final static public boolean el2bool(Project project, String expr)
   {
     EL ctxref = el(project);
     // TODO: match expr for 'true/false' if ctxref == null?
@@ -1844,7 +1748,7 @@ final public class Static
    * function <code>haveEL(project)</code> returns true. Otherwise the behaviour
    * is undefined.
    */
-  static private EL el(Project project)
+  final static private EL el(Project project)
   {
     EL ctxref = null;
 
@@ -1867,7 +1771,7 @@ final public class Static
     return ctxref;
   }
 
-  static public String q(String s)
+  final static public String q(String s)
   {
     if (s != null)
     {
@@ -1910,4 +1814,16 @@ final public class Static
     }
     return project;
   }
+  
+  static final public int bitset(int bitset,int bit,boolean on)
+  {
+    if (on) {
+      bitset |= bit;
+    }
+    else {
+      bitset &= (~bit);
+    }
+    return bitset;
+  }
+  
 }

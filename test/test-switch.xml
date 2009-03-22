@@ -1,9 +1,9 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
 
   <c:switch value="foo" debug="true">
-    <case match="foo|bar">
+    <matches re="foo|bar">
       <fail message="test 0x01 fails"/>
-    </case>
+    </matches>
   </c:switch>
 
   <c:switch value="foo" debug="true">
@@ -89,16 +89,16 @@
     </sequential>
   </macrodef>
   
-  <c:switch value="v-uat_3_20_500" stem="g">
-    <case match = "/v-(?:([^\d][^_]*)_)?(\d.*)/" stem="g">
-      <expect cand="${g.p}"  this="v-(?:([^\d][^_]*)_)?(\d.*)" />
-      <expect cand="${g.n}"  this="2" />
-      <expect cand="${g.g0}" this="v-uat_3_20_500" />
-      <expect cand="${g.g1}" this="uat" />
-      <expect cand="${g.g2}" this="3_20_500" />
-      <expect cand="${g.g3}" this="$${g.g3}" />
-      <expect cand="${g.s1}" this="2" />
-      <expect cand="${g.e1}" this="5" />
+  <c:switch value="v-uat_3_20_500">
+    <case match = "v-(?:([^\d][^_]*)_)?(\d.*)" var="g">
+      <expect cand="#{g.p}"  this="v-(?:([^\d][^_]*)_)?(\d.*)" />
+      <expect cand="#{g.n}"  this="2" />
+      <expect cand="#{g[0]}" this="v-uat_3_20_500" />
+      <expect cand="#{g[1]}" this="uat" />
+      <expect cand="#{g[2]}" this="3_20_500" />
+      <expect cand="#{g[3]}" this="$${g.g3}" />
+      <expect cand="#{g[1].b}" this="2" />
+      <expect cand="#{g[1].e}" this="5" />
     </case>
   </c:switch>
   
