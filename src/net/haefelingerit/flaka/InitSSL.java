@@ -46,7 +46,8 @@ import org.apache.tools.ant.BuildException;
 /**
  * Utility class for configuring and testing JSSE for various JDKs
  * 
- * @author wh81752
+ * @author merzedes
+ * @since 1.0
  */
 
 public class InitSSL extends Task
@@ -208,8 +209,6 @@ public class InitSSL extends Task
    * the * default TrustManager - which makes use of property
    * javax.net.ssl.trustStore - * is installed. * *
    * 
-   * @param path
-   *          if null, property javax.net.ssl.trustStore will be removed. * *
    * @return previous value of javax.net.ssl.trustStore
    */
   protected String useTrustStore(File f)

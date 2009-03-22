@@ -38,7 +38,7 @@ public class EchoReader extends TextReader
     this.skipempty = false;
   }
 
-  protected int lefttrim(String line,int lastindex)
+  protected int lefttrim(String line, int lastindex)
   {
     int i;
 
@@ -51,7 +51,7 @@ public class EchoReader extends TextReader
 
   protected String indent(String line)
   {
-    int i = lefttrim(line,line.length()-1);
+    int i = lefttrim(line, line.length() - 1);
     int L = line.length();
     int n = 0;
     StringBuilder accu = new StringBuilder();
@@ -107,11 +107,11 @@ public class EchoReader extends TextReader
       }
       // Subsequent lines: strip leading whitespace.
       L = line.length();
-      i = lefttrim(line,L-1);
- 
+      i = lefttrim(line, L - 1);
+
       if (accu == null)
         accu = "";
-      
+
       /* replace indendation character */
       while (i < L && line.charAt(i) == this.ic)
       {

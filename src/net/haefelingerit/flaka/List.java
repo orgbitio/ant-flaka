@@ -26,6 +26,11 @@ import net.haefelingerit.flaka.util.TextReader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class List extends Task
 {
   protected String var;
@@ -33,7 +38,6 @@ public class List extends Task
   protected String comment;
   protected java.util.List list;
 
- 
   public void setComment(String s)
   {
     this.comment = Static.trim3(getProject(), s, null);

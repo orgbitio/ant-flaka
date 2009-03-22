@@ -18,6 +18,11 @@
 
 package net.haefelingerit.flaka;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class HttpStatusText
 {
   final static public String explain(int status)

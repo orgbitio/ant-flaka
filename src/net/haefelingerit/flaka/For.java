@@ -31,6 +31,11 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class For extends net.haefelingerit.flaka.Task implements TaskContainer
 {
   protected String expr;
@@ -46,8 +51,6 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
 
   /**
    * The argument list to be iterated over.
-   * 
-   * @param list
    */
   public void setIn(String expr)
   {
@@ -57,9 +60,6 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
   /**
    * Set the var attribute. This is the name of the macrodef attribute that gets
    * set for each iterator of the sequential element.
-   * 
-   * @param param
-   *          the name of the macrodef attribute.
    */
   public void setVar(String var)
   {
@@ -88,7 +88,7 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
     Iterator iter;
     Task task;
 
-    Static.assign(getProject(),this.var,val, Static.VARREF);
+    Static.assign(getProject(), this.var, val, Static.VARREF);
     iter = this.tasks.iterator();
     while (iter.hasNext())
     {
@@ -97,11 +97,12 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
     }
   }
 
-  protected Iterator iterator() {
+  protected Iterator iterator()
+  {
     Iterator iter;
     Project project;
     Object obj;
-    
+
     project = getProject();
     obj = Static.el2obj(project, "#{" + this.expr + "}");
 
@@ -117,12 +118,13 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
     }
     return iter;
   }
-  
+
   public void execute() throws BuildException
   {
     Iterator iter;
 
-    if (this.expr == null || this.var == null) {
+    if (this.expr == null || this.var == null)
+    {
       // TODO: debug message
       return;
     }
@@ -131,7 +133,7 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
     {
       /* rescue variable `var` */
       rescue();
-      
+
       /* iterate over each list item */
       iter = iterator();
       while (iter != null && iter.hasNext())
@@ -157,10 +159,10 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
           throw bx;
         }
       }
-      } finally
-      {
-        /* restore variable */
-        restore();
-      }
+    } finally
+    {
+      /* restore variable */
+      restore();
+    }
   }
 }

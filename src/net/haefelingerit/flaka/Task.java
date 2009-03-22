@@ -25,6 +25,10 @@ import net.haefelingerit.flaka.util.Static;
 import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class Task extends org.apache.tools.ant.Task
 {
   public boolean el = true;

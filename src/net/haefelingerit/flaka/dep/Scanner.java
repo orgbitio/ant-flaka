@@ -31,38 +31,44 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 public class Scanner
 {
   public Project proj;
   public List list;
-  
-  public Scanner(Project proj) {
+
+  public Scanner(Project proj)
+  {
     super();
     this.proj = proj;
     this.list = new ArrayList();
   }
-  
-  public Scanner reset() {
+
+  public Scanner reset()
+  {
     this.list.clear();
     return this;
   }
-  public Scanner reset(Project proj) {
+
+  public Scanner reset(Project proj)
+  {
     this.proj = proj;
     this.list.clear();
     return this;
   }
- public Scanner annotate(File file)
- {
-   /* annotate each dependenc with origin */
-   for(int j=0;j<this.list.size();++j) {
-     Dependency d = (Dependency) this.list.get(j);
-     d.setLocation("file://localhost"+file.getAbsolutePath());
-   }
-   return this;
- }
- 
-  static private char aliaschar(char c) {
+
+  public Scanner annotate(File file)
+  {
+    /* annotate each dependenc with origin */
+    for (int j = 0; j < this.list.size(); ++j)
+    {
+      Dependency d = (Dependency) this.list.get(j);
+      d.setLocation("file://localhost" + file.getAbsolutePath());
+    }
+    return this;
+  }
+
+  static private char aliaschar(char c)
+  {
     if (Character.isDigit(c))
       return c;
     if (Character.isLetter(c))
@@ -72,7 +78,8 @@ public class Scanner
     return '_';
   }
 
-  static private String name2alias(String v) {
+  static private String name2alias(String v)
+  {
     String s;
     /* `v' is assumed to be not null */
     s = "";
@@ -81,8 +88,8 @@ public class Scanner
     return s;
   }
 
-   public void scan(InputStream stream)
-      throws Exception {
+  public void scan(InputStream stream) throws Exception
+  {
     Node node, kid;
     NodeList nodes, kids;
     Dependency dep;
@@ -92,8 +99,9 @@ public class Scanner
     /* digest the given stream, return XML "document" */
     doc = Static.getxmldoc(stream);
 
-    if (doc == null) {
-      Static.debug(null,"XML input stream parsed - `null' document returned");
+    if (doc == null)
+    {
+      Static.debug(null, "XML input stream parsed - `null' document returned");
       return;
     }
 
@@ -104,20 +112,21 @@ public class Scanner
 
     nodes = doc.getElementsByTagNameNS("*", "dependency");
 
-    for (int i = 0; i < nodes.getLength(); i++) {
+    for (int i = 0; i < nodes.getLength(); i++)
+    {
       dep = new Dependency(this.proj);
       node = nodes.item(i);
 
       /*
-       * check whether name has attribute "name". If so then * autoset
-       * dependencies with property variables based
-       * on "alias".
+       * check whether name has attribute "name". If so then autoset
+       * dependencies with property variables based on "alias".
        */
-      alias = Static.nodeattribute(node, "alias",null);
-      type = Static.nodeattribute(node, "type","jar");
+      alias = Static.nodeattribute(node, "alias", null);
+      type = Static.nodeattribute(node, "type", "jar");
 
       /* set alias to be "<name>.<type>" */
-      if (alias != null) {
+      if (alias != null)
+      {
         alias = name2alias(alias);
         alias += ".";
         alias += type;
@@ -125,73 +134,87 @@ public class Scanner
       }
 
       /* fetch relevant attributes */
-      value = Static.nodeattribute(node, "id",null);
-      if (value != null) {
+      value = Static.nodeattribute(node, "id", null);
+      if (value != null)
+      {
         dep.setGroupId(value);
         dep.setArtifactId(value);
       }
-      value = Static.nodeattribute(node, "alt",null);
+      value = Static.nodeattribute(node, "alt", null);
       if (value != null)
         dep.setUrl(value);
-      value = Static.nodeattribute(node, "version",null);
+      value = Static.nodeattribute(node, "version", null);
       if (value != null)
         dep.setVersion(value);
-      value = Static.nodeattribute(node, "groupid",null);
+      value = Static.nodeattribute(node, "groupid", null);
       if (value != null)
         dep.setGroupId(value);
-      value = Static.nodeattribute(node, "artifactid",null);
+      value = Static.nodeattribute(node, "artifactid", null);
       if (value != null)
         dep.setArtifactId(value);
-      value = Static.nodeattribute(node, "type",null);
+      value = Static.nodeattribute(node, "type", null);
       if (value != null)
         dep.setType(value);
-      value = Static.nodeattribute(node, "jar",null);
+      value = Static.nodeattribute(node, "jar", null);
       if (value != null)
         dep.setJar(value);
-      value = Static.nodeattribute(node, "scope",null);
+      value = Static.nodeattribute(node, "scope", null);
       if (value != null)
         dep.setScope(value);
 
       /* allow for Maven style deps */
       kids = node.getChildNodes();
 
-      for (int j = 0; j < kids.getLength(); j++) {
+      for (int j = 0; j < kids.getLength(); j++)
+      {
         kid = kids.item(j);
         short nodeType = kid.getNodeType();
-        if (nodeType != Node.ELEMENT_NODE) {
+        if (nodeType != Node.ELEMENT_NODE)
+        {
           continue;
         }
 
         tag = kid.getLocalName();
         value = getTextNodeValue((Element) kid);
 
-        if (value == null) {
+        if (value == null)
+        {
           continue;
         }
 
         value = value.trim();
-        if (value.equals("")) {
+        if (value.equals(""))
+        {
           continue;
         }
 
-        if ("id".equalsIgnoreCase(tag)) {
+        if ("id".equalsIgnoreCase(tag))
+        {
           dep.setGroupId(value);
           dep.setArtifactId(value);
-        } else if ("alt".equalsIgnoreCase(tag)) {
+        } else if ("alt".equalsIgnoreCase(tag))
+        {
           dep.setUrl(value);
-        } else if ("version".equalsIgnoreCase(tag)) {
+        } else if ("version".equalsIgnoreCase(tag))
+        {
           dep.setVersion(value);
-        } else if ("groupId".equalsIgnoreCase(tag)) {
+        } else if ("groupId".equalsIgnoreCase(tag))
+        {
           dep.setGroupId(value);
-        } else if ("artifactId".equalsIgnoreCase(tag)) {
+        } else if ("artifactId".equalsIgnoreCase(tag))
+        {
           dep.setArtifactId(value);
-        } else if ("type".equalsIgnoreCase(tag)) {
+        } else if ("type".equalsIgnoreCase(tag))
+        {
           dep.setType(value);
-        } else if ("jar".equalsIgnoreCase(tag)) {
+        } else if ("jar".equalsIgnoreCase(tag))
+        {
           dep.setJar(value);
-        } else if ("properties".equalsIgnoreCase(tag)) {
+        } else if ("properties".equalsIgnoreCase(tag))
+        {
           getProperties(kid, dep);
-        } else if ("scope".equalsIgnoreCase(tag)) {
+        } else if ("scope".equalsIgnoreCase(tag))
+        {
           dep.setScope(value);
         }
       }
@@ -208,13 +231,17 @@ public class Scanner
    * @param dep
    *          the dependency to populate with any properties found
    */
-  static private void getProperties(Node el, Dependency dep) {
+  static private void getProperties(Node el, Dependency dep)
+  {
     NodeList children = el.getChildNodes();
-    for (int i = 0; i < children.getLength(); i++) {
+    for (int i = 0; i < children.getLength(); i++)
+    {
       Node child = children.item(i);
-      if (child.getNodeType() == Node.ELEMENT_NODE) {
+      if (child.getNodeType() == Node.ELEMENT_NODE)
+      {
         String textValue = getTextNodeValue((Element) child);
-        if (textValue != null) {
+        if (textValue != null)
+        {
           textValue = textValue.trim();
         }
         dep.putProperty(child.getLocalName(), textValue);
@@ -228,11 +255,14 @@ public class Scanner
    * @param node
    * @return
    */
-  static private String getTextNodeValue(Element el) {
+  static private String getTextNodeValue(Element el)
+  {
     NodeList children = el.getChildNodes();
-    for (int i = 0; i < children.getLength(); i++) {
+    for (int i = 0; i < children.getLength(); i++)
+    {
       Node child = children.item(i);
-      if (child.getNodeType() == Node.TEXT_NODE) {
+      if (child.getNodeType() == Node.TEXT_NODE)
+      {
         return child.getNodeValue();
       }
     }

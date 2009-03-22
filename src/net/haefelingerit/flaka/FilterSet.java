@@ -46,6 +46,10 @@ import net.haefelingerit.flaka.util.Static;
  * 
  * A filter set may have begintoken and endtokens defined.
  * 
+ * *
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 public class FilterSet extends org.apache.tools.ant.types.FilterSet
 {

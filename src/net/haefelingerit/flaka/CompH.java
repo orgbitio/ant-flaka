@@ -62,7 +62,9 @@ import org.apache.tools.ant.UnknownElement;
  * similar to * the one used in this class needs to be applied. * b.) what was
  * the other approach again?? * * *
  * 
- * @author wh81752
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class CompH extends ComponentHelper

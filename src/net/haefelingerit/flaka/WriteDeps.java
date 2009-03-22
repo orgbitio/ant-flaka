@@ -30,8 +30,8 @@ import org.apache.tools.ant.BuildException;
 /**
  * A task which outputs a CLASSPATH ..
  * 
- * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang
- *         H&auml;felinger</a>
+ * @author merzedes
+ * @since 1.0
  */
 
 public class WriteDeps extends Task
@@ -54,8 +54,6 @@ public class WriteDeps extends Task
    * usually into existence when using task
    * {@link net.haefelingerit.flaka.GetDeps} to retrieve dependencies from a
    * depot.
-   * 
-   * @param var
    */
   public void setVar(String s)
   {

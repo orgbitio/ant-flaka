@@ -33,6 +33,11 @@ import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class GetDeps extends Task
 {
   protected String var = "project.dependencies";
@@ -59,8 +64,6 @@ public class GetDeps extends Task
 
   /**
    * Sets the remote repository
-   * 
-   * @param string
    */
   public void setSrc(String s)
   {

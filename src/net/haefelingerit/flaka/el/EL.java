@@ -126,9 +126,9 @@ public final class EL
 
           if (sym(Symbol.EOF) || sym(Symbol.END_EVAL))
           {
-            int len,end,delta,size;
+            int len, end, delta, size;
             String text;
-            
+
             // We have do do some math here to calculate the position of '}'.
             len = this.scanner.getInput().length();
             // This is how much the scanner may have advanced meanwhile ..
@@ -142,7 +142,7 @@ public final class EL
             AstText node = new AstText(text);
             this.list.add(node);
             return;
-          } 
+          }
 
           /* serious internal error here, someone broke the contract */
           syntaxerror("expected (<}>|<EOF>)", start);
@@ -559,15 +559,15 @@ public final class EL
     funcdef0("rand", Math.class, "random");
 
     funcdef("typeof", Functions.class, "typeof", Object.class);
-    funcdef("file",   Functions.class, "file", Object.class);
-    funcdef("size",   Functions.class, "size", Object.class);
+    funcdef("file", Functions.class, "file", Object.class);
+    funcdef("size", Functions.class, "size", Object.class);
     funcdef("sizeof", Functions.class, "size", Object.class);
-    funcdef("null",   Functions.class, "isnil", Object.class);
+    funcdef("null", Functions.class, "isnil", Object.class);
 
     // string functions
     funcdefv("concat", Functions.class, "concat", Object[].class);
 
-    funcdefv("list",   Functions.class, "list", Object[].class);
+    funcdefv("list", Functions.class, "list", Object[].class);
     funcdefv("append", Functions.class, "append", Object[].class);
 
     // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
@@ -657,12 +657,11 @@ public final class EL
     {
       ve = this.factory.createValueExpression(this.context, expr, clazz);
       obj = ve.getValue(this.context);
-    } 
-    catch (TreeBuilderException tbe)
+    } catch (TreeBuilderException tbe)
     {
       System.err.println(tbe.getMessage());
-    }
-    catch(ELException ele) {
+    } catch (ELException ele)
+    {
       System.err.println(ele.getMessage());
     }
     return obj;

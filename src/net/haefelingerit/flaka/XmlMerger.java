@@ -39,6 +39,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class XmlMerger extends Task
 {
   protected String dst = null;

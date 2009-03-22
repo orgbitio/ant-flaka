@@ -27,6 +27,9 @@ import org.apache.tools.ant.BuildException;
  * in situations where scripts rely on the existince of a particular task. Ant
  * would fail if such a task does not exist. Rather than doing so, this clazz
  * can be used to let Ant continue, perhaps with a warning message.
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class NoOp extends Task

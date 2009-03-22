@@ -31,8 +31,9 @@ import org.apache.tools.ant.taskdefs.PreSetDef;
 /**
  * A task allowing the dynamic execution of a macro or task.
  * 
- * @author wh81752
- * @since 2.0
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class RunMacro extends Task

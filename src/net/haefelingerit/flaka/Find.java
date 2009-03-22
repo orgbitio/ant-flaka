@@ -34,6 +34,9 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
  * A task echoing files in a fileset similar as the Unix command
  * <code>find</code> would do.
  * 
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class Find extends MatchingTask

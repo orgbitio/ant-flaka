@@ -34,6 +34,11 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class HttpUpload
 {
   // protected static final Pattern REGEX_P;
@@ -89,16 +94,6 @@ public class HttpUpload
 
   /**
    * Get value of attribute
-   * 
-   * @name.
-   * 
-   * @param name
-   *          not null
-   * @param otherwise
-   *          not null
-   * @return value of attribute
-   * @name or
-   * @otherwise if not available.
    */
   public String get(String name, String otherwise)
   {

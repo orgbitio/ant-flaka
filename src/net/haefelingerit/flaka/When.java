@@ -31,8 +31,8 @@ import org.apache.tools.ant.TaskContainer;
 /**
  * A task to simulate a else-less if statement.
  * 
- * @author wh81752
- * 
+ * @author merzedes
+ * @since 1.0
  */
 public class When extends Task implements TaskContainer
 {

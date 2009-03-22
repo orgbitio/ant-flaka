@@ -23,11 +23,17 @@ import net.haefelingerit.flaka.util.Static;
 import org.apache.tools.ant.BuildException;
 
 /**
- * A task to terminate a {@link http://code.google.com/p/flaka/wiki/Tasks#for for} or 
- * {@link http://code.google.com/p/flaka/wiki/Tasks#while while} loop.
+ * A task to terminate a <a
+ * href="http://code.google.com/p/flaka/wiki/Tasks#for">for</a> or <a
+ * href="http://code.google.com/p/flaka/wiki/Tasks#while">while</a> loop.
  * 
- * References:
- * See {@link http://code.google.com/p/flaka/wiki/Tasks#break} for details on task for.
+ * <p>
+ * See <a href="http://code.google.com/p/flaka/wiki/Tasks#break">break</a> for a
+ * detailed description of this task.
+ * </p>
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class Break extends Task
@@ -38,23 +44,27 @@ public class Break extends Task
   protected String test;
   protected String ifp;
   protected String unlessp;
- 
-  public void setTest(String test) {
-    this.test = Static.trim3(getProject(),test,this.test);
+
+  public void setTest(String test)
+  {
+    this.test = Static.trim3(getProject(), test, this.test);
   }
 
-  public void setIf(String ifp) {
-    this.test = Static.trim3(getProject(),ifp,this.ifp);
+  public void setIf(String ifp)
+  {
+    this.test = Static.trim3(getProject(), ifp, this.ifp);
   }
-  
-  public void setUnless(String unlessp) {
-    this.test = Static.trim3(getProject(),unlessp,this.unlessp);
+
+  public void setUnless(String unlessp)
+  {
+    this.test = Static.trim3(getProject(), unlessp, this.unlessp);
   }
-  
-  protected void fail() {
+
+  protected void fail()
+  {
     throw EXCEPTION;
   }
-  
+
   public void execute() throws BuildException
   {
     // Implementation Note:
@@ -71,14 +81,17 @@ public class Break extends Task
 
     if (this.test == null && this.ifp == null && this.unlessp == null)
       fail();
-    
-    if (this.ifp != null && getProject().getProperty(this.ifp) != null) {
+
+    if (this.ifp != null && getProject().getProperty(this.ifp) != null)
+    {
       fail();
     }
-    if (this.unlessp != null && getProject().getProperty(this.unlessp) == null) {
+    if (this.unlessp != null && getProject().getProperty(this.unlessp) == null)
+    {
       fail();
     }
-    if (this.test != null && Static.el2bool(getProject(),"#{"+this.test+"}")) {
+    if (this.test != null && Static.el2bool(getProject(), "#{" + this.test + "}"))
+    {
       fail();
     }
   }

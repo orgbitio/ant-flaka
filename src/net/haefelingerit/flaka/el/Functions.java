@@ -36,9 +36,6 @@ public class Functions
    * 
    * A EL string is not allowed to have escaped characters other than <code>\'</code>
    * and <code>\\</code>.
-   * 
-   * @param s
-   * @return
    */
   static public String quote(String s)
   {
@@ -209,32 +206,33 @@ public class Functions
       list.add(args[i]);
     return list;
   }
- 
-  static public String typeof(Object object) {
+
+  static public String typeof(Object object)
+  {
     if (object == null)
       return "null";
-    
+
     if (object instanceof String)
       return "string";
-    
+
     if (object instanceof File)
       return "file";
-    
+
     if (object.getClass().isArray())
       return "array";
-    
+
     if (object instanceof Iterable)
       return "list";
-    
+
     if (Integer.class.isAssignableFrom(object.getClass()))
       return "integer";
-    
+
     if (Double.class.isAssignableFrom(object.getClass()))
       return "float";
-    
+
     if (Boolean.class.isAssignableFrom(object.getClass()))
       return "boolean";
-    
+
     return "object";
   }
 

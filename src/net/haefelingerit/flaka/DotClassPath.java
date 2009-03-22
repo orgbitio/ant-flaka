@@ -42,8 +42,9 @@ import org.w3c.dom.NodeList;
  * This task implements opertations like append, remove and query on a
  * .classpath loc.
  * 
- * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang
- *         H&auml;felinger</a>
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class DotClassPath extends Task
@@ -155,9 +156,6 @@ public class DotClassPath extends Task
   /**
    * Use this attribute to set the loc to operate on. By default, .classpath is
    * used.
-   * 
-   * @param loc
-   *          The loc to operate on.
    */
   public void setFile(File file)
   {
@@ -168,8 +166,6 @@ public class DotClassPath extends Task
    * Use this attribute to specify the base directory. By default, the base
    * directory is the folder containing the build loc.
    * 
-   * @param loc
-   *          The base folder.
    */
   public void setBase(File file)
   {
@@ -179,9 +175,6 @@ public class DotClassPath extends Task
   /**
    * Use this attribute to specify the workspace folder of Eclipse. If not
    * given, then the workspace folder will be the parent of base directory.
-   * 
-   * @param loc
-   *          Eclipse workspace folder.
    */
   public void setWsFolder(File file)
   {
@@ -700,10 +693,6 @@ public class DotClassPath extends Task
     /**
      * Evaluate this fileset and create instance of type
      * 
-     * @Entry for each resolved loc. Each
-     * @Entry instance will be appended to
-     * @bucket.
-     * 
      * @param bucket
      *          not null, resolved entries appended
      */
@@ -1004,9 +993,6 @@ public class DotClassPath extends Task
 
   /**
    * * Update XML element by adding classpath entries. * *
-   * 
-   * @param root
-   *          can be null
    */
   protected void opUpdate(List clazzpath) throws BuildException
   {

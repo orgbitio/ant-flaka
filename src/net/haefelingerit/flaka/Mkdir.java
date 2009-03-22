@@ -21,6 +21,11 @@ package net.haefelingerit.flaka;
 import java.io.File;
 import org.apache.tools.ant.BuildException;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class Mkdir extends Task
 {
 

@@ -25,8 +25,9 @@ import org.apache.tools.ant.BuildException;
 /**
  * A task allowing the dynamic execution of a target.
  * 
- * @author wh81752
- * @since 2.0
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class RunTarget extends Task

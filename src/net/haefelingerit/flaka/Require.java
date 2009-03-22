@@ -24,6 +24,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class Require extends Task
 {
   /* This is the minimal Ant version requird to make Flaka happy */

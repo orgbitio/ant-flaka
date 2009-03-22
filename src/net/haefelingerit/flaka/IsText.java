@@ -27,6 +27,11 @@ import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.types.selectors.BaseSelector;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class IsText extends BaseSelector
 {
   /** upper limit of characters to investige. */
@@ -54,14 +59,6 @@ public class IsText extends BaseSelector
   /**
    * * Implements a selector to restrict a given fileset to contain * "textual"
    * files only. * *
-   * 
-   * @param basedir
-   *          directory containing <code>filename</code> *
-   * @param filename
-   *          name of loc *
-   * @param loc
-   *          the loc as File object * *
-   * @return true if <code>loc</code> is a textual loc.
    */
 
   public boolean isSelected(File basedir, String filename, File file)

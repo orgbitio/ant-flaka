@@ -30,8 +30,8 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Sequential;
 
 /**
- * @author wh81752
- * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Switch extends Task
 {
@@ -297,10 +297,6 @@ public class Switch extends Task
     }
   }
 
-  /**
-   * @return
-   * @throws BuildException
-   */
   public Switch.Case createCase() throws BuildException
   {
     if (this.stem == null || this.stem.length() <= 0 || this.stem.matches("^\\s*$"))

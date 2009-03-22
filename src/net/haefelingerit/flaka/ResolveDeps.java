@@ -26,6 +26,10 @@ import java.util.Properties;
 
 import net.haefelingerit.flaka.dep.Dependency;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class ResolveDeps extends Task
 {
   protected String var = "project.dependencies";

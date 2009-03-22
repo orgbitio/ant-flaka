@@ -25,19 +25,23 @@ import de.odysseus.el.misc.TypeConverterImpl;
 @SuppressWarnings("serial")
 public class TypeConverter extends TypeConverterImpl
 {
-  protected Boolean coerceToBoolean(Object value) 
+  protected Boolean coerceToBoolean(Object value)
   {
-    if (value == null) {
+    if (value == null)
+    {
       return Boolean.FALSE;
     }
-    if (value instanceof Boolean) {
-      return (Boolean)value;
+    if (value instanceof Boolean)
+    {
+      return (Boolean) value;
     }
-    if (value instanceof String) {
-      return ((String)value).equals("") ? Boolean.FALSE : Boolean.TRUE;
+    if (value instanceof String)
+    {
+      return ((String) value).equals("") ? Boolean.FALSE : Boolean.TRUE;
     }
-    if (value instanceof File) {
-      return ((File)value).exists() ? Boolean.TRUE : Boolean.FALSE;
+    if (value instanceof File)
+    {
+      return ((File) value).exists() ? Boolean.TRUE : Boolean.FALSE;
     }
     return Boolean.TRUE;
   }

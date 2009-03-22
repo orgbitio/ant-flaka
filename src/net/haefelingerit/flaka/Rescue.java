@@ -33,8 +33,8 @@ import org.apache.tools.ant.TaskContainer;
 /**
  * A task to rescue variables.
  * 
- * @author geronimo
- * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Rescue extends net.haefelingerit.flaka.Task implements TaskContainer
 {
@@ -58,11 +58,11 @@ public class Rescue extends net.haefelingerit.flaka.Task implements TaskContaine
     this.properties.setEl(false);
   }
 
-  public void addTask(Task nestedTask) {
+  public void addTask(Task nestedTask)
+  {
     this.tasks.add(nestedTask);
   }
 
-  
   protected void rescue()
   {
     Project project;
@@ -135,7 +135,7 @@ public class Rescue extends net.haefelingerit.flaka.Task implements TaskContaine
     {
       org.apache.tools.ant.Task task;
       Iterator iter;
-      
+
       iter = this.tasks.iterator();
       while (iter.hasNext())
       {

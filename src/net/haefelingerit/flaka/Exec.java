@@ -30,9 +30,9 @@ import org.apache.tools.ant.taskdefs.Execute;
  * 
  * Usage of this task is deprecated.
  * 
- * @author wh81752
  * @deprecated
- * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Exec extends ExecTask
 {

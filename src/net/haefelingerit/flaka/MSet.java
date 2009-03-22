@@ -28,9 +28,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 /**
- * This task is properly doc http://w/Flaka/API/set
+ * 
+ * @author merzedes
+ * @since 1.0
  */
-
 public class MSet extends Task
 {
   private String text = null;

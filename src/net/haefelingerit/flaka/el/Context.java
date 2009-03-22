@@ -29,14 +29,12 @@ import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
-
 public class Context extends ELContext
 {
   private Functions functions;
   private Variables variables;
   private ELResolver resolver;
 
-  
   static class Functions extends FunctionMapper
   {
     Map<String, Method> map = Collections.emptyMap();
@@ -71,9 +69,11 @@ public class Context extends ELContext
     }
   }
 
-  protected Context() {
+  protected Context()
+  {
     this(null);
   }
+
   /**
    * Create a context, use the specified resolver.
    */
@@ -82,13 +82,13 @@ public class Context extends ELContext
     if (resolver == null)
       throw new NullPointerException("context requires a resolver");
     this.resolver = resolver;
- 
+
   }
-  
+
   /**
    * Get our function mapper.
    */
-  
+
   public FunctionMapper getFunctionMapper()
   {
     if (this.functions == null)
@@ -99,19 +99,20 @@ public class Context extends ELContext
   /**
    * Get our variable mapper.
    */
-  
+
   public VariableMapper getVariableMapper()
   {
     if (this.variables == null)
       this.variables = new Variables();
     return this.variables;
   }
+
   /**
    * Define a function.
    */
   public void setFunction(String prefix, String localName, Method method)
   {
-    if (this.functions==null) 
+    if (this.functions == null)
       this.functions = new Functions();
     this.functions.setFunction(prefix, localName, method);
   }
@@ -121,8 +122,8 @@ public class Context extends ELContext
    */
   public ValueExpression setVariable(String name, ValueExpression expression)
   {
-    if (this.variables==null)
-      this.variables=new Variables();
+    if (this.variables == null)
+      this.variables = new Variables();
     return this.variables.setVariable(name, expression);
   }
 

@@ -43,7 +43,6 @@
 // http://java.sun.com/nav/business/index.html for further important licensing
 // information for the Java Technology.
 //
-
 package net.haefelingerit.flaka.util;
 
 import java.text.DecimalFormatSymbols;
@@ -416,7 +415,8 @@ public class Printf
    *              if the control string is null, zero length, or otherwise
    *              malformed.
    */
-  public Printf(String fmtArg) throws IllegalArgumentException {
+  public Printf(String fmtArg) throws IllegalArgumentException
+  {
     this(Locale.getDefault(), fmtArg);
   }
 
@@ -432,18 +432,22 @@ public class Printf
    *              if the control string is null, zero length, or otherwise
    *              malformed.
    */
-  public Printf(Locale locale, String fmtArg) throws IllegalArgumentException {
+  public Printf(Locale locale, String fmtArg) throws IllegalArgumentException
+  {
     this.dfs = new DecimalFormatSymbols(locale);
     int ePos = 0;
     ConversionSpecification sFmt = null;
     String unCS = this.nonControl(fmtArg, 0);
-    if (unCS != null) {
+    if (unCS != null)
+    {
       sFmt = new ConversionSpecification();
       sFmt.setLiteral(unCS);
       this.vFmt.addElement(sFmt);
     }
-    while (this.cPos != -1 && this.cPos < fmtArg.length()) {
-      for (ePos = this.cPos + 1; ePos < fmtArg.length(); ePos++) {
+    while (this.cPos != -1 && this.cPos < fmtArg.length())
+    {
+      for (ePos = this.cPos + 1; ePos < fmtArg.length(); ePos++)
+      {
         char c = 0;
         c = fmtArg.charAt(ePos);
         if (c == 'i')
@@ -477,7 +481,8 @@ public class Printf
       sFmt = new ConversionSpecification(fmtArg.substring(this.cPos, ePos));
       this.vFmt.addElement(sFmt);
       unCS = this.nonControl(fmtArg, ePos);
-      if (unCS != null) {
+      if (unCS != null)
+      {
         sFmt = new ConversionSpecification();
         sFmt.setLiteral(unCS);
         this.vFmt.addElement(sFmt);
@@ -486,9 +491,9 @@ public class Printf
   }
 
   /**
-   * Return a substring starting at <code>start</code> and ending at either
-   * the end of the String <code>s</code>, the next unpaired percent sign, or
-   * at the end of the String if the last character is a percent sign.
+   * Return a substring starting at <code>start</code> and ending at either the
+   * end of the String <code>s</code>, the next unpaired percent sign, or at the
+   * end of the String if the last character is a percent sign.
    * 
    * @param s
    *          Control string.
@@ -498,7 +503,8 @@ public class Printf
    * @return the substring from the start position to the beginning of the
    *         control string.
    */
-  private String nonControl(String s, int start) {
+  private String nonControl(String s, int start)
+  {
     this.cPos = s.indexOf("%", start);
     if (this.cPos == -1)
       this.cPos = s.length();
@@ -513,36 +519,45 @@ public class Printf
    *          The array of objects to format.
    * @return The formatted String.
    */
-  public String sprintf(Object[] o) {
+  public String sprintf(Object[] o)
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     int i = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
         sb.append(cs.getLiteral());
       else if (c == '%')
         sb.append("%");
-      else {
-        if (cs.isPositionalSpecification()) {
+      else
+      {
+        if (cs.isPositionalSpecification())
+        {
           i = cs.getArgumentPosition() - 1;
-          if (cs.isPositionalFieldWidth()) {
+          if (cs.isPositionalFieldWidth())
+          {
             int ifw = cs.getArgumentPositionForFieldWidth() - 1;
             cs.setFieldWidthWithArg(((Integer) o[ifw]).intValue());
           }
-          if (cs.isPositionalPrecision()) {
+          if (cs.isPositionalPrecision())
+          {
             int ipr = cs.getArgumentPositionForPrecision() - 1;
             cs.setPrecisionWithArg(((Integer) o[ipr]).intValue());
           }
-        } else {
-          if (cs.isVariableFieldWidth()) {
+        } else
+        {
+          if (cs.isVariableFieldWidth())
+          {
             cs.setFieldWidthWithArg(((Integer) o[i]).intValue());
             i++;
           }
-          if (cs.isVariablePrecision()) {
+          if (cs.isVariablePrecision())
+          {
             cs.setPrecisionWithArg(((Integer) o[i]).intValue());
             i++;
           }
@@ -577,12 +592,14 @@ public class Printf
    * 
    * @return the formatted String.
    */
-  public String sprintf() {
+  public String sprintf()
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
@@ -602,12 +619,14 @@ public class Printf
    * @exception IllegalArgumentException
    *              if the conversion character is f, e, E, g, G, s, or S.
    */
-  public String sprintf(int x) throws IllegalArgumentException {
+  public String sprintf(int x) throws IllegalArgumentException
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
@@ -629,12 +648,14 @@ public class Printf
    * @exception IllegalArgumentException
    *              if the conversion character is f, e, E, g, G, s, or S.
    */
-  public String sprintf(long x) throws IllegalArgumentException {
+  public String sprintf(long x) throws IllegalArgumentException
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
@@ -656,12 +677,14 @@ public class Printf
    * @exception IllegalArgumentException
    *              if the conversion character is c, C, s, S, d, d, x, X, or o.
    */
-  public String sprintf(double x) throws IllegalArgumentException {
+  public String sprintf(double x) throws IllegalArgumentException
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
@@ -683,12 +706,14 @@ public class Printf
    * @exception IllegalArgumentException
    *              if the conversion character is neither s nor S.
    */
-  public String sprintf(String x) throws IllegalArgumentException {
+  public String sprintf(String x) throws IllegalArgumentException
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
@@ -714,19 +739,22 @@ public class Printf
    *              if the conversion character is inappropriate for formatting an
    *              unwrapped value.
    */
-  public String sprintf(Object x) throws IllegalArgumentException {
+  public String sprintf(Object x) throws IllegalArgumentException
+  {
     Enumeration e = this.vFmt.elements();
     ConversionSpecification cs = null;
     char c = 0;
     StringBuffer sb = new StringBuffer();
-    while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       cs = (ConversionSpecification) e.nextElement();
       c = cs.getConversionCharacter();
       if (c == '\0')
         sb.append(cs.getLiteral());
       else if (c == '%')
         sb.append("%");
-      else {
+      else
+      {
         if (x instanceof Byte)
           sb.append(cs.internalsprintf(((Byte) x).byteValue()));
         else if (x instanceof Short)
@@ -786,7 +814,8 @@ public class Printf
      * Constructor. Used to prepare an instance to hold a literal, not a control
      * string.
      */
-    ConversionSpecification() { /* not used */
+    ConversionSpecification()
+    { /* not used */
     }
 
     /**
@@ -800,13 +829,14 @@ public class Printf
      *              if the input string is null, zero length, or otherwise
      *              malformed.
      */
-    ConversionSpecification(String fmtArg) throws IllegalArgumentException {
+    ConversionSpecification(String fmtArg) throws IllegalArgumentException
+    {
       if (fmtArg == null)
         throw new NullPointerException();
       if (fmtArg.length() == 0)
-        throw new IllegalArgumentException("Control strings must have positive"
-            + " lengths.");
-      if (fmtArg.charAt(0) == '%') {
+        throw new IllegalArgumentException("Control strings must have positive" + " lengths.");
+      if (fmtArg.charAt(0) == '%')
+      {
         this.fmt = fmtArg;
         this.pos = 1;
         setArgPosition();
@@ -814,24 +844,24 @@ public class Printf
         setFieldWidth();
         setPrecision();
         setOptionalHL();
-        if (setConversionCharacter()) {
-          if (this.pos == fmtArg.length()) {
+        if (setConversionCharacter())
+        {
+          if (this.pos == fmtArg.length())
+          {
             if (this.leadingZeros && this.leftJustify)
               this.leadingZeros = false;
-            if (this.precisionSet && this.leadingZeros) {
-              if (this.conversionCharacter == 'd'
-                  || this.conversionCharacter == 'i'
-                  || this.conversionCharacter == 'o'
-                  || this.conversionCharacter == 'x') {
+            if (this.precisionSet && this.leadingZeros)
+            {
+              if (this.conversionCharacter == 'd' || this.conversionCharacter == 'i'
+                  || this.conversionCharacter == 'o' || this.conversionCharacter == 'x')
+              {
                 this.leadingZeros = false;
               }
             }
           } else
-            throw new IllegalArgumentException(
-                "Malformed conversion specification=" + fmtArg);
+            throw new IllegalArgumentException("Malformed conversion specification=" + fmtArg);
         } else
-          throw new IllegalArgumentException(
-              "Malformed conversion specification=" + fmtArg);
+          throw new IllegalArgumentException("Malformed conversion specification=" + fmtArg);
       } else
         throw new IllegalArgumentException("Control strings must begin with %.");
     }
@@ -842,7 +872,8 @@ public class Printf
      * @param s
      *          the String to store.
      */
-    void setLiteral(String s) {
+    void setLiteral(String s)
+    {
       this.fmt = s;
     }
 
@@ -851,15 +882,20 @@ public class Printf
      * 
      * @return s the stored String.
      */
-    String getLiteral() {
+    String getLiteral()
+    {
       StringBuffer sb = new StringBuffer();
       int i = 0;
-      while (i < this.fmt.length()) {
-        if (this.fmt.charAt(i) == '\\') {
+      while (i < this.fmt.length())
+      {
+        if (this.fmt.charAt(i) == '\\')
+        {
           i++;
-          if (i < this.fmt.length()) {
+          if (i < this.fmt.length())
+          {
             char c = this.fmt.charAt(i);
-            switch (c) {
+            switch (c)
+            {
               case 'a':
                 sb.append((char) 0x07);
                 break;
@@ -900,7 +936,8 @@ public class Printf
      * 
      * @return the conversion character.
      */
-    char getConversionCharacter() {
+    char getConversionCharacter()
+    {
       return this.conversionCharacter;
     }
 
@@ -911,7 +948,8 @@ public class Printf
      * @return <code>true</code> if the conversion uses an * field width;
      *         otherwise <code>false</code>.
      */
-    boolean isVariableFieldWidth() {
+    boolean isVariableFieldWidth()
+    {
       return this.variableFieldWidth;
     }
 
@@ -922,7 +960,8 @@ public class Printf
      * @param fw
      *          the field width.
      */
-    void setFieldWidthWithArg(int fw) {
+    void setFieldWidthWithArg(int fw)
+    {
       if (fw < 0)
         this.leftJustify = true;
       this.fieldWidthSet = true;
@@ -936,7 +975,8 @@ public class Printf
      * @return <code>true</code> if the conversion uses an * precision;
      *         otherwise <code>false</code>.
      */
-    boolean isVariablePrecision() {
+    boolean isVariablePrecision()
+    {
       return this.variablePrecision;
     }
 
@@ -947,7 +987,8 @@ public class Printf
      * @param pr
      *          the precision.
      */
-    void setPrecisionWithArg(int pr) {
+    void setPrecisionWithArg(int pr)
+    {
       this.precisionSet = true;
       this.precision = Math.max(pr, 0);
     }
@@ -961,9 +1002,11 @@ public class Printf
      * @exception IllegalArgumentException
      *              if the conversion character is f, e, E, g, or G.
      */
-    String internalsprintf(int s) throws IllegalArgumentException {
+    String internalsprintf(int s) throws IllegalArgumentException
+    {
       String s2 = "";
-      switch (this.conversionCharacter) {
+      switch (this.conversionCharacter)
+      {
         case 'd':
         case 'i':
           if (this.optionalh)
@@ -995,9 +1038,8 @@ public class Printf
           s2 = printCFormat((char) s);
           break;
         default:
-          throw new IllegalArgumentException(
-              "Cannot format a int with a format using a "
-                  + this.conversionCharacter + " conversion character.");
+          throw new IllegalArgumentException("Cannot format a int with a format using a "
+              + this.conversionCharacter + " conversion character.");
       }
       return s2;
     }
@@ -1011,9 +1053,11 @@ public class Printf
      * @exception IllegalArgumentException
      *              if the conversion character is f, e, E, g, or G.
      */
-    String internalsprintf(long s) throws IllegalArgumentException {
+    String internalsprintf(long s) throws IllegalArgumentException
+    {
       String s2 = "";
-      switch (this.conversionCharacter) {
+      switch (this.conversionCharacter)
+      {
         case 'd':
         case 'i':
           if (this.optionalh)
@@ -1045,9 +1089,8 @@ public class Printf
           s2 = printCFormat((char) s);
           break;
         default:
-          throw new IllegalArgumentException(
-              "Cannot format a long with a format using a "
-                  + this.conversionCharacter + " conversion character.");
+          throw new IllegalArgumentException("Cannot format a long with a format using a "
+              + this.conversionCharacter + " conversion character.");
       }
       return s2;
     }
@@ -1061,9 +1104,11 @@ public class Printf
      * @exception IllegalArgumentException
      *              if the conversion character is c, C, s, S, i, d, x, X, or o.
      */
-    String internalsprintf(double s) throws IllegalArgumentException {
+    String internalsprintf(double s) throws IllegalArgumentException
+    {
       String s2 = "";
-      switch (this.conversionCharacter) {
+      switch (this.conversionCharacter)
+      {
         case 'f':
           s2 = printFFormat(s);
           break;
@@ -1076,8 +1121,7 @@ public class Printf
           s2 = printGFormat(s);
           break;
         default:
-          throw new IllegalArgumentException("Cannot "
-              + "format a double with a format using a "
+          throw new IllegalArgumentException("Cannot " + "format a double with a format using a "
               + this.conversionCharacter + " conversion character.");
       }
       return s2;
@@ -1092,13 +1136,13 @@ public class Printf
      * @exception IllegalArgumentException
      *              if the conversion character is neither s nor S.
      */
-    String internalsprintf(String s) throws IllegalArgumentException {
+    String internalsprintf(String s) throws IllegalArgumentException
+    {
       String s2 = "";
       if (this.conversionCharacter == 's' || this.conversionCharacter == 'S')
         s2 = printSFormat(s);
       else
-        throw new IllegalArgumentException("Cannot "
-            + "format a String with a format using a "
+        throw new IllegalArgumentException("Cannot " + "format a String with a format using a "
             + this.conversionCharacter + " conversion character.");
       return s2;
     }
@@ -1112,14 +1156,14 @@ public class Printf
      * @exception IllegalArgumentException
      *              if the conversion character is neither s nor S.
      */
-    String internalsprintf(Object s) {
+    String internalsprintf(Object s)
+    {
       String s2 = "";
       if (this.conversionCharacter == 's' || this.conversionCharacter == 'S')
         s2 = printSFormat(s.toString());
       else
-        throw new IllegalArgumentException(
-            "Cannot format a String with a format using" + " a "
-                + this.conversionCharacter + " conversion character.");
+        throw new IllegalArgumentException("Cannot format a String with a format using" + " a "
+            + this.conversionCharacter + " conversion character.");
       return s2;
     }
 
@@ -1139,7 +1183,8 @@ public class Printf
      * The precision, if set, is the number of digits to appear after the radix
      * character. Padding is with trailing 0s.
      */
-    private char[] fFormatDigits(double x) {
+    private char[] fFormatDigits(double x)
+    {
       // int defaultDigits=6;
       String sx;
       int i, j, k;
@@ -1148,12 +1193,15 @@ public class Printf
       boolean minusSign = false;
       if (x > 0.0)
         sx = Double.toString(x);
-      else if (x < 0.0) {
+      else if (x < 0.0)
+      {
         sx = Double.toString(-x);
         minusSign = true;
-      } else {
+      } else
+      {
         sx = Double.toString(x);
-        if (sx.charAt(0) == '-') {
+        if (sx.charAt(0) == '-')
+        {
           minusSign = true;
           sx = sx.substring(1);
         }
@@ -1166,23 +1214,27 @@ public class Printf
         n1In = ePos;
       else
         n1In = sx.length();
-      if (rPos != -1) {
+      if (rPos != -1)
+      {
         if (ePos != -1)
           n2In = ePos - rPos - 1;
         else
           n2In = sx.length() - rPos - 1;
       } else
         n2In = 0;
-      if (ePos != -1) {
+      if (ePos != -1)
+      {
         int ie = ePos + 1;
         expon = 0;
-        if (sx.charAt(ie) == '-') {
+        if (sx.charAt(ie) == '-')
+        {
           for (++ie; ie < sx.length(); ie++)
             if (sx.charAt(ie) != '0')
               break;
           if (ie < sx.length())
             expon = -Integer.parseInt(sx.substring(ie));
-        } else {
+        } else
+        {
           if (sx.charAt(ie) == '+')
             ++ie;
           for (; ie < sx.length(); ie++)
@@ -1205,7 +1257,8 @@ public class Printf
       i = j + 1;
       for (k = 0; k < n2In; j++, i++, k++)
         ca2[j] = ca1[i];
-      if (n1In + expon <= 0) {
+      if (n1In + expon <= 0)
+      {
         ca3 = new char[-expon + n2In];
         for (j = 0, k = 0; k < (-n1In - expon); k++, j++)
           ca3[j] = '0';
@@ -1214,7 +1267,8 @@ public class Printf
       } else
         ca3 = ca2;
       boolean carry = false;
-      if (p < -expon + n2In) {
+      if (p < -expon + n2In)
+      {
         if (expon < 0)
           i = p;
         else
@@ -1223,27 +1277,32 @@ public class Printf
         if (carry)
           carry = startSymbolicCarry(ca3, i - 1, 0);
       }
-      if (n1In + expon <= 0) {
+      if (n1In + expon <= 0)
+      {
         ca4 = new char[2 + p];
         if (!carry)
           ca4[0] = '0';
         else
           ca4[0] = '1';
-        if (this.alternateForm || !this.precisionSet || this.precision != 0) {
+        if (this.alternateForm || !this.precisionSet || this.precision != 0)
+        {
           ca4[1] = '.';
           for (i = 0, j = 2; i < Math.min(p, ca3.length); i++, j++)
             ca4[j] = ca3[i];
           for (; j < ca4.length; j++)
             ca4[j] = '0';
         }
-      } else {
-        if (!carry) {
+      } else
+      {
+        if (!carry)
+        {
           if (this.alternateForm || !this.precisionSet || this.precision != 0)
             ca4 = new char[n1In + expon + p + 1];
           else
             ca4 = new char[n1In + expon];
           j = 0;
-        } else {
+        } else
+        {
           if (this.alternateForm || !this.precisionSet || this.precision != 0)
             ca4 = new char[n1In + expon + p + 2];
           else
@@ -1255,7 +1314,8 @@ public class Printf
           ca4[j] = ca3[i];
         for (; i < n1In + expon; i++, j++)
           ca4[j] = '0';
-        if (this.alternateForm || !this.precisionSet || this.precision != 0) {
+        if (this.alternateForm || !this.precisionSet || this.precision != 0)
+        {
           ca4[j] = '.';
           j++;
           for (k = 0; i < ca3.length && k < p; i++, j++, k++)
@@ -1265,9 +1325,11 @@ public class Printf
         }
       }
       int nZeros = 0;
-      if (!this.leftJustify && this.leadingZeros) {
+      if (!this.leftJustify && this.leadingZeros)
+      {
         int xThousands = 0;
-        if (this.thousands) {
+        if (this.thousands)
+        {
           int xlead = 0;
           if (ca4[0] == '+' || ca4[0] == '-' || ca4[0] == ' ')
             xlead = 1;
@@ -1279,20 +1341,21 @@ public class Printf
         }
         if (this.fieldWidthSet)
           nZeros = this.fieldWidth - ca4.length;
-        if ((!minusSign && (this.leadingSign || this.leadingSpace))
-            || minusSign)
+        if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign)
           nZeros--;
         nZeros -= xThousands;
         if (nZeros < 0)
           nZeros = 0;
       }
       j = 0;
-      if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign) {
+      if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign)
+      {
         ca5 = new char[ca4.length + nZeros + 1];
         j++;
       } else
         ca5 = new char[ca4.length + nZeros];
-      if (!minusSign) {
+      if (!minusSign)
+      {
         if (this.leadingSign)
           ca5[0] = '+';
         if (this.leadingSpace)
@@ -1316,21 +1379,26 @@ public class Printf
       if (dp < ca5.length)
         ca5[dp] = Printf.this.dfs.getDecimalSeparator();
       char[] ca6 = ca5;
-      if (this.thousands && nThousands > 0) {
+      if (this.thousands && nThousands > 0)
+      {
         ca6 = new char[ca5.length + nThousands + lead];
         ca6[0] = ca5[0];
-        for (i = lead, k = lead; i < dp; i++) {
-          if (i > 0 && (dp - i) % 3 == 0) {
+        for (i = lead, k = lead; i < dp; i++)
+        {
+          if (i > 0 && (dp - i) % 3 == 0)
+          {
             // ca6[k]=',';
             ca6[k] = Printf.this.dfs.getGroupingSeparator();
             ca6[k + 1] = ca5[i];
             k += 2;
-          } else {
+          } else
+          {
             ca6[k] = ca5[i];
             k++;
           }
         }
-        for (; i < ca5.length; i++, k++) {
+        for (; i < ca5.length; i++, k++)
+        {
           ca6[k] = ca5[i];
         }
       }
@@ -1347,10 +1415,13 @@ public class Printf
      *          the double value to be formatted.
      * @return the converted double value.
      */
-    private String fFormatString(double x) {
+    private String fFormatString(double x)
+    {
       char[] ca6, ca7;
-      if (Double.isInfinite(x)) {
-        if (x == Double.POSITIVE_INFINITY) {
+      if (Double.isInfinite(x))
+      {
+        if (x == Double.POSITIVE_INFINITY)
+        {
           if (this.leadingSign)
             ca6 = "+Inf".toCharArray();
           else if (this.leadingSpace)
@@ -1359,7 +1430,8 @@ public class Printf
             ca6 = "Inf".toCharArray();
         } else
           ca6 = "-Inf".toCharArray();
-      } else if (Double.isNaN(x)) {
+      } else if (Double.isNaN(x))
+      {
         if (this.leadingSign)
           ca6 = "+NaN".toCharArray();
         else if (this.leadingSpace)
@@ -1394,7 +1466,8 @@ public class Printf
      * character. The optional L does not imply conversion to a long long
      * double.
      */
-    private char[] eFormatDigits(double x, char eChar) {
+    private char[] eFormatDigits(double x, char eChar)
+    {
       char[] ca1, ca2, ca3;
       // int defaultDigits=6;
       String sx;
@@ -1404,12 +1477,15 @@ public class Printf
       boolean minusSign = false;
       if (x > 0.0)
         sx = Double.toString(x);
-      else if (x < 0.0) {
+      else if (x < 0.0)
+      {
         sx = Double.toString(-x);
         minusSign = true;
-      } else {
+      } else
+      {
         sx = Double.toString(x);
-        if (sx.charAt(0) == '-') {
+        if (sx.charAt(0) == '-')
+        {
           minusSign = true;
           sx = sx.substring(1);
         }
@@ -1418,32 +1494,42 @@ public class Printf
       if (ePos == -1)
         ePos = sx.indexOf('e');
       rPos = sx.indexOf('.');
-      if (rPos != -1) {
+      if (rPos != -1)
+      {
         /* do nothing */
-      } else if (ePos != -1) {
+      } else if (ePos != -1)
+      {
         /* do nothing */
-      } else {
+      } else
+      {
         /* do nothing */
       }
-      if (rPos != -1) {
-        if (ePos != -1) {
+      if (rPos != -1)
+      {
+        if (ePos != -1)
+        {
           /* do nothing */
-        } else {
+        } else
+        {
           /* do nothing */
         }
-      } else {
+      } else
+      {
         /* do nothing */
       }
-      if (ePos != -1) {
+      if (ePos != -1)
+      {
         int ie = ePos + 1;
         expon = 0;
-        if (sx.charAt(ie) == '-') {
+        if (sx.charAt(ie) == '-')
+        {
           for (++ie; ie < sx.length(); ie++)
             if (sx.charAt(ie) != '0')
               break;
           if (ie < sx.length())
             expon = -Integer.parseInt(sx.substring(ie));
-        } else {
+        } else
+        {
           if (sx.charAt(ie) == '+')
             ++ie;
           for (; ie < sx.length(); ie++)
@@ -1475,11 +1561,13 @@ public class Printf
         for (i0 = 0; i0 < ca1.length; i0++)
           if (ca1[i0] != '0')
             break;
-      if (i0 + p < ca1.length - 1) {
+      if (i0 + p < ca1.length - 1)
+      {
         carry = checkForCarry(ca1, i0 + p + 1);
         if (carry)
           carry = startSymbolicCarry(ca1, i0 + p, i0);
-        if (carry) {
+        if (carry)
+        {
           ca2 = new char[i0 + p + 1];
           ca2[i0] = '1';
           for (j = 0; j < i0; j++)
@@ -1498,23 +1586,28 @@ public class Printf
         ca2 = new char[2 + p + eSize];
       else
         ca2 = new char[1 + eSize];
-      if (ca1[0] != '0') {
+      if (ca1[0] != '0')
+      {
         ca2[0] = ca1[0];
         j = 1;
-      } else {
+      } else
+      {
         for (j = 1; j < (ePos == -1 ? ca1.length : ePos); j++)
           if (ca1[j] != '0')
             break;
-        if ((ePos != -1 && j < ePos) || (ePos == -1 && j < ca1.length)) {
+        if ((ePos != -1 && j < ePos) || (ePos == -1 && j < ca1.length))
+        {
           ca2[0] = ca1[j];
           expon -= j;
           j++;
-        } else {
+        } else
+        {
           ca2[0] = '0';
           j = 2;
         }
       }
-      if (this.alternateForm || !this.precisionSet || this.precision != 0) {
+      if (this.alternateForm || !this.precisionSet || this.precision != 0)
+      {
         ca2[1] = '.';
         i = 2;
       } else
@@ -1529,8 +1622,10 @@ public class Printf
       else
         ca2[i++] = '+';
       expon = Math.abs(expon);
-      if (expon >= 100) {
-        switch (expon / 100) {
+      if (expon >= 100)
+      {
+        switch (expon / 100)
+        {
           case 1:
             ca2[i] = '1';
             break;
@@ -1561,7 +1656,8 @@ public class Printf
         }
         i++;
       }
-      switch ((expon % 100) / 10) {
+      switch ((expon % 100) / 10)
+      {
         case 0:
           ca2[i] = '0';
           break;
@@ -1594,7 +1690,8 @@ public class Printf
           break;
       }
       i++;
-      switch (expon % 10) {
+      switch (expon % 10)
+      {
         case 0:
           ca2[i] = '0';
           break;
@@ -1627,9 +1724,11 @@ public class Printf
           break;
       }
       int nZeros = 0;
-      if (!this.leftJustify && this.leadingZeros) {
+      if (!this.leftJustify && this.leadingZeros)
+      {
         int xThousands = 0;
-        if (this.thousands) {
+        if (this.thousands)
+        {
           int xlead = 0;
           if (ca2[0] == '+' || ca2[0] == '-' || ca2[0] == ' ')
             xlead = 1;
@@ -1641,20 +1740,21 @@ public class Printf
         }
         if (this.fieldWidthSet)
           nZeros = this.fieldWidth - ca2.length;
-        if ((!minusSign && (this.leadingSign || this.leadingSpace))
-            || minusSign)
+        if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign)
           nZeros--;
         nZeros -= xThousands;
         if (nZeros < 0)
           nZeros = 0;
       }
       j = 0;
-      if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign) {
+      if ((!minusSign && (this.leadingSign || this.leadingSpace)) || minusSign)
+      {
         ca3 = new char[ca2.length + nZeros + 1];
         j++;
       } else
         ca3 = new char[ca2.length + nZeros];
-      if (!minusSign) {
+      if (!minusSign)
+      {
         if (this.leadingSign)
           ca3[0] = '+';
         if (this.leadingSpace)
@@ -1678,16 +1778,20 @@ public class Printf
       if (dp < ca3.length)
         ca3[dp] = Printf.this.dfs.getDecimalSeparator();
       char[] ca4 = ca3;
-      if (this.thousands && nThousands > 0) {
+      if (this.thousands && nThousands > 0)
+      {
         ca4 = new char[ca3.length + nThousands + lead];
         ca4[0] = ca3[0];
-        for (i = lead, k = lead; i < dp; i++) {
-          if (i > 0 && (dp - i) % 3 == 0) {
+        for (i = lead, k = lead; i < dp; i++)
+        {
+          if (i > 0 && (dp - i) % 3 == 0)
+          {
             // ca4[k]=',';
             ca4[k] = Printf.this.dfs.getGroupingSeparator();
             ca4[k + 1] = ca3[i];
             k += 2;
-          } else {
+          } else
+          {
             ca4[k] = ca3[i];
             k++;
           }
@@ -1710,21 +1814,24 @@ public class Printf
      * @return <code>true</code> if the truncation forces a round that will
      *         change the print
      */
-    private boolean checkForCarry(char[] ca1, int icarry) {
+    private boolean checkForCarry(char[] ca1, int icarry)
+    {
       boolean carry = false;
-      if (icarry < ca1.length) {
-        if (ca1[icarry] == '6' || ca1[icarry] == '7' || ca1[icarry] == '8'
-            || ca1[icarry] == '9')
+      if (icarry < ca1.length)
+      {
+        if (ca1[icarry] == '6' || ca1[icarry] == '7' || ca1[icarry] == '8' || ca1[icarry] == '9')
           carry = true;
-        else if (ca1[icarry] == '5') {
+        else if (ca1[icarry] == '5')
+        {
           int ii = icarry + 1;
           for (; ii < ca1.length; ii++)
             if (ca1[ii] != '0')
               break;
           carry = ii < ca1.length;
-          if (!carry && icarry > 0) {
-            carry = (ca1[icarry - 1] == '1' || ca1[icarry - 1] == '3'
-                || ca1[icarry - 1] == '5' || ca1[icarry - 1] == '7' || ca1[icarry - 1] == '9');
+          if (!carry && icarry > 0)
+          {
+            carry = (ca1[icarry - 1] == '1' || ca1[icarry - 1] == '3' || ca1[icarry - 1] == '5'
+                || ca1[icarry - 1] == '7' || ca1[icarry - 1] == '9');
           }
         }
       }
@@ -1744,11 +1851,14 @@ public class Printf
      * @return <code>true</code> if the carry forces a round that will change
      *         the print still more
      */
-    private boolean startSymbolicCarry(char[] ca, int cLast, int cFirst) {
+    private boolean startSymbolicCarry(char[] ca, int cLast, int cFirst)
+    {
       boolean carry = true;
-      for (int i = cLast; carry && i >= cFirst; i--) {
+      for (int i = cLast; carry && i >= cFirst; i--)
+      {
         carry = false;
-        switch (ca[i]) {
+        switch (ca[i])
+        {
           case '0':
             ca[i] = '1';
             break;
@@ -1797,10 +1907,13 @@ public class Printf
      *          an 'e' or 'E' to use in the converted double value.
      * @return the converted double value.
      */
-    private String eFormatString(double x, char eChar) {
+    private String eFormatString(double x, char eChar)
+    {
       char[] ca4, ca5;
-      if (Double.isInfinite(x)) {
-        if (x == Double.POSITIVE_INFINITY) {
+      if (Double.isInfinite(x))
+      {
+        if (x == Double.POSITIVE_INFINITY)
+        {
           if (this.leadingSign)
             ca4 = "+Inf".toCharArray();
           else if (this.leadingSpace)
@@ -1809,7 +1922,8 @@ public class Printf
             ca4 = "Inf".toCharArray();
         } else
           ca4 = "-Inf".toCharArray();
-      } else if (Double.isNaN(x)) {
+      } else if (Double.isNaN(x))
+      {
         if (this.leadingSign)
           ca4 = "+NaN".toCharArray();
         else if (this.leadingSpace)
@@ -1831,35 +1945,44 @@ public class Printf
      *          NaN or signed Inf
      * @return a padded array of characters
      */
-    private char[] applyFloatPadding(char[] ca4, boolean noDigits) {
+    private char[] applyFloatPadding(char[] ca4, boolean noDigits)
+    {
       char[] ca5 = ca4;
-      if (this.fieldWidthSet) {
+      if (this.fieldWidthSet)
+      {
         int i, j, nBlanks;
-        if (this.leftJustify) {
+        if (this.leftJustify)
+        {
           nBlanks = this.fieldWidth - ca4.length;
-          if (nBlanks > 0) {
+          if (nBlanks > 0)
+          {
             ca5 = new char[ca4.length + nBlanks];
             for (i = 0; i < ca4.length; i++)
               ca5[i] = ca4[i];
             for (j = 0; j < nBlanks; j++, i++)
               ca5[i] = ' ';
           }
-        } else if (!this.leadingZeros || noDigits) {
+        } else if (!this.leadingZeros || noDigits)
+        {
           nBlanks = this.fieldWidth - ca4.length;
-          if (nBlanks > 0) {
+          if (nBlanks > 0)
+          {
             ca5 = new char[ca4.length + nBlanks];
             for (i = 0; i < nBlanks; i++)
               ca5[i] = ' ';
             for (j = 0; j < ca4.length; i++, j++)
               ca5[i] = ca4[j];
           }
-        } else if (this.leadingZeros) {
+        } else if (this.leadingZeros)
+        {
           nBlanks = this.fieldWidth - ca4.length;
-          if (nBlanks > 0) {
+          if (nBlanks > 0)
+          {
             ca5 = new char[ca4.length + nBlanks];
             i = 0;
             j = 0;
-            if (ca4[0] == '-') {
+            if (ca4[0] == '-')
+            {
               ca5[0] = '-';
               i++;
               j++;
@@ -1881,7 +2004,8 @@ public class Printf
      *          the double to format.
      * @return the formatted String.
      */
-    private String printFFormat(double x) {
+    private String printFFormat(double x)
+    {
       return fFormatString(x);
     }
 
@@ -1892,7 +2016,8 @@ public class Printf
      *          the double to format.
      * @return the formatted String.
      */
-    private String printEFormat(double x) {
+    private String printEFormat(double x)
+    {
       if (this.conversionCharacter == 'e')
         return eFormatString(x, 'e');
       return eFormatString(x, 'E');
@@ -1920,13 +2045,16 @@ public class Printf
      *          the double to format.
      * @return the formatted String.
      */
-    private String printGFormat(double x) {
+    private String printGFormat(double x)
+    {
       String sx, sy, sz, ret;
       int savePrecision = this.precision;
       int i;
       char[] ca4, ca5;
-      if (Double.isInfinite(x)) {
-        if (x == Double.POSITIVE_INFINITY) {
+      if (Double.isInfinite(x))
+      {
+        if (x == Double.POSITIVE_INFINITY)
+        {
           if (this.leadingSign)
             ca4 = "+Inf".toCharArray();
           else if (this.leadingSpace)
@@ -1935,35 +2063,41 @@ public class Printf
             ca4 = "Inf".toCharArray();
         } else
           ca4 = "-Inf".toCharArray();
-      } else if (Double.isNaN(x)) {
+      } else if (Double.isNaN(x))
+      {
         if (this.leadingSign)
           ca4 = "+NaN".toCharArray();
         else if (this.leadingSpace)
           ca4 = " NaN".toCharArray();
         else
           ca4 = "NaN".toCharArray();
-      } else {
+      } else
+      {
         if (!this.precisionSet)
           this.precision = defaultDigits;
         if (this.precision == 0)
           this.precision = 1;
         int ePos = -1;
-        if (this.conversionCharacter == 'g') {
+        if (this.conversionCharacter == 'g')
+        {
           sx = eFormatString(x, 'e').trim();
           ePos = sx.indexOf('e');
-        } else {
+        } else
+        {
           sx = eFormatString(x, 'E').trim();
           ePos = sx.indexOf('E');
         }
         i = ePos + 1;
         int expon = 0;
-        if (sx.charAt(i) == '-') {
+        if (sx.charAt(i) == '-')
+        {
           for (++i; i < sx.length(); i++)
             if (sx.charAt(i) != '0')
               break;
           if (i < sx.length())
             expon = -Integer.parseInt(sx.substring(i));
-        } else {
+        } else
+        {
           if (sx.charAt(i) == '+')
             ++i;
           for (; i < sx.length(); i++)
@@ -1975,7 +2109,8 @@ public class Printf
         // Trim trailing zeros.
         // If the radix character is not followed by
         // a digit, trim it, too.
-        if (!this.alternateForm) {
+        if (!this.alternateForm)
+        {
           if (expon >= -4 && expon < this.precision)
             sy = fFormatString(x).trim();
           else
@@ -1996,7 +2131,8 @@ public class Printf
             ret = sz;
           else
             ret = sz + sx.substring(ePos);
-        } else {
+        } else
+        {
           if (expon >= -4 && expon < this.precision)
             ret = fFormatString(x).trim();
           else
@@ -2037,7 +2173,8 @@ public class Printf
      *          the short to format.
      * @return the formatted String.
      */
-    private String printDFormat(short x) {
+    private String printDFormat(short x)
+    {
       return printDFormat(Short.toString(x));
     }
 
@@ -2063,7 +2200,8 @@ public class Printf
      *          the long to format.
      * @return the formatted String.
      */
-    private String printDFormat(long x) {
+    private String printDFormat(long x)
+    {
       return printDFormat(Long.toString(x));
     }
 
@@ -2089,7 +2227,8 @@ public class Printf
      *          the int to format.
      * @return the formatted String.
      */
-    private String printDFormat(int x) {
+    private String printDFormat(int x)
+    {
       return printDFormat(Integer.toString(x));
     }
 
@@ -2101,7 +2240,8 @@ public class Printf
      *          long to a String.
      * @return the formatted String.
      */
-    private String printDFormat(String Sx) {
+    private String printDFormat(String Sx)
+    {
       int nLeadingZeros = 0;
       int nBlanks = 0, n = 0;
       int i = 0, jFirst = 0;
@@ -2110,16 +2250,19 @@ public class Printf
 
       if (sx.equals("0") && this.precisionSet && this.precision == 0)
         sx = "";
-      if (!neg) {
+      if (!neg)
+      {
         if (this.precisionSet && sx.length() < this.precision)
           nLeadingZeros = this.precision - sx.length();
-      } else {
+      } else
+      {
         if (this.precisionSet && (sx.length() - 1) < this.precision)
           nLeadingZeros = this.precision - sx.length() + 1;
       }
       if (nLeadingZeros < 0)
         nLeadingZeros = 0;
-      if (this.fieldWidthSet) {
+      if (this.fieldWidthSet)
+      {
         nBlanks = this.fieldWidth - nLeadingZeros - sx.length();
         if (!neg && (this.leadingSign || this.leadingSpace))
           nBlanks--;
@@ -2134,7 +2277,8 @@ public class Printf
       n += nLeadingZeros;
       n += sx.length();
       char[] ca = new char[n];
-      if (this.leftJustify) {
+      if (this.leftJustify)
+      {
         if (neg)
           ca[i++] = '-';
         else if (this.leadingSign)
@@ -2149,8 +2293,10 @@ public class Printf
           ca[i] = csx[j];
         for (int j = 0; j < nBlanks; i++, j++)
           ca[i] = ' ';
-      } else {
-        if (!this.leadingZeros) {
+      } else
+      {
+        if (!this.leadingZeros)
+        {
           for (i = 0; i < nBlanks; i++)
             ca[i] = ' ';
           if (neg)
@@ -2159,7 +2305,8 @@ public class Printf
             ca[i++] = '+';
           else if (this.leadingSpace)
             ca[i++] = ' ';
-        } else {
+        } else
+        {
           if (neg)
             ca[i++] = '-';
           else if (this.leadingSign)
@@ -2197,20 +2344,24 @@ public class Printf
      *          the short to format.
      * @return the formatted String.
      */
-    private String printXFormat(short x) {
+    private String printXFormat(short x)
+    {
       String sx = null;
       if (x == Short.MIN_VALUE)
         sx = "8000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t;
         if (x == Short.MIN_VALUE)
           t = "0";
-        else {
+        else
+        {
           t = Integer.toString((~(-x - 1)) ^ Short.MIN_VALUE, 16);
           if (t.charAt(0) == 'F' || t.charAt(0) == 'f')
             t = t.substring(16, 32);
         }
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "800" + t;
             break;
@@ -2221,7 +2372,8 @@ public class Printf
             sx = "8" + t;
             break;
           case 4:
-            switch (t.charAt(0)) {
+            switch (t.charAt(0))
+            {
               case '1':
                 sx = "9" + t.substring(1, 4);
                 break;
@@ -2269,13 +2421,16 @@ public class Printf
      *          the long to format.
      * @return the formatted String.
      */
-    private String printXFormat(long x) {
+    private String printXFormat(long x)
+    {
       String sx = null;
       if (x == Long.MIN_VALUE)
         sx = "8000000000000000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t = Long.toString((~(-x - 1)) ^ Long.MIN_VALUE, 16);
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "800000000000000" + t;
             break;
@@ -2322,7 +2477,8 @@ public class Printf
             sx = "8" + t;
             break;
           case 16:
-            switch (t.charAt(0)) {
+            switch (t.charAt(0))
+            {
               case '1':
                 sx = "9" + t.substring(1, 16);
                 break;
@@ -2370,13 +2526,16 @@ public class Printf
      *          the int to format.
      * @return the formatted String.
      */
-    private String printXFormat(int x) {
+    private String printXFormat(int x)
+    {
       String sx = null;
       if (x == Integer.MIN_VALUE)
         sx = "80000000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t = Integer.toString((~(-x - 1)) ^ Integer.MIN_VALUE, 16);
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "8000000" + t;
             break;
@@ -2399,7 +2558,8 @@ public class Printf
             sx = "8" + t;
             break;
           case 8:
-            switch (t.charAt(0)) {
+            switch (t.charAt(0))
+            {
               case '1':
                 sx = "9" + t.substring(1, 8);
                 break;
@@ -2437,7 +2597,8 @@ public class Printf
      *          long to a String.
      * @return the formatted String.
      */
-    private String printXFormat(String Sx) {
+    private String printXFormat(String Sx)
+    {
       int nLeadingZeros = 0;
       int nBlanks = 0;
       String sx = Sx;
@@ -2447,7 +2608,8 @@ public class Printf
         nLeadingZeros = this.precision - sx.length();
       if (nLeadingZeros < 0)
         nLeadingZeros = 0;
-      if (this.fieldWidthSet) {
+      if (this.fieldWidthSet)
+      {
         nBlanks = this.fieldWidth - nLeadingZeros - sx.length();
         if (this.alternateForm)
           nBlanks = nBlanks - 2;
@@ -2462,8 +2624,10 @@ public class Printf
       n += nBlanks;
       char[] ca = new char[n];
       int i = 0;
-      if (this.leftJustify) {
-        if (this.alternateForm) {
+      if (this.leftJustify)
+      {
+        if (this.alternateForm)
+        {
           ca[i++] = '0';
           ca[i++] = 'x';
         }
@@ -2474,11 +2638,13 @@ public class Printf
           ca[i] = csx[j];
         for (int j = 0; j < nBlanks; j++, i++)
           ca[i] = ' ';
-      } else {
+      } else
+      {
         if (!this.leadingZeros)
           for (int j = 0; j < nBlanks; j++, i++)
             ca[i] = ' ';
-        if (this.alternateForm) {
+        if (this.alternateForm)
+        {
           ca[i++] = '0';
           ca[i++] = 'x';
         }
@@ -2516,13 +2682,16 @@ public class Printf
      *          the short to format.
      * @return the formatted String.
      */
-    private String printOFormat(short x) {
+    private String printOFormat(short x)
+    {
       String sx = null;
       if (x == Short.MIN_VALUE)
         sx = "100000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t = Integer.toString((~(-x - 1)) ^ Short.MIN_VALUE, 8);
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "10000" + t;
             break;
@@ -2563,13 +2732,16 @@ public class Printf
      *          the long to format.
      * @return the formatted String.
      */
-    private String printOFormat(long x) {
+    private String printOFormat(long x)
+    {
       String sx = null;
       if (x == Long.MIN_VALUE)
         sx = "1000000000000000000000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t = Long.toString((~(-x - 1)) ^ Long.MIN_VALUE, 8);
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "100000000000000000000" + t;
             break;
@@ -2658,13 +2830,16 @@ public class Printf
      *          the int to format.
      * @return the formatted String.
      */
-    private String printOFormat(int x) {
+    private String printOFormat(int x)
+    {
       String sx = null;
       if (x == Integer.MIN_VALUE)
         sx = "20000000000";
-      else if (x < 0) {
+      else if (x < 0)
+      {
         String t = Integer.toString((~(-x - 1)) ^ Integer.MIN_VALUE, 8);
-        switch (t.length()) {
+        switch (t.length())
+        {
           case 1:
             sx = "2000000000" + t;
             break;
@@ -2712,7 +2887,8 @@ public class Printf
      *          long to a String.
      * @return the formatted String.
      */
-    private String printOFormat(String Sx) {
+    private String printOFormat(String Sx)
+    {
       int nLeadingZeros = 0;
       int nBlanks = 0;
       String sx = Sx;
@@ -2731,7 +2907,8 @@ public class Printf
       int n = nLeadingZeros + sx.length() + nBlanks;
       char[] ca = new char[n];
       int i;
-      if (this.leftJustify) {
+      if (this.leftJustify)
+      {
         for (i = 0; i < nLeadingZeros; i++)
           ca[i] = '0';
         char[] csx = sx.toCharArray();
@@ -2739,7 +2916,8 @@ public class Printf
           ca[i] = csx[j];
         for (int j = 0; j < nBlanks; j++, i++)
           ca[i] = ' ';
-      } else {
+      } else
+      {
         if (this.leadingZeros)
           for (i = 0; i < nBlanks; i++)
             ca[i] = '0';
@@ -2771,18 +2949,21 @@ public class Printf
      *          the char to format.
      * @return the formatted String.
      */
-    private String printCFormat(char x) {
+    private String printCFormat(char x)
+    {
       int nPrint = 1;
       int width = this.fieldWidth;
       if (!this.fieldWidthSet)
         width = nPrint;
       char[] ca = new char[width];
       int i = 0;
-      if (this.leftJustify) {
+      if (this.leftJustify)
+      {
         ca[0] = x;
         for (i = 1; i <= width - nPrint; i++)
           ca[i] = ' ';
-      } else {
+      } else
+      {
         for (i = 0; i < width - nPrint; i++)
           ca[i] = ' ';
         ca[i] = x;
@@ -2809,7 +2990,8 @@ public class Printf
      *          the String to format.
      * @return the formatted String.
      */
-    private String printSFormat(String x) {
+    private String printSFormat(String x)
+    {
       int nPrint = x.length();
       int width = this.fieldWidth;
       if (this.precisionSet && nPrint > this.precision)
@@ -2825,26 +3007,32 @@ public class Printf
         n += nPrint;
       char[] ca = new char[n];
       int i = 0;
-      if (this.leftJustify) {
-        if (nPrint >= x.length()) {
+      if (this.leftJustify)
+      {
+        if (nPrint >= x.length())
+        {
           char[] csx = x.toCharArray();
           for (i = 0; i < x.length(); i++)
             ca[i] = csx[i];
-        } else {
+        } else
+        {
           char[] csx = x.substring(0, nPrint).toCharArray();
           for (i = 0; i < nPrint; i++)
             ca[i] = csx[i];
         }
         for (int j = 0; j < width - nPrint; j++, i++)
           ca[i] = ' ';
-      } else {
+      } else
+      {
         for (i = 0; i < width - nPrint; i++)
           ca[i] = ' ';
-        if (nPrint >= x.length()) {
+        if (nPrint >= x.length())
+        {
           char[] csx = x.toCharArray();
           for (int j = 0; j < x.length(); i++, j++)
             ca[i] = csx[j];
-        } else {
+        } else
+        {
           char[] csx = x.substring(0, nPrint).toCharArray();
           for (int j = 0; j < nPrint; i++, j++)
             ca[i] = csx[j];
@@ -2861,15 +3049,17 @@ public class Printf
      * @return <code>true</code> if the conversion character is there, and
      *         <code>false</code> otherwise.
      */
-    private boolean setConversionCharacter() {
+    private boolean setConversionCharacter()
+    {
       /* idfgGoxXeEcs */
       boolean ret = false;
       this.conversionCharacter = '\0';
-      if (this.pos < this.fmt.length()) {
+      if (this.pos < this.fmt.length())
+      {
         char c = this.fmt.charAt(this.pos);
-        if (c == 'i' || c == 'd' || c == 'f' || c == 'g' || c == 'G'
-            || c == 'o' || c == 'x' || c == 'X' || c == 'e' || c == 'E'
-            || c == 'c' || c == 's' || c == '%') {
+        if (c == 'i' || c == 'd' || c == 'f' || c == 'g' || c == 'G' || c == 'o' || c == 'x'
+            || c == 'X' || c == 'e' || c == 'E' || c == 'c' || c == 's' || c == '%')
+        {
           this.conversionCharacter = c;
           this.pos++;
           ret = true;
@@ -2884,19 +3074,24 @@ public class Printf
      * or h is used to control conversion of the input to a long or short,
      * respectively, before formatting. If any of these is present, store them.
      */
-    private void setOptionalHL() {
+    private void setOptionalHL()
+    {
       this.optionalh = false;
       this.optionall = false;
       this.optionalL = false;
-      if (this.pos < this.fmt.length()) {
+      if (this.pos < this.fmt.length())
+      {
         char c = this.fmt.charAt(this.pos);
-        if (c == 'h') {
+        if (c == 'h')
+        {
           this.optionalh = true;
           this.pos++;
-        } else if (c == 'l') {
+        } else if (c == 'l')
+        {
           this.optionall = true;
           this.pos++;
-        } else if (c == 'L') {
+        } else if (c == 'L')
+        {
           this.optionalL = true;
           this.pos++;
         }
@@ -2906,28 +3101,33 @@ public class Printf
     /**
      * Set the precision.
      */
-    private void setPrecision() {
+    private void setPrecision()
+    {
       int firstPos = this.pos;
       this.precisionSet = false;
-      if (this.pos < this.fmt.length() && this.fmt.charAt(this.pos) == '.') {
+      if (this.pos < this.fmt.length() && this.fmt.charAt(this.pos) == '.')
+      {
         this.pos++;
-        if ((this.pos < this.fmt.length())
-            && (this.fmt.charAt(this.pos) == '*')) {
+        if ((this.pos < this.fmt.length()) && (this.fmt.charAt(this.pos) == '*'))
+        {
           this.pos++;
-          if (!setPrecisionArgPosition()) {
+          if (!setPrecisionArgPosition())
+          {
             this.variablePrecision = true;
             this.precisionSet = true;
           }
           return;
         }
-        while (this.pos < this.fmt.length()) {
+        while (this.pos < this.fmt.length())
+        {
           char c = this.fmt.charAt(this.pos);
           if (Character.isDigit(c))
             this.pos++;
           else
             break;
         }
-        if (this.pos > firstPos + 1) {
+        if (this.pos > firstPos + 1)
+        {
           String sz = this.fmt.substring(firstPos + 1, this.pos);
           this.precision = Integer.parseInt(sz);
           this.precisionSet = true;
@@ -2938,25 +3138,31 @@ public class Printf
     /**
      * Set the field width.
      */
-    private void setFieldWidth() {
+    private void setFieldWidth()
+    {
       int firstPos = this.pos;
       this.fieldWidth = 0;
       this.fieldWidthSet = false;
-      if ((this.pos < this.fmt.length()) && (this.fmt.charAt(this.pos) == '*')) {
+      if ((this.pos < this.fmt.length()) && (this.fmt.charAt(this.pos) == '*'))
+      {
         this.pos++;
-        if (!setFieldWidthArgPosition()) {
+        if (!setFieldWidthArgPosition())
+        {
           this.variableFieldWidth = true;
           this.fieldWidthSet = true;
         }
-      } else {
-        while (this.pos < this.fmt.length()) {
+      } else
+      {
+        while (this.pos < this.fmt.length())
+        {
           char c = this.fmt.charAt(this.pos);
           if (Character.isDigit(c))
             this.pos++;
           else
             break;
         }
-        if (firstPos < this.pos && firstPos < this.fmt.length()) {
+        if (firstPos < this.pos && firstPos < this.fmt.length())
+        {
           String sz = this.fmt.substring(firstPos, this.pos);
           this.fieldWidth = Integer.parseInt(sz);
           this.fieldWidthSet = true;
@@ -2967,17 +3173,20 @@ public class Printf
     /**
      * Store the digits <code>n</code> in %n$ forms.
      */
-    private void setArgPosition() {
+    private void setArgPosition()
+    {
       int xPos;
-      for (xPos = this.pos; xPos < this.fmt.length(); xPos++) {
+      for (xPos = this.pos; xPos < this.fmt.length(); xPos++)
+      {
         if (!Character.isDigit(this.fmt.charAt(xPos)))
           break;
       }
-      if (xPos > this.pos && xPos < this.fmt.length()) {
-        if (this.fmt.charAt(xPos) == '$') {
+      if (xPos > this.pos && xPos < this.fmt.length())
+      {
+        if (this.fmt.charAt(xPos) == '$')
+        {
           this.positionalSpecification = true;
-          this.argumentPosition = Integer.parseInt(this.fmt.substring(this.pos,
-              xPos));
+          this.argumentPosition = Integer.parseInt(this.fmt.substring(this.pos, xPos));
           this.pos = xPos + 1;
         }
       }
@@ -2986,18 +3195,21 @@ public class Printf
     /**
      * Store the digits <code>n</code> in *n$ forms.
      */
-    private boolean setFieldWidthArgPosition() {
+    private boolean setFieldWidthArgPosition()
+    {
       boolean ret = false;
       int xPos;
-      for (xPos = this.pos; xPos < this.fmt.length(); xPos++) {
+      for (xPos = this.pos; xPos < this.fmt.length(); xPos++)
+      {
         if (!Character.isDigit(this.fmt.charAt(xPos)))
           break;
       }
-      if (xPos > this.pos && xPos < this.fmt.length()) {
-        if (this.fmt.charAt(xPos) == '$') {
+      if (xPos > this.pos && xPos < this.fmt.length())
+      {
+        if (this.fmt.charAt(xPos) == '$')
+        {
           this.positionalFieldWidth = true;
-          this.argumentPositionForFieldWidth = Integer.parseInt(this.fmt.substring(
-              this.pos, xPos));
+          this.argumentPositionForFieldWidth = Integer.parseInt(this.fmt.substring(this.pos, xPos));
           this.pos = xPos + 1;
           ret = true;
         }
@@ -3008,18 +3220,21 @@ public class Printf
     /**
      * Store the digits <code>n</code> in *n$ forms.
      */
-    private boolean setPrecisionArgPosition() {
+    private boolean setPrecisionArgPosition()
+    {
       boolean ret = false;
       int xPos;
-      for (xPos = this.pos; xPos < this.fmt.length(); xPos++) {
+      for (xPos = this.pos; xPos < this.fmt.length(); xPos++)
+      {
         if (!Character.isDigit(this.fmt.charAt(xPos)))
           break;
       }
-      if (xPos > this.pos && xPos < this.fmt.length()) {
-        if (this.fmt.charAt(xPos) == '$') {
+      if (xPos > this.pos && xPos < this.fmt.length())
+      {
+        if (this.fmt.charAt(xPos) == '$')
+        {
           this.positionalPrecision = true;
-          this.argumentPositionForPrecision = Integer.parseInt(this.fmt.substring(
-              this.pos, xPos));
+          this.argumentPositionForPrecision = Integer.parseInt(this.fmt.substring(this.pos, xPos));
           this.pos = xPos + 1;
           ret = true;
         }
@@ -3027,34 +3242,41 @@ public class Printf
       return ret;
     }
 
-    boolean isPositionalSpecification() {
+    boolean isPositionalSpecification()
+    {
       return this.positionalSpecification;
     }
 
-    int getArgumentPosition() {
+    int getArgumentPosition()
+    {
       return this.argumentPosition;
     }
 
-    boolean isPositionalFieldWidth() {
+    boolean isPositionalFieldWidth()
+    {
       return this.positionalFieldWidth;
     }
 
-    int getArgumentPositionForFieldWidth() {
+    int getArgumentPositionForFieldWidth()
+    {
       return this.argumentPositionForFieldWidth;
     }
 
-    boolean isPositionalPrecision() {
+    boolean isPositionalPrecision()
+    {
       return this.positionalPrecision;
     }
 
-    int getArgumentPositionForPrecision() {
+    int getArgumentPositionForPrecision()
+    {
       return this.argumentPositionForPrecision;
     }
 
     /**
      * Set flag characters, one of '-+#0 or a space.
      */
-    private void setFlagCharacters() {
+    private void setFlagCharacters()
+    {
       /* '-+ #0 */
       this.thousands = false;
       this.leftJustify = false;
@@ -3062,22 +3284,27 @@ public class Printf
       this.leadingSpace = false;
       this.alternateForm = false;
       this.leadingZeros = false;
-      for (; this.pos < this.fmt.length(); this.pos++) {
+      for (; this.pos < this.fmt.length(); this.pos++)
+      {
         char c = this.fmt.charAt(this.pos);
         if (c == '\'')
           this.thousands = true;
-        else if (c == '-') {
+        else if (c == '-')
+        {
           this.leftJustify = true;
           this.leadingZeros = false;
-        } else if (c == '+') {
+        } else if (c == '+')
+        {
           this.leadingSign = true;
           this.leadingSpace = false;
-        } else if (c == ' ') {
+        } else if (c == ' ')
+        {
           if (!this.leadingSign)
             this.leadingSpace = true;
         } else if (c == '#')
           this.alternateForm = true;
-        else if (c == '0') {
+        else if (c == '0')
+        {
           if (!this.leftJustify)
             this.leadingZeros = true;
         } else
@@ -3090,19 +3317,19 @@ public class Printf
      * or G) will be formatted with thousands' grouping characters. For other
      * conversions the flag is ignored.
      */
-    protected boolean          thousands                     = false;
+    protected boolean thousands = false;
     /**
      * The result of the conversion will be left-justified within the field.
      */
-    protected boolean          leftJustify                   = false;
+    protected boolean leftJustify = false;
     /**
      * The result of a signed conversion will always begin with a sign (+ or -).
      */
-    protected boolean          leadingSign                   = false;
+    protected boolean leadingSign = false;
     /**
      * Flag indicating that left padding with spaces is specified.
      */
-    protected boolean          leadingSpace                  = false;
+    protected boolean leadingSpace = false;
     /**
      * For an o conversion, increase the precision to force the first digit of
      * the result to be a zero. For x (or X) conversions, a non-zero result will
@@ -3111,24 +3338,24 @@ public class Printf
      * the point. For g and G conversions, trailing zeros will not be removed
      * from the result.
      */
-    protected boolean          alternateForm                 = false;
+    protected boolean alternateForm = false;
     /**
      * Flag indicating that left padding with zeroes is specified.
      */
-    protected boolean          leadingZeros                  = false;
+    protected boolean leadingZeros = false;
     /**
      * Flag indicating that the field width is *.
      */
-    protected boolean          variableFieldWidth            = false;
+    protected boolean variableFieldWidth = false;
     /**
      * If the converted value has fewer bytes than the field width, it will be
      * padded with spaces or zeroes.
      */
-    protected int              fieldWidth                    = 0;
+    protected int fieldWidth = 0;
     /**
      * Flag indicating whether or not the field width has been set.
      */
-    protected boolean          fieldWidthSet                 = false;
+    protected boolean fieldWidthSet = false;
     /**
      * The minimum number of digits to appear for the d, i, o, u, x, or X
      * conversions. The number of digits to appear after the radix character for
@@ -3136,54 +3363,54 @@ public class Printf
      * the g and G conversions. The maximum number of bytes to be printed from a
      * string in s and S conversions.
      */
-    protected int              precision                     = 0;
+    protected int precision = 0;
     /** Default precision. */
-    protected final static int defaultDigits                 = 6;
+    protected final static int defaultDigits = 6;
     /**
      * Flag indicating that the precision is *.
      */
-    protected boolean          variablePrecision             = false;
+    protected boolean variablePrecision = false;
     /**
      * Flag indicating whether or not the precision has been set.
      */
-    private boolean            precisionSet                  = false;
+    private boolean precisionSet = false;
     /*
      */
-    private boolean            positionalSpecification       = false;
-    private int                argumentPosition              = 0;
-    private boolean            positionalFieldWidth          = false;
-    private int                argumentPositionForFieldWidth = 0;
-    private boolean            positionalPrecision           = false;
-    private int                argumentPositionForPrecision  = 0;
+    private boolean positionalSpecification = false;
+    private int argumentPosition = 0;
+    private boolean positionalFieldWidth = false;
+    private int argumentPositionForFieldWidth = 0;
+    private boolean positionalPrecision = false;
+    private int argumentPositionForPrecision = 0;
     /**
      * Flag specifying that a following d, i, o, u, x, or X conversion character
      * applies to a type short int.
      */
-    private boolean            optionalh                     = false;
+    private boolean optionalh = false;
     /**
      * Flag specifying that a following d, i, o, u, x, or X conversion character
      * applies to a type lont int argument.
      */
-    private boolean            optionall                     = false;
+    private boolean optionall = false;
     /**
      * Flag specifying that a following e, E, f, g, or G conversion character
      * applies to a type double argument. This is a noop in Java.
      */
-    private boolean            optionalL                     = false;
+    private boolean optionalL = false;
     /** Control string type. */
-    private char               conversionCharacter           = '\0';
+    private char conversionCharacter = '\0';
     /**
      * Position within the control string. Used by the constructor.
      */
-    private int                pos                           = 0;
+    private int pos = 0;
     /** Literal or control format string. */
-    private String             fmt;
+    private String fmt;
   }
 
   /** Vector of control strings and format literals. */
-  protected Vector               vFmt = new Vector();
+  protected Vector vFmt = new Vector();
   /** Character position. Used by the constructor. */
-  protected int                  cPos = 0;
+  protected int cPos = 0;
   /** Character position. Used by the constructor. */
-  protected DecimalFormatSymbols dfs  = null;
+  protected DecimalFormatSymbols dfs = null;
 }

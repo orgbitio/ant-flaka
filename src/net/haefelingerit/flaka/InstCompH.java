@@ -27,7 +27,9 @@ import org.apache.tools.ant.Project;
  * messages. Installation may fail if * your Ant does not support all required
  * methods. * *
  * 
- * @author flaka (at) haefelingerit (dot) net
+ * 
+ * @author merzedes
+ * @since 1.0
  * @deprecated
  */
 

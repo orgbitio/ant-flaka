@@ -21,7 +21,9 @@ package net.haefelingerit.flaka;
 import org.apache.tools.ant.BuildException;
 
 /**
- * @author geronimo
+ * 
+ * @author merzedes
+ * @since 1.0
  * @deprecated
  * 
  */

@@ -24,6 +24,10 @@ import net.haefelingerit.flaka.util.TextReader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class Unset extends Task
 {
   protected String comment;

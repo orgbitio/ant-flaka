@@ -136,6 +136,8 @@ import org.apache.tools.ant.taskdefs.Sequential;
  * &lt;/code&gt;
  * </pre>
  * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class TryCatch extends Task
@@ -172,8 +174,6 @@ public class TryCatch extends Task
      * Set the name of the Java class to be catched.
      * 
      * By default, only exceptions of type BuildException are caught.
-     * 
-     * @param throwable
      */
     public void setType(String type)
     {
@@ -184,8 +184,6 @@ public class TryCatch extends Task
 
     /**
      * The pattern expession to use to select a particular exception.
-     * 
-     * @param s
      */
     public void setMatch(String match)
     {

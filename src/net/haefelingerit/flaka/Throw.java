@@ -47,6 +47,9 @@ import org.apache.tools.ant.types.Reference;
  * <code>&lt;trycatch&gt;</code> task if you want to rethrow the exception just
  * caught.
  * </p>
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class Throw extends Exit

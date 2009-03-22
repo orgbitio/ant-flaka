@@ -31,8 +31,8 @@ import org.apache.tools.ant.Project;
  * A task to set multiple properties at once.
  * 
  * 
- * @author geronimo
- * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Property extends Task
 {

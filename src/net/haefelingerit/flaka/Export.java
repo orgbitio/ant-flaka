@@ -30,6 +30,9 @@ import org.apache.tools.ant.BuildException;
  * looking up the search class path. By default the result will be printed on
  * stdout.
  * 
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class Export extends Task

@@ -31,11 +31,10 @@ import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.Project;
 
-
 public class StringELResolver extends ELResolver
 {
   protected Project project = null;
-  
+
   public StringELResolver(Project project)
   {
     super();
@@ -54,7 +53,6 @@ public class StringELResolver extends ELResolver
     return null;
   }
 
- 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
       throws NullPointerException, PropertyNotFoundException, ELException
@@ -66,45 +64,49 @@ public class StringELResolver extends ELResolver
       throws NullPointerException, PropertyNotFoundException, ELException
   {
     Object r = null;
- 
-    
+
     if (base == null || context == null || property == null || !(base instanceof String))
       return null;
 
-    
-    try {
+    try
+    {
       String k;
-      k = (String)property;
-      if (k.equals("length") || k.equals("size")) {
-        r = new Integer(((String)base).length());
+      k = (String) property;
+      if (k.equals("length") || k.equals("size"))
+      {
+        r = new Integer(((String) base).length());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tolower")) {
-        r = ((String)base).toLowerCase();
+      if (k.equals("tolower"))
+      {
+        r = ((String) base).toLowerCase();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("toupper")) {
-        r = ((String)base).toUpperCase();
+      if (k.equals("toupper"))
+      {
+        r = ((String) base).toUpperCase();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("trim")) {
-        r = ((String)base).trim();
+      if (k.equals("trim"))
+      {
+        r = ((String) base).trim();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tofile")) {
-        r = Static.toFile(this.project,(String)base);
+      if (k.equals("tofile"))
+      {
+        r = Static.toFile(this.project, (String) base);
         context.setPropertyResolved(true);
         return r;
       }
-    }
-    catch(Exception e) {
+    } catch (Exception e)
+    {
       return null;
     }
-    
+
     return r;
   }
 

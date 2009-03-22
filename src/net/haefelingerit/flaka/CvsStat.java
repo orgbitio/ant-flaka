@@ -24,6 +24,11 @@ import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class CvsStat extends Task
 {
   private String stem = "cvsstat.";

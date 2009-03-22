@@ -29,6 +29,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class HttpUploadTask extends Task
 {
   protected File rcfile;

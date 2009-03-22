@@ -9,6 +9,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class While extends net.haefelingerit.flaka.Task implements TaskContainer
 {
   protected String test;
@@ -40,7 +44,7 @@ public class While extends net.haefelingerit.flaka.Task implements TaskContainer
   protected boolean eval()
   {
     // TODO: parse EL into value expression once, then only eval that Ast.
-    return Static.el2bool(getProject(),"#{"+this.test+"}");
+    return Static.el2bool(getProject(), "#{" + this.test + "}");
   }
 
   public void execute() throws BuildException

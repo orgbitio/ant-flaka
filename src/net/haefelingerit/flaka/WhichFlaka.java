@@ -27,6 +27,10 @@ import org.apache.tools.ant.AntClassLoader;
 
 import java.net.URL;
 
+/**
+ * @author merzedes
+ * @since 1.0
+ */
 public class WhichFlaka extends Task
 {
   protected String resource = "net/haefelingerit/flaka/antlib.xml";
@@ -134,10 +138,6 @@ public class WhichFlaka extends Task
 
   /**
    * name the resource to look for
-   * 
-   * @param resource
-   *          the name of the resource to look for.
-   * @ant.attribute group="oneof"
    */
   public void setResource(String s)
   {
@@ -146,10 +146,6 @@ public class WhichFlaka extends Task
 
   /**
    * the property to fill with the URL of the resource or class
-   * 
-   * @param property
-   *          the property to be set.
-   * @ant.attribute group="required"
    */
   public void setVar(String s)
   {

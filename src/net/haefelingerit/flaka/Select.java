@@ -26,8 +26,8 @@ import org.apache.tools.ant.Project;
 /**
  * Create a new property by selecting a couple of existing ones ..
  * 
- * @author <a href="mailto:flaka (at) haefelingerit (dot) net">Wolfgang
- *         H&auml;felinger</a>
+ * @author merzedes
+ * @since 1.0
  */
 
 public class Select extends Task

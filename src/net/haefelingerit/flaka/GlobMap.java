@@ -30,6 +30,11 @@ import org.apache.tools.ant.util.GlobPatternMapper;
  * removed from further processing. But that's * the job of a selector. *
  */
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class GlobMap extends GlobPatternMapper
 {
   public String[] mapFileName(String s)

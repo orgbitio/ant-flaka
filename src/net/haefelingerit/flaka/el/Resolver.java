@@ -420,22 +420,21 @@ public class Resolver extends ELResolver
       throws NullPointerException, PropertyNotFoundException, ELException
   {
     Object obj = null;
-    
-    try 
+
+    try
     {
       /*
        * If base is null, let other resolvers handle the issue. This resolver
        * shall handle top level objects. Top level objects are: a. The implict
        * object 'project'. b. All references defined within project.
        */
-    
+
       if (base == null)
       {
         String key;
         key = property.toString();
         obj = get(key);
-      } 
-      else
+      } else
       {
         obj = this.delegate.getValue(context, base, property);
       }
@@ -443,22 +442,22 @@ public class Resolver extends ELResolver
       {
         String p = Static.q(property.toString());
         String b = base == null ? "{}" : Static.q(base.toString());
-        error("unable to resolve property " + p + " on base "+b);
+        error("unable to resolve property " + p + " on base " + b);
       }
 
-    } 
-    catch(PropertyNotFoundException pne) {
-      /* we silently ignore this common exception */
-    }
-    catch (Exception e)
+    } catch (PropertyNotFoundException pne)
     {
-      if (this.debug) {
+      /* we silently ignore this common exception */
+    } catch (Exception e)
+    {
+      if (this.debug)
+      {
         String p = Static.q(property.toString());
         String b = base == null ? "{}" : Static.q(base.toString());
-        Static.debug(this.project,"error while evaluating "+p+" on base "+b,e);
+        Static.debug(this.project, "error while evaluating " + p + " on base " + b, e);
       }
-    }
-    finally {
+    } finally
+    {
       context.setPropertyResolved(true);
     }
     return obj;

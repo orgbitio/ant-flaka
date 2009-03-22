@@ -32,8 +32,9 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 /**
- * @author geronimo
  * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Echo extends org.apache.tools.ant.taskdefs.Echo
 {
@@ -61,21 +62,20 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   {
     Pattern p;
     Matcher m;
-    
-    s = Static.trim3(getProject(),s,"");
+
+    s = Static.trim3(getProject(), s, "");
     p = Pattern.compile("(\\d+)\\*?(.*)");
     m = p.matcher(s);
-    
+
     if (m.matches())
     {
       int times = Integer.parseInt(m.group(1));
-      String what = Static.trim2(m.group(2)," ");
+      String what = Static.trim2(m.group(2), " ");
       StringBuilder accu = new StringBuilder();
-      for(int i=0;i<times;++i)
+      for (int i = 0; i < times; ++i)
         accu.append(what);
       this.shift = accu.toString();
-    }
-    else
+    } else
     {
       this.shift = s;
     }
@@ -91,7 +91,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   {
     String line;
     StringBuilder accu;
-    
+
     accu = new StringBuilder();
     line = reader.readLine();
     while (line != null)
@@ -104,11 +104,10 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     return accu.toString();
   }
 
- 
   final private String prettyfy()
   {
     EchoReader er;
-    
+
     er = new EchoReader(this.message);
     er.setComment(this.comment);
     er.setContinuation(true);
@@ -117,11 +116,11 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     er.ic = this.ic;
     return accumulate(er);
   }
- 
+
   final private String strip()
   {
     TextReader tr;
-    
+
     tr = new TextReader(this.message);
     tr.setComment(this.comment);
     tr.setContinuation(false);

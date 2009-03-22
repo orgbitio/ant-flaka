@@ -62,34 +62,35 @@ import org.w3c.dom.NodeList;
 /**
  * From the basis of an XML source, creates a list of dependencies.
  * 
- * @author Wolfgang Haefelinger (flaka (at) haefelingerit (dot) net)
- * @version
- * 
  */
 
 final public class Static
 {
   static final public String EL = "ant.el";
 
-  static final public int VARREF      = 0x1;
-  static final public int PROPTY      = 0x2;
+  static final public int VARREF = 0x1;
+  static final public int PROPTY = 0x2;
   static final public int WRITEPROPTY = 0x3;
-   
+
   /**
    * Assign an object either as variable or as property to a given project.
    * 
-   * @param project not null
-   * @param key not null
-   * @param obj null allowed
-   * @param type must be either Static.VARREF, Static.PROPTY or Static.WRITEPROPTY
+   * @param project
+   *          not null
+   * @param key
+   *          not null
+   * @param obj
+   *          null allowed
+   * @param type
+   *          must be either Static.VARREF, Static.PROPTY or Static.WRITEPROPTY
    * @return project
    */
-  public static Project assign(Project project,String key, Object obj, int type)
+  public static Project assign(Project project, String key, Object obj, int type)
   {
     /* need a proper key */
     if (key == null || (key = key.trim()).equalsIgnoreCase(""))
       return project;
-    
+
     switch (type)
     {
       case Static.VARREF:
@@ -105,8 +106,8 @@ final public class Static
       {
         if (obj != null)
         {
-          String val =  obj instanceof String ? (String) obj : obj.toString();
-          project.setNewProperty(key,val);
+          String val = obj instanceof String ? (String) obj : obj.toString();
+          project.setNewProperty(key, val);
         }
         break;
       }
@@ -115,18 +116,16 @@ final public class Static
         if (obj != null)
         {
           String val = obj instanceof String ? (String) obj : obj.toString();
-          project.setProperty(key,val);
-        }
-        else 
+          project.setProperty(key, val);
+        } else
         {
-          Static.unset(project,key);
+          Static.unset(project, key);
         }
       }
     }
     return project;
   }
 
-  
   public static void _log_(Project P, String msg, int type)
   {
     Project p = P;
@@ -225,8 +224,6 @@ final public class Static
   {
     warning(P, msg, null);
   }
-
-  
 
   public static void writex(File f, String buf, boolean append) throws IOException
   {
@@ -420,79 +417,76 @@ final public class Static
    * add a property to the project: => property is not added in case property
    * already exists => property is not RESOLVED.
    */
-//  static public void addProperty(Project P, String k, String v)
-//  {
-//    // exactly the same as Project.setNewProperty() but avoids to
-//    // log any comment as Ant is doing by default.
-//    if (P.getProperty(k) == null)
-//      P.setProperty(k, v);
-//  }
+  // static public void addProperty(Project P, String k, String v)
+  // {
+  // // exactly the same as Project.setNewProperty() but avoids to
+  // // log any comment as Ant is doing by default.
+  // if (P.getProperty(k) == null)
+  // P.setProperty(k, v);
+  // }
 
- 
-//  static public String concat(String[] argv, int I, int E, String Sep)
-//  {
-//    StringBuffer buf;
-//    int i = I;
-//    int e = E;
-//    String sep = Sep;
-//    if (argv == null)
-//      return "";
-//    if (e > argv.length)
-//      e = argv.length;
-//    if (i >= e)
-//      return "";
-//    if (sep == null)
-//      sep = " ";
-//
-//    buf = new StringBuffer();
-//    while (i + 1 < e)
-//    {
-//      buf.append(argv[i]);
-//      buf.append(sep);
-//      i += 1;
-//    }
-//    buf.append(argv[e - 1]);
-//    return buf.toString();
-//  }
-//
-//  static public String concat(String[] argv, String sep)
-//  {
-//    return concat(argv, 0, argv.length, sep);
-//  }
-
-//  static public int xendOf(String v, int Pos, int end)
-//  {
-//    int open = 0;
-//    int close = 0;
-//    char c;
-//    int pos = Pos;
-//    while (pos < end)
-//    {
-//      c = v.charAt(pos);
-//      if (c == '}')
-//      {
-//        close += 1;
-//        if (open == close)
-//          return pos;
-//      }
-//      if (c == '$')
-//      {
-//        if (pos + 1 < end)
-//        {
-//          pos += 1;
-//          c = v.charAt(pos);
-//          if (c == '{')
-//          {
-//            open += 1;
-//          }
-//        }
-//      }
-//      pos += 1;
-//    }
-//
-//    return pos;
-//  }
-
+  // static public String concat(String[] argv, int I, int E, String Sep)
+  // {
+  // StringBuffer buf;
+  // int i = I;
+  // int e = E;
+  // String sep = Sep;
+  // if (argv == null)
+  // return "";
+  // if (e > argv.length)
+  // e = argv.length;
+  // if (i >= e)
+  // return "";
+  // if (sep == null)
+  // sep = " ";
+  //
+  // buf = new StringBuffer();
+  // while (i + 1 < e)
+  // {
+  // buf.append(argv[i]);
+  // buf.append(sep);
+  // i += 1;
+  // }
+  // buf.append(argv[e - 1]);
+  // return buf.toString();
+  // }
+  //
+  // static public String concat(String[] argv, String sep)
+  // {
+  // return concat(argv, 0, argv.length, sep);
+  // }
+  // static public int xendOf(String v, int Pos, int end)
+  // {
+  // int open = 0;
+  // int close = 0;
+  // char c;
+  // int pos = Pos;
+  // while (pos < end)
+  // {
+  // c = v.charAt(pos);
+  // if (c == '}')
+  // {
+  // close += 1;
+  // if (open == close)
+  // return pos;
+  // }
+  // if (c == '$')
+  // {
+  // if (pos + 1 < end)
+  // {
+  // pos += 1;
+  // c = v.charAt(pos);
+  // if (c == '{')
+  // {
+  // open += 1;
+  // }
+  // }
+  // }
+  // pos += 1;
+  // }
+  //
+  // return pos;
+  // }
   static public String[] split(String v, String c)
   {
     if (v == null)
@@ -526,17 +520,17 @@ final public class Static
     return str;
   }
 
-//  static public String xdirname(String name)
-//  {
-//    File F = new File(name);
-//    return F.getParent();
-//  }
-//
-//  static public String xbasename(String name)
-//  {
-//    File F = new File(name);
-//    return F.getName();
-//  }
+  // static public String xdirname(String name)
+  // {
+  // File F = new File(name);
+  // return F.getParent();
+  // }
+  //
+  // static public String xbasename(String name)
+  // {
+  // File F = new File(name);
+  // return F.getName();
+  // }
 
   static public String trimNonDigit(String V)
   {
@@ -617,12 +611,6 @@ final public class Static
 
   /**
    * Translates a given loc name in it's official dependency name.
-   * 
-   * @param v
-   *          library name as string
-   * @return A string representing the variable name used in a baseline for
-   *         given library (artifact) name <code>v</code>. The method never
-   *         returns null.
    */
   static public String jar2var(String V)
   {
@@ -656,8 +644,6 @@ final public class Static
     }
     return s;
   }
-
- 
 
   public static String mkchrseq(char c, int n)
   {
@@ -1274,9 +1260,6 @@ final public class Static
    * matches any char not in seq
    * 
    * Note that there's no way to quote meta-characters.
-   * 
-   * @param glob
-   *          not null
    */
 
   static public String glob2regex(String pat)
@@ -1497,10 +1480,11 @@ final public class Static
     return !istext(c);
   }
 
-  final static public String trim3(Project project,String s,String otherwise) {
-    if (s != null && s.indexOf('#')>=0)
-      s = Static.el2str(project,s);
-    return trim2(s,otherwise);
+  final static public String trim3(Project project, String s, String otherwise)
+  {
+    if (s != null && s.indexOf('#') >= 0)
+      s = Static.el2str(project, s);
+    return trim2(s, otherwise);
   }
 
   /**
@@ -1509,8 +1493,6 @@ final public class Static
    * This version of trim ensures that the result value is not an empty string,
    * i.e. a string consisting only of whitespace characters. If an empty string
    * would be returned after trimming down, the alternative
-   * 
-   * @otherwise is returned instead.
    */
 
   final static public String trim2(String s, String otherwise)
@@ -1521,7 +1503,7 @@ final public class Static
     if (s != null && s.length() > 0)
     {
       char c1, c2;
-      
+
       c1 = s.charAt(0);
       c2 = s.charAt(s.length() - 1);
       r = s;
@@ -1732,7 +1714,6 @@ final public class Static
     return doc;
   }
 
- 
   static public boolean isregexchar(char c)
   {
     return c == '/';
@@ -1756,12 +1737,6 @@ final public class Static
    * <li>When both characters are not equal or, when equal, neither of both
    * characters above, then a pattern expression is assumed.</li>
    * </ul>
-   * 
-   * @param s
-   *          the pattern to compile (not null)
-   * @param f
-   *          flags to use when compiling
-   * @return Regular Expression (not null)
    */
   static public Pattern patterncompile(String S, int f)
   {
@@ -1797,7 +1772,6 @@ final public class Static
     return P;
   }
 
-
   /**
    * Checks whether EL is enabled on project.
    * 
@@ -1810,25 +1784,25 @@ final public class Static
     return p == null ? true : (p.matches("false") ? false : true);
   }
 
-  
-  static public String el2str(Project project,String expr)
+  static public String el2str(Project project, String expr)
   {
     EL ctxref = el(project);
     return ctxref == null ? expr : ctxref.tostr(expr);
   }
-  
-  static public Object el2obj(Project project,String expr)
+
+  static public Object el2obj(Project project, String expr)
   {
     EL ctxref = el(project);
     return ctxref == null ? expr : ctxref.toobj(expr);
   }
-  
-  static public boolean el2bool(Project project,String expr)
+
+  static public boolean el2bool(Project project, String expr)
   {
     EL ctxref = el(project);
     // TODO: match expr for 'true/false' if ctxref == null?
     return ctxref == null ? false : ctxref.tobool(expr);
   }
+
   /**
    * A function to return a EL context reference (consisting of a context and
    * expression factory) for a given project.
@@ -1850,11 +1824,10 @@ final public class Static
         project.addReference(Static.EL, ctxref);
         ctxref = (EL) project.getReference(Static.EL);
       }
-    }
-    catch(NullPointerException npe) {
+    } catch (NullPointerException npe)
+    {
       System.err.println("internal error, el(null) called.");
-    }
-    catch (Exception e)
+    } catch (Exception e)
     {
       error(project, q(Static.EL) + " references unexpected object");
     }
@@ -1873,16 +1846,17 @@ final public class Static
   static final public File toFile(Project project, String s)
   {
     File f;
-    
+
     if (s != null)
       s = s.trim();
     if (s == null || s.matches("\\s*"))
       return project.getBaseDir();
-    
-    if (s.matches("\\.\\.?")) {
+
+    if (s.matches("\\.\\.?"))
+    {
       return new File(s);
     }
-    
+
     f = new File(s);
     if (f.isAbsolute() == false)
     {
@@ -1891,13 +1865,15 @@ final public class Static
     }
     return f;
   }
-  
-  static final public Project unset(Project project,String... properties) {
+
+  static final public Project unset(Project project, String... properties)
+  {
     Object obj;
     obj = project.getReference("ant.PropertyHelper");
-    for (String name : properties) {
-      Static.htabremove(obj, "properties",name);
-      Static.htabremove(obj, "userProperties",name);
+    for (String name : properties)
+    {
+      Static.htabremove(obj, "properties", name);
+      Static.htabremove(obj, "userProperties", name);
     }
     return project;
   }

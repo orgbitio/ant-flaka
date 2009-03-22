@@ -29,8 +29,9 @@ import org.apache.tools.ant.taskdefs.condition.ConditionBase;
  * Same as Ant's fail task, additionally resolve EL references in message and
  * property.
  * 
- * @author geronimo
  * 
+ * @author merzedes
+ * @since 1.0
  */
 public class Fail extends Exit
 {

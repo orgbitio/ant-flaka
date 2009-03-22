@@ -30,58 +30,71 @@ public class TextReader extends BufferedReader
   public boolean skipempty = true;
   public int lineno = 0;
   public boolean continuation = true;
-  
-  public TextReader(Reader reader) {
+
+  public TextReader(Reader reader)
+  {
     super(reader);
     setComment(";");
   }
-  
-  public TextReader(String text) {
+
+  public TextReader(String text)
+  {
     this(new StringReader(text));
   }
-  
-  public TextReader setComment(String comment) {
-    makeregex(Static.trim2(comment,";"));
+
+  public TextReader setComment(String comment)
+  {
+    makeregex(Static.trim2(comment, ";"));
     return this;
   }
-  public TextReader setContinuation(boolean b) {
+
+  public TextReader setContinuation(boolean b)
+  {
     this.continuation = b;
     return this;
   }
-  public TextReader setSkipEmpty(boolean b) {
+
+  public TextReader setSkipEmpty(boolean b)
+  {
     this.skipempty = b;
     return this;
   }
-  
-  protected void makeregex(String s) {
-    try {
+
+  protected void makeregex(String s)
+  {
+    try
+    {
       String regex;
       regex = "^\\s*" + Pattern.quote(s);
       this.comment = Pattern.compile(regex);
-    }
-    catch(Exception e) {
+    } catch (Exception e)
+    {
       /* TODO: error */
       // this.debug("error compiling regex '"+s+"'", e);
     }
   }
-  
-  protected boolean ignore(String line) {
+
+  protected boolean ignore(String line)
+  {
     return this.comment.matcher(line).find();
   }
-  
+
   /**
    * Read next line from underlying stream, skipping (continued) comment lines
    */
-  public String next() {
+  public String next()
+  {
     String line;
-    try {
+    try
+    {
       line = super.readLine();
       this.lineno += 1;
       /* comment ? */
       if (line != null && ignore(line))
       {
         /* ignore this lines */
-        while (line != null && line.endsWith("\\") && !line.endsWith("\\\\")) {
+        while (line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
+        {
           line = super.readLine();
           this.lineno += 1;
         }
@@ -89,46 +102,51 @@ public class TextReader extends BufferedReader
         line = super.readLine();
         this.lineno += 1;
       }
-    }
-    catch(IOException ioe) {
+    } catch (IOException ioe)
+    {
       // TODO: send debug message
       line = null;
     }
     return line;
   }
-  /** 
+
+  /**
    * Return the next line but comment lines, supports continuation lines.
    */
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.io.BufferedReader#readLine()
    */
-  public String readLine()  {
+  public String readLine()
+  {
     String line;
     String accu;
 
     accu = null;
     line = next();
-    
-    while(accu == null && line!= null)
+
+    while (accu == null && line != null)
     {
       accu = "";
-    
+
       /* Continuation line */
       while (this.continuation && line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
       {
         accu += line.substring(0, line.length() - 1);
         line = next();
       }
-    
+
       /* Add last line */
       accu += line;
-      if (this.skipempty && accu.matches("\\s*")) {
+      if (this.skipempty && accu.matches("\\s*"))
+      {
         accu = null;
         line = next();
       }
     }
     return accu;
   }
-  
+
 }

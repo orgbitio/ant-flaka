@@ -35,8 +35,9 @@ import net.haefelingerit.flaka.util.Static;
 import org.apache.tools.ant.DirectoryScanner;
 
 /**
- * @author geronimo
  * 
+ * @author merzedes
+ * @since 1.0
  */
 public class ScanDeps extends MatchingTask
 {

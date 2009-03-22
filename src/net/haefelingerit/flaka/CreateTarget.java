@@ -28,8 +28,9 @@ import org.apache.tools.ant.taskdefs.PreSetDef;
 /**
  * A task allowing the dynamic creation of a target.
  * 
- * @author wh81752
- * @since 2.1.10
+ * 
+ * @author merzedes
+ * @since 1.0
  */
 
 public class CreateTarget extends Task

@@ -27,39 +27,50 @@ import junit.framework.TestSuite;
 
 public class RegexTest extends TestCase
 {
-  Pattern p = Pattern.compile("^\\s*[^#\\s]",Pattern.MULTILINE);
+  Pattern p = Pattern.compile("^\\s*[^#\\s]", Pattern.MULTILINE);
+
   public RegexTest(String name)
   {
     super(name);
   }
+
   public static void main(String[] args)
   {
     junit.textui.TestRunner.run(suite());
   }
+
   public static Test suite()
   {
-    /* using reflection to setup test cases, i.e. each method matching
-    ** pattern "test*" will be a test case. 
-    **/
+    /*
+     * using reflection to setup test cases, i.e. each method matching pattern
+     * "test*" will be a test case.
+     */
     return new TestSuite(RegexTest.class);
   }
-  
-  public void testFind01() {
+
+  public void testFind01()
+  {
     String t1 = "L";
     Matcher m1 = this.p.matcher(t1);
     assertTrue(m1.find());
   }
-  public void testFind02() {
+
+  public void testFind02()
+  {
     String t2 = "\nL";
     Matcher m2 = this.p.matcher(t2);
     assertTrue(m2.find());
   }
-  public void testFind03() {
+
+  public void testFind03()
+  {
     String t3 = "\n# comment\nL";
     Matcher m3 = this.p.matcher(t3);
     assertTrue(m3.find());
   }
-  public void testFind04() {
+
+  public void testFind04()
+  {
     String t4 = "\n# comment\n\tL";
     Matcher m4 = this.p.matcher(t4);
     assertTrue(m4.find());

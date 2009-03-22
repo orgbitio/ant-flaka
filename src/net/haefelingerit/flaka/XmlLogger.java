@@ -55,7 +55,9 @@ import org.apache.tools.ant.util.DateUtils;
  * characters are normalized into " " (two blank chars).
  * 
  * Regarding 2: A message like "<echo>a\nb</echo>" will be logged as if written
- * like <echo>a</echo><echo>b</echo>.
+ * like <echo>a</echo><echo>b</echo>. * @author merzedes
+ * 
+ * @since 1.0
  * 
  */
 public class XmlLogger implements BuildLogger

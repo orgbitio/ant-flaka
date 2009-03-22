@@ -24,6 +24,11 @@ import java.util.List;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Sequential;
 
+/**
+ * 
+ * @author merzedes
+ * @since 1.0
+ */
 public class Choose extends Task
 {
   protected List whenlist;
