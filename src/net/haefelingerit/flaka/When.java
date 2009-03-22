@@ -44,7 +44,7 @@ public class When extends Task implements TaskContainer
    */
   public void setTest(String s)
   {
-    this.test = Static.trim2(s, this.test);
+    this.test = Static.trim3(getProject(),s, this.test);
   }
 
   public void addTask(org.apache.tools.ant.Task task)
@@ -63,13 +63,8 @@ public class When extends Task implements TaskContainer
   protected boolean eval() throws BuildException
   {
     Project p;
-    boolean b;
-    String v;
-
     p = this.getProject();
-    v = Static.el2str(p, this.test);
-    b = Static.el2bool(p, "#{" + v + "}");
-    return b;
+    return Static.el2bool(p,this.test);
   }
 
   /**

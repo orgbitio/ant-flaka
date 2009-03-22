@@ -140,7 +140,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       this.message = strip();
 
       /* resolve all EL references in message */
-      this.message = Static.el2str(project, this.message);
+      this.message = Static.elresolve(project, this.message);
 
       /* format message */
       this.message = prettyfy();

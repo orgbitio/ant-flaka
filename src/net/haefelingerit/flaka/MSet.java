@@ -142,9 +142,9 @@ public class MSet extends Task
       o = null;
       try
       {
-        k = Static.el2str(project, k);
-        v = Static.el2str(project, v);
-        o = Static.el2obj(project, "#{" + v + "}");
+        k = Static.elresolve(project, k);
+        v = Static.elresolve(project, v);
+        o = Static.el2obj(project, v);
       } catch (Exception e)
       {
         if (this.debug)

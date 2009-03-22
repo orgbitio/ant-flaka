@@ -90,7 +90,7 @@ public class Break extends Task
     {
       fail();
     }
-    if (this.test != null && Static.el2bool(getProject(), "#{" + this.test + "}"))
+    if (this.test != null && Static.el2bool(getProject(),this.test))
     {
       fail();
     }

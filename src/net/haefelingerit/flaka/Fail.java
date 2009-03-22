@@ -43,7 +43,7 @@ public class Fail extends Exit
   {
     Project project = getProject();
     msg = project.replaceProperties(msg);
-    msg = Static.el2str(project, msg);
+    msg = Static.elresolve(project, msg);
     super.setMessage(msg);
     this.havemsg = true;
   }
@@ -52,14 +52,14 @@ public class Fail extends Exit
   {
     Project project = getProject();
     msg = project.replaceProperties(msg);
-    msg = Static.el2str(project, msg);
+    msg = Static.elresolve(project, msg);
     super.addText(msg);
     this.havemsg = true;
   }
 
   public void setTest(String expr)
   {
-    this.test = Static.trim2(expr, this.test);
+    this.test = Static.trim3(getProject(),expr, this.test);
   }
 
   public void setIf(String s)
@@ -82,7 +82,6 @@ public class Fail extends Exit
 
   public void execute() throws BuildException
   {
-    String s;
     Project project;
 
     /* standard behaviour */
@@ -93,9 +92,7 @@ public class Fail extends Exit
     }
 
     project = getProject();
-    s = Static.el2str(project, this.test);
-    s = "#{" + s + "}";
-    if (Static.el2bool(project, s))
+    if (Static.el2bool(project,this.test))
     {
       /* Set a nice message if not set */
       if (this.havemsg == false)

@@ -47,17 +47,17 @@ public class Find extends MatchingTask
 
   public void setVar(String var)
   {
-    this.var = Static.trim2(var, this.var);
+    this.var = Static.trim3(getProject(),var, this.var);
   }
 
   public void setDir(String dir)
   {
-    this.srcdir = Static.trim2(dir, this.srcdir);
+    this.srcdir = Static.trim3(getProject(),dir, this.srcdir);
   }
 
   public void setType(String type)
   {
-    this.type = Static.trim2(type, this.type);
+    this.type = Static.trim3(getProject(),type, this.type);
   }
 
   protected DirectoryScanner getds(File dir)
@@ -149,13 +149,11 @@ public class Find extends MatchingTask
     File dir;
     Iterator di;
     ArrayList L;
-    String var, srcdir;
 
     project = getProject();
-    srcdir = Static.el2str(project, this.srcdir);
-    var = Static.el2str(project, this.var);
+
     // eval dir attribute
-    obj = Static.el2obj(project, "#{" + srcdir + "}");
+    obj = Static.el2obj(project,this.srcdir);
     di = iteratorof(obj);
 
     L = new ArrayList();
@@ -173,6 +171,6 @@ public class Find extends MatchingTask
       scan(dir, L);
     }
 
-    Static.assign(project, var, L, Static.VARREF);
+    Static.assign(project, this.var, L, Static.VARREF);
   }
 }

@@ -106,9 +106,9 @@ public class Property extends Task
       try
       {
         k = project.replaceProperties(k);
-        k = Static.el2str(project, k);
+        k = Static.elresolve(project, k);
         v = project.replaceProperties(v);
-        v = Static.el2str(project, v);
+        v = Static.elresolve(project, v);
       } catch (Exception e)
       {
         int where = tr.lineno;

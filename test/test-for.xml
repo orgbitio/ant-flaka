@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka" xmlns:foo="foobar">
+<project xmlns:c="antlib:net.haefelingerit.flaka">
 
   <c:for />
   <c:for var="" />

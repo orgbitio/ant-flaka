@@ -56,7 +56,7 @@ public class Unset extends Task
     while ((line = tr.readLine()) != null)
     {
       line = project.replaceProperties(line);
-      line = Static.el2str(project, line);
+      line = Static.elresolve(project, line);
       line = line.trim();
       Static.unset(project, line);
     }

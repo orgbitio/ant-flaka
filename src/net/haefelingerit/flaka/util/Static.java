@@ -1483,7 +1483,7 @@ final public class Static
   final static public String trim3(Project project, String s, String otherwise)
   {
     if (s != null && s.indexOf('#') >= 0)
-      s = Static.el2str(project, s);
+      s = Static.elresolve(project, s);
     return trim2(s, otherwise);
   }
 
@@ -1784,22 +1784,55 @@ final public class Static
     return p == null ? true : (p.matches("false") ? false : true);
   }
 
+  /**
+   * Resolve embedded EL references in <code>text</code>.
+   * 
+   * Text can be an arbitrary text containing one or more references
+   * to EL expressions {@code #{..}}. Resolving a reference means 
+   * that the embedded EL expression is evaluated into an object and
+   * stringized in a second step. 
+   */
+  static public String elresolve(Project project, String text)
+  {
+    EL ctxref = el(project);
+    return ctxref == null ? text : ctxref.tostr(text);
+  }
+  
+  /**
+   * Evaluate EL expression in a string context.
+   * 
+   * The given expression is evaluated and in a second step stringized.
+   */
   static public String el2str(Project project, String expr)
   {
     EL ctxref = el(project);
-    return ctxref == null ? expr : ctxref.tostr(expr);
+    return ctxref == null ? expr : ctxref.tostr("#{"+expr+"}");
   }
 
+  /**
+  * Evaluate EL expression.
+  * 
+  * The expression given must be a native EL expression not containing any
+  * embedded {@code #{}} references. The expression is simply evaluated and
+  * not coerced.
+   */
   static public Object el2obj(Project project, String expr)
   {
     EL ctxref = el(project);
-    return ctxref == null ? expr : ctxref.toobj(expr);
+    return ctxref == null ? expr : ctxref.toobj("#{"+expr+"}");
   }
 
+  /**
+   * Evaluate a EL expression in a boolean context.
+   * 
+   * Important: The expr given is evaluated as true EL expression. Thus 
+   * it may not contain EL references like {@code #{..}}.
+   */
   static public boolean el2bool(Project project, String expr)
   {
     EL ctxref = el(project);
     // TODO: match expr for 'true/false' if ctxref == null?
+    expr = "#{" + (expr == null ? "false" : expr)+"}";
     return ctxref == null ? false : ctxref.tobool(expr);
   }
 

@@ -1,3 +1,3 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <c:fail test="3 * 5 == 15" unless="p"/>
+  <c:fail test="3 * 5 != 15" if="p"/>
 </project>

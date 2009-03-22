@@ -90,9 +90,9 @@ public class List extends Task
     {
       try
       {
-        v = Static.el2str(project, line);
+        v = Static.elresolve(project, line);
         if (this.el)
-          v = Static.el2str(project, "#{" + v + "}");
+          v = Static.el2str(project,v);
         else
           v = v.trim();
         append(v);

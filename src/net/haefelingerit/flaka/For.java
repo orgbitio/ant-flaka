@@ -19,7 +19,6 @@
 package net.haefelingerit.flaka;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -104,7 +103,7 @@ public class For extends net.haefelingerit.flaka.Task implements TaskContainer
     Object obj;
 
     project = getProject();
-    obj = Static.el2obj(project, "#{" + this.expr + "}");
+    obj = Static.el2obj(project,this.expr);
 
     iter = null;
     if (obj instanceof Iterable)
