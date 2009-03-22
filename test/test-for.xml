@@ -1,6 +1,7 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka" xmlns:foo="foobar">
 
   <c:for />
+  <c:for var="" />
   <c:for in="" />
   <c:for var="x" />
   <c:for var="x" in="" />
@@ -11,7 +12,34 @@
   <c:for var="x" in="y" />
   <c:for var="x" in="list(a, b, c)" />
   
-
+  
+  <c:set>
+    x = null
+  </c:set>
+  <c:fail test="has.var.x" />
+  <c:for var="x" />
+  <c:for var="x" in="'foobar'" >
+    <c:fail test="not has.var.x" />
+    <c:set>
+      ;; set property px
+      px := x
+    </c:set>
+  </c:for>  
+  <!--  test that px is set and that x is not set -->
+  <c:fail test="has.var.x" />
+  <fail unless="px" />	
+  
+  <!--  same again, this time we check that x is restored -->
+  <c:set>
+    x = 'foo'
+  </c:set>
+  <c:fail test="not has.var.x and x != 'foo'" />
+  <c:for var="x" in="'foobar'" >
+    <c:fail test="not has.var.x and x != 'foobar'" />
+  </c:for>
+  <c:fail test="not has.var.x and x != 'foo'" />
+  
+    
   <c:for var="i" in=" ''.tofile.list ">
     <c:echo>#{i} => #{i.mtime}</c:echo>
   </c:for>
