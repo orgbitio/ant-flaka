@@ -19,25 +19,25 @@
 package net.haefelingerit.flaka;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
-import org.apache.tools.ant.taskdefs.MacroDef;
-import org.apache.tools.ant.taskdefs.MacroInstance;
 
-public class For2 extends Task implements TaskContainer
+public class For2 extends net.haefelingerit.flaka.Task implements TaskContainer
 {
-  // Macro and sequential belong together. We have hold both here due
-  // some half back ANT API.
-  protected MacroDef macro;
-  protected MacroDef.NestedSequential sequential;
   protected String expr;
   protected String var;
+  /** Optional Vector holding the nested tasks */
+  protected Vector tasks = new Vector();
+  protected Object saved = null;
 
   public For2()
   {
@@ -51,7 +51,7 @@ public class For2 extends Task implements TaskContainer
    */
   public void setIn(String expr)
   {
-    this.expr = Static.trim2(expr, this.expr);
+    this.expr = Static.trim3(getProject(), expr, this.expr);
   }
 
   /**
@@ -63,83 +63,83 @@ public class For2 extends Task implements TaskContainer
    */
   public void setVar(String var)
   {
-    // TODO: document that this value will not be subject to EL evaluation.
-    this.var = Static.trim2(var, this.var);
+    this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void addTask(org.apache.tools.ant.Task task)
+  public void addTask(Task nestedTask)
   {
-    if (this.macro == null)
+    this.tasks.add(nestedTask);
+  }
+
+  protected void rescue()
+  {
+    /* save variable (if existing) */
+    // TODO: variables are not references
+    this.saved = getProject().getReference(this.var);
+  }
+
+  protected void restore()
+  {
+    Static.assign(getProject(), this.var, this.saved, Static.VARREF);
+  }
+
+  protected void exectasks(Object val) throws BuildException
+  {
+    Iterator iter;
+    Task task;
+
+    Static.assign(getProject(),this.var,val, Static.VARREF);
+    iter = this.tasks.iterator();
+    while (iter.hasNext())
     {
-      this.macro = new MacroDef();
-      this.sequential = this.macro.createSequential();
+      task = (Task) iter.next();
+      task.perform();
     }
-    this.sequential.addTask(task);
   }
 
-  public void execute() throws BuildException
-  {
-    MacroInstance instance;
+  protected Iterator iterator() {
+    Iterator iter;
     Project project;
     Object obj;
-    String key, val;
-
-    if (this.macro == null)
-    {
-      debug("nothing to be done");
-      return;
-    }
-    if (this.var == null)
-    {
-      debug("empty variable given in for element");
-      return;
-    }
+    
     project = getProject();
+    obj = Static.el2obj(project, "#{" + this.expr + "}");
 
-    this.macro.setProject(project);
-    this.macro.setName("??");
-    this.macro.init();
-    this.macro.execute();
-    /* now we should have a new anonymous macro */
-    instance = new MacroInstance();
-    instance.setProject(project);
-    instance.setOwningTarget(this.getOwningTarget());
-    instance.setMacroDef(this.macro);
-
-    key = Static.el2str(project, this.var).trim();
-    val = Static.el2str(project, this.expr);
-    obj = Static.el2obj(project, "#{" + val + "}");
-
-    /* we need to have something to iterate over */
-    if (obj == null)
+    iter = null;
+    if (obj instanceof Iterable)
+      iter = ((Iterable) obj).iterator();
+    else if (obj != null)
     {
+      List L;
+      L = new ArrayList();
+      L.add(obj);
+      iter = L.iterator();
+    }
+    return iter;
+  }
+  
+  public void execute() throws BuildException
+  {
+    Iterator iter;
+
+    if (this.expr == null || this.var == null) {
+      // TODO: debug message
       return;
     }
-    if (!(obj instanceof Iterable))
-    {
-      List L = new ArrayList();
-      L.add(obj);
-      obj = L;
-    }
-
-    Iterator i = ((Iterable) obj).iterator();
-    boolean hasname = project.getReferences().containsKey(key);
-    Object saved = project.getReference(key);
 
     try
     {
-
-      while (i.hasNext())
+      /* rescue variable `var` */
+      rescue();
+      
+      /* iterate over each list item */
+      iter = iterator();
+      while (iter != null && iter.hasNext())
       {
-        Object tmp;
-        tmp = i.next();
-        /* make sure not to iterate over null */
-        if (tmp == null)
-          continue;
         try
         {
-          project.addReference(key, tmp);
-          instance.execute();
+          /* exec all tasks using on current list item */
+          exectasks(iter.next());
         } catch (BuildException bx)
         {
           String s;
@@ -157,15 +157,10 @@ public class For2 extends Task implements TaskContainer
           throw bx;
         }
       }
-    } finally
-    {
-      if (hasname)
+      } finally
       {
-        project.addReference(key, saved);
-      } else
-      {
-        project.getReferences().remove(key);
+        /* restore variable */
+        restore();
       }
-    }
   }
 }

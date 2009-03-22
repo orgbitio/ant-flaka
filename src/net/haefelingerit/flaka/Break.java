@@ -23,7 +23,8 @@ import org.apache.tools.ant.BuildException;
 /**
  * A task to throw a special build exception: to terminate a for-loop.
  * 
- * See {@link http://w/AntFlaka/API/Task#for} for details on task for.
+ * References:
+ * See {@link http://code.google.com/p/flaka/wiki/Tasks#break} for details on task for.
  */
 
 public class Break extends Task
