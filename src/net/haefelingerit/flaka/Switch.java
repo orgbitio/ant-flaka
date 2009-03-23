@@ -40,6 +40,7 @@ public class Switch extends Task
   protected String var;
   protected int flags;
 
+  
   public void setVar(String s)
   {
     this.var = Static.trim3(getProject(), s, this.var);
@@ -84,6 +85,15 @@ public class Switch extends Task
     public boolean debug;
     public boolean ispattern = false;
 
+    public void setDebug(boolean debug) {
+      this.debug = debug;
+    }
+    
+    public void setVar(String s)
+    {
+      this.var = Static.trim3(getProject(), s, this.var);
+    }
+    
     public void setRE(String value)
     {
       this.regexstr = Static.trim3(getProject(), value, this.regexstr);
@@ -91,6 +101,11 @@ public class Switch extends Task
     }
 
     public void setPat(String value)
+    {
+      setGlob(value);
+    }
+    
+    public void setGlob(String value)
     {
       this.regexstr = Static.trim3(getProject(), value, this.regexstr);
       this.ispattern = true;
@@ -131,7 +146,7 @@ public class Switch extends Task
       r = M.find();
       if (r && this.var != null)
       {
-        Static.assign(getProject(), this.var,new MatcherBean(M), Static.VARREF);
+        Static.assign(getProject(), this.var,new MatcherBean(M,0), Static.VARREF);
       }
       if (this.debug)
       {
@@ -181,33 +196,47 @@ public class Switch extends Task
   static public class MatcherBean
   {
     final Matcher m;
+    final int index;
 
-    public MatcherBean(Matcher m)
+    @SuppressWarnings("unused")
+    private MatcherBean() {
+      this.m = null;
+      this.index = 0;
+    }
+    
+    public MatcherBean(Matcher m,int index)
     {
       this.m = m;
+      this.index = index;
     }
 
-    public Matcher getBean() {
+    public Matcher getMatcher() {
       return this.m;
     }
     
     public int getStart()
     {
-      return this.m.start();
+      return this.m.start(this.index);
     }
-
+    public int getS()
+    {
+      return getStart();
+    }
     public int getEnd()
     {
-      return this.m.end();
+      return this.m.end(this.index);
     }
-
+    public int getE()
+    {
+      return getEnd();
+    }
     public String getPattern()
     {
       return this.m.pattern().pattern();
     }
     public String getP()
     {
-      return this.m.pattern().pattern();
+      return getPattern();
     }
 
     public int getGroups()
@@ -217,21 +246,21 @@ public class Switch extends Task
 
     public int getN()
     {
-      return this.m.groupCount();
+      return getGroups();
     }
 
     public int getLength()
     {
-      return this.m.groupCount();
+      return getGroups();
     }
 
     public int getSize()
     {
-      return this.m.groupCount();
+      return getGroups();
     }
     
     public String toString() {
-      return this.m.group();
+      return this.m.group(this.index);
     }
 
   }

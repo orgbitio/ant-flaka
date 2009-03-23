@@ -87,50 +87,35 @@ public class MatchResolver extends ELResolver
   {
     int idx;
     Object obj;
+    Matcher bean;
     
     if (base == null || context == null || property == null || !(base instanceof MatcherBean))
       return null;
 
-    obj = null;
     try 
     {
       idx = toIndex(property);
-      Matcher bean = ((MatcherBean)base).getBean();
-      if (idx >= 0 && idx <= bean.groupCount())
-        obj = new Group((MatcherBean)base,idx);
-      context.setPropertyResolved(true);
-    } catch (Exception e)
-    {
-      /* ignore me */
     }
+    catch (Exception e)
+    {
+      /* Unable to  convert to numeric value, give up on numerics. However,
+       * do not set property as resolved to give further resolvers a chance
+       * to handle.
+       */
+      return null;
+    }
+    
+    obj = null;
+    bean = ((MatcherBean)base).getMatcher();
+    
+    if (idx >= 0 && idx <= bean.groupCount())
+    {
+      obj = new MatcherBean(bean,idx);
+      context.setPropertyResolved(true);
+    } 
     return obj;
   }
 
-  final static public  class Group {
-    final int index;
-    final Matcher matcher;
-    
-    public Group(MatcherBean matcher,int index) {
-      this.index = index;
-      this.matcher = matcher.getBean();
-    }
-    
-    public String getGroup() {
-      return this.matcher.group(this.index);
-    }
-    public String getG() {
-      return this.matcher.group(this.index);
-    }
-    public int getS() {
-      return this.matcher.start(this.index);
-    }
-    public int getE() {
-      return this.matcher.end(this.index);
-    }
-    public String toString() {
-      return this.matcher.group(this.index);
-    }
-  }
   
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)

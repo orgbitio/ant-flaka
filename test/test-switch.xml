@@ -1,105 +1,103 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
 
-  <c:switch value="foo" debug="true">
-    <matches re="foo|bar">
-      <fail message="test 0x01 fails"/>
-    </matches>
-  </c:switch>
+	<c:switch value="foo" debug="true">
+		<matches pat="foo|bar">
+			<fail message="test 0x01 fails" />
+		</matches>
+	</c:switch>
 
-  <c:switch value="foo" debug="true">
-    <case match="/foo|bar/">
-    </case>
-    <default>
-      <fail message="test 0x02 fails"/>
-    </default>
-  </c:switch>
-  
-  <c:switch value="xfoox" debug="true">
-    <case match="/foo|bar/">
-      <fail message="test 0x03 fails"/>
-    </case>
-  </c:switch>
+	<c:switch value="foo" debug="true">
+		<matches re="foo|bar" />
+		<default>
+			<fail message="test 0x02 fails" />
+		</default>
+	</c:switch>
 
-  <c:switch value="foobar" debug="true">
-    <case match="*ob*">
-    </case>
-    <default>
-      <fail message="test 0x04 fails"/>
-    </default>
-  </c:switch>
+	<c:switch value="xfoox" debug="true">
+		<matches re="foo|bar">
+			<fail message="test 0x03 fails" />
+		</matches>
+	</c:switch>
 
-  <c:switch value="foobar" debug="true">
-    <case match="ob">
-    	<fail message="test 0x05 fails"/>
-    </case>
-    <default>
-      
-    </default>
-  </c:switch>
+	<c:switch value="foobar" debug="true">
+		<matches pat="*ob*" />
+		<default>
+			<fail message="test 0x04 fails" />
+		</default>
+	</c:switch>
 
-  <c:switch value="foo bar" debug="true">
-    <case match="*bar">
-    </case>
-    <default>
-      <fail message="test 0x06 fails"/>
-    </default>
-  </c:switch>
-  
-  <c:switch value="foo bar" debug="true">
-    <case match="%*bar%">
-    </case>
-    <default>
-      <fail message="test 0x07 fails"/>
-    </default>
-  </c:switch>
-  
-  <!-- useless bug legal -->
-  <c:switch value="foobar=" debug="true" />
+	<c:switch value="foobar" debug="true">
+		<matches re="ob">
+			<fail message="test 0x05 fails" />
+		</matches>
+	</c:switch>
 
-  <c:trycatch>
-    <try>
-      <c:switch value="foo bar" debug="true">
-        <default />
-      </c:switch>
-    </try>
-    <catch>
-      <fail message="test 0x08 fails"/>
-    </catch>
-  </c:trycatch>
-  
-  <c:switch value="a.tgz">
-    <case match="*.jar">
+	<c:switch value="foo bar" debug="true">
+		<matches pat="*bar" />
+		<default>
+			<fail message="test 0x06 fails" />
+		</default>
+	</c:switch>
 
-    </case>
-    <case match="/(.*)\.war/">
+	<c:switch value="foo bar" debug="true">
+		<matches re="*bar">
+		</matches>
+		<default>
+			<fail message="test 0x07 fails" />
+		</default>
+	</c:switch>
 
-    </case>
-    <case match="/.*(zip|tgz)/">
-      <echo>extension = ${switch.g1}</echo>
-    </case>
-  </c:switch>
+	<!-- useless bug legal -->
+	<c:switch value="foobar=" debug="true" />
 
-  <macrodef name="expect">
-    <attribute name="cand" />
-    <attribute name="this" />
-    <sequential>
-      <c:unless test=" '@{this}' == '@{cand}' ">
-        <fail message="unexpected '@{cand}', expected '@{this}'" />
-      </c:unless>
-    </sequential>
-  </macrodef>
-  
-  <c:switch value="v-uat_3_20_500">
-    <case match = "v-(?:([^\d][^_]*)_)?(\d.*)" var="g">
-      <expect cand="#{g.p}"  this="v-(?:([^\d][^_]*)_)?(\d.*)" />
-      <expect cand="#{g.n}"  this="2" />
-      <expect cand="#{g[0]}" this="v-uat_3_20_500" />
-      <expect cand="#{g[1]}" this="uat" />
-      <expect cand="#{g[2]}" this="3_20_500" />
-      <expect cand="#{g[3]}" this="$${g.g3}" />
-      <expect cand="#{g[1].b}" this="2" />
-      <expect cand="#{g[1].e}" this="5" />
-    </case>
-  </c:switch>
-  
+	<c:trycatch>
+		<try>
+			<c:switch value="foo bar" debug="true">
+				<default />
+			</c:switch>
+		</try>
+		<catch>
+			<fail message="test 0x08 fails" />
+		</catch>
+	</c:trycatch>
+
+	<c:switch value="a.tgz">
+		<matches pat="*.jar">
+
+		</matches>
+		<matches re="/(.*)\.war/">
+
+		</matches>
+		<matches re="/.*(zip|tgz)/">
+			<c:echo>extension = #{g}</c:echo>
+		</matches>
+	</c:switch>
+
+	<macrodef name="expect">
+		<attribute name="cand" />
+		<attribute name="this" />
+		<sequential>
+			<c:unless test=" '@{this}' == '@{cand}' ">
+				<fail message="unexpected '@{cand}', expected '@{this}'" />
+			</c:unless>
+		</sequential>
+	</macrodef>
+
+	<c:switch value="v-uat_3_20_500" var="g">
+		<matches re="v-(?:([^\d][^_]*)_)?(\d.*)">
+			<c:echo>
+	        #{g[0]}
+	      </c:echo>
+			<expect cand="#{g}" this="v-uat_3_20_500" />
+			<expect cand="#{g.n}" this="2" />
+			<expect cand="#{g[0]}" this="v-uat_3_20_500" />
+			<expect cand="#{g[1]}" this="uat" />
+			<expect cand="#{g[2]}" this="3_20_500" />
+			<expect cand="#{g[3]}" this="" />
+			<expect cand="#{g[1].s}" this="2" />
+			<expect cand="#{g[1].e}" this="5" />
+			<expect cand="#{g.p}" this="v-(?:([^\d][^_]*)_)?(\d.*)" />
+		</matches>
+	</c:switch>
+
 </project>
