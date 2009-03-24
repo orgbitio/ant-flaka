@@ -27,12 +27,18 @@
     <include name="tryme.xml" />
   </c:scndeps>
 
-  <c:for var="d" in=" dlist ">
-    <c:set>
-      x = d.scope
-    </c:set>
-    <c:echo>#{x}</c:echo>
-  </c:for>
-  
-
+	<!-- install handler able to resolve #{..} -->
+	<c:install-reference-handler />
+	
+  <property name="foo" value="bar" />
+	<c:set>
+	 foo = 'bar'
+	</c:set>
+  <echo>
+  	property foo => ${foo}
+  	variable foo => #{foo}
+  	
+  	ant.file    => ${ant.file}
+  </echo>
+	
 </project>

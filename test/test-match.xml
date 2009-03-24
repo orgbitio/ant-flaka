@@ -27,9 +27,9 @@
       		</c:unset>
 			<loadfile srcfile="@{src}" property="alias" />
 			<c:switch value="${alias}" debug="true">
-				<case match="/^\s*[^#\s]/" find="true" multiline="true">
+				<matches re="^\s*[^#\s]" multiline="true">
 					<echo>FOUND</echo>
-				</case>
+				</matches>
 			</c:switch>
 		</sequential>
 	</macrodef>

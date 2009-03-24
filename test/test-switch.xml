@@ -14,9 +14,10 @@
 	</c:switch>
 
 	<c:switch value="xfoox" debug="true">
-		<matches re="foo|bar">
+		<matches re="foo|bar" />
+		<otherwise>
 			<fail message="test 0x03 fails" />
-		</matches>
+		</otherwise>
 	</c:switch>
 
 	<c:switch value="foobar" debug="true">
@@ -27,9 +28,10 @@
 	</c:switch>
 
 	<c:switch value="foobar" debug="true">
-		<matches re="ob">
+		<matches re="ob" />
+		<default>
 			<fail message="test 0x05 fails" />
-		</matches>
+		</default>
 	</c:switch>
 
 	<c:switch value="foo bar" debug="true">
@@ -41,10 +43,8 @@
 
 	<c:switch value="foo bar" debug="true">
 		<matches re="*bar">
-		</matches>
-		<default>
 			<fail message="test 0x07 fails" />
-		</default>
+		</matches>
 	</c:switch>
 
 	<!-- useless bug legal -->

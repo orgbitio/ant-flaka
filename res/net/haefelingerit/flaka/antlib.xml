@@ -14,6 +14,7 @@
   <!--                         TASKS                               -->
   <!--=============================================================-->
 
+  <taskdef name="install-reference-handler" classname="net.haefelingerit.flaka.PropertyHelper" /> 
   <taskdef name="while" classname="net.haefelingerit.flaka.While" />
   <taskdef name="rescue" classname="net.haefelingerit.flaka.Rescue" />
   <taskdef name="list" classname="net.haefelingerit.flaka.List" />
@@ -38,7 +39,7 @@
   <taskdef name="properties" classname="net.haefelingerit.flaka.Property" />
   <taskdef name="inline-properties" classname="net.haefelingerit.flaka.Property" />
   <taskdef name="property-by-regex" classname="net.haefelingerit.flaka.Select" />
-  <taskdef name="property-handler" classname="net.haefelingerit.flaka.Init" />
+  <taskdef name="property-handler" classname="net.haefelingerit.flaka.PropertyHelper" />
   <taskdef name="requires-ant" classname="net.haefelingerit.flaka.Require" />
   <taskdef name="resdeps" classname="net.haefelingerit.flaka.ResolveDeps" />
   <taskdef name="run-macro" classname="net.haefelingerit.flaka.RunMacro" />
@@ -55,7 +56,6 @@
   <taskdef name="unset" classname="net.haefelingerit.flaka.Unset" />
   <taskdef name="uploadtask" classname="net.haefelingerit.flaka.HttpUploadTask" />
   <taskdef name="when" classname="net.haefelingerit.flaka.When" />
-  <taskdef name="writedeps" classname="net.haefelingerit.flaka.WriteDeps" />
   <taskdef name="xmlmerge" classname="net.haefelingerit.flaka.XmlMerger" />
 
   <!--=============================================================-->

@@ -17,7 +17,7 @@
   <dependency alias="log4j">
     <groupId>log4j</groupId>
     <artifactId>log4j</artifactId>
-    <version>2.8.9</version>
+    <version>1.2.8</version>
   </dependency>
 
   <mkdir dir="tmp" />
@@ -32,7 +32,7 @@
     </c:set>
     <c:echo>#{x}</c:echo>
   </c:for>
-  
+
 
   <c:echo>
     ;; we got 
@@ -71,5 +71,23 @@
     <c:echo>
       [4] | #{d.location.name} | #{d.file} | #{d.scope} | 
     </c:echo>
+  </c:for>
+  <c:list var="repos">
+    ;; my own repo
+    'http://haefelingerit.net/depot'
+  </c:list>
+
+  <c:for var="d" in=" dependencies ">
+    <c:for var="r" in=" repos ">
+      <c:echo>
+        downloading .. #{d.shortname} from #{r}
+      </c:echo>
+      <c:set>
+        url  ::= concat(r,'/',d.m2path)
+        name ::= d.basename
+      </c:set>
+      <echo>url=${url} => ${name}</echo>
+      <get src="${url}" dest="build/lib/${name}" verbose="on" />
+    </c:for>
   </c:for>
 </project>
