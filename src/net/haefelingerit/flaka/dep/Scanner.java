@@ -19,8 +19,10 @@
 package net.haefelingerit.flaka.dep;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.haefelingerit.flaka.util.Static;
@@ -33,37 +35,27 @@ import org.w3c.dom.NodeList;
 
 public class Scanner
 {
-  public Project proj;
+  public Project project;
   public List list;
-
+  public File file;
+  public int cntr;
+  
+  public Scanner(Project project,List list) {
+    super();
+    reset(project,list);
+  }
+  
   public Scanner(Project proj)
   {
-    super();
-    this.proj = proj;
-    this.list = new ArrayList();
+    this(proj,null);
   }
 
-  public Scanner reset()
+  public Scanner reset(Project proj,List list)
   {
-    this.list.clear();
-    return this;
-  }
-
-  public Scanner reset(Project proj)
-  {
-    this.proj = proj;
-    this.list.clear();
-    return this;
-  }
-
-  public Scanner annotate(File file)
-  {
-    /* annotate each dependenc with origin */
-    for (int j = 0; j < this.list.size(); ++j)
-    {
-      Dependency d = (Dependency) this.list.get(j);
-      d.setLocation("file://localhost" + file.getAbsolutePath());
-    }
+    this.project = proj;
+    this.list = list;
+    this.cntr = 0;
+    this.file = null;
     return this;
   }
 
@@ -88,15 +80,61 @@ public class Scanner
     return s;
   }
 
-  public void scan(InputStream stream) throws Exception
+  protected void annotate(File file) 
+  {
+    Iterator iter;
+    
+    if (this.list != null) {
+      iter = iterator();
+      while(iter.hasNext()) {
+        Dependency d = (Dependency)iter.next();
+        d.setLocation(file);
+      }
+    }
+  }
+  
+  protected Iterator iterator() {
+    return getList().iterator();
+  }
+  
+  protected List getList() {
+    if (this.list == null) 
+      this.list = new ArrayList();
+    return this.list;
+  }
+  protected void addtolist(Dependency d) {
+    this.cntr += 1;
+    getList().add(d.setLocation(this.file));
+  }
+  /**
+   * @param file not null
+   */
+  public void scan(File file)
+  {
+    InputStream is = null;
+    try {
+      this.file = file;
+      is = new FileInputStream(file);
+      scan(is);
+    }
+    catch(Exception e)
+    {
+      Static.debug(this.project,"error scanning "+file.getAbsolutePath(),e);
+    }
+    finally {
+      Static.close(is);
+    }
+  }
+
+  protected void scan(InputStream stream) throws Exception
   {
     Node node, kid;
     NodeList nodes, kids;
     Dependency dep;
     Document doc;
     String alias, type, tag, value;
-
-    /* digest the given stream, return XML "document" */
+ 
+     /* digest the given stream, return XML "document" */
     doc = Static.getxmldoc(stream);
 
     if (doc == null)
@@ -114,7 +152,7 @@ public class Scanner
 
     for (int i = 0; i < nodes.getLength(); i++)
     {
-      dep = new Dependency(this.proj);
+      dep = new Dependency(this.project);
       node = nodes.item(i);
 
       /*
@@ -219,7 +257,7 @@ public class Scanner
         }
       }
       /* add dependencies in arrival order !! */
-      this.list.add(dep);
+      addtolist(dep);
     }
   }
 

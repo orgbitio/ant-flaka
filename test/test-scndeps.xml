@@ -1,6 +1,7 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
+
   <macrodef name="dependency">
-    <attribute name="alias" default=""/>
+    <attribute name="alias" default="" />
     <element name="groupId" />
     <element name="artifactId" />
     <element name="version" />
@@ -8,34 +9,67 @@
   </macrodef>
 
   <c:dependency>
-    <groupId>log4j</groupId>
-    <artifactId>log4j</artifactId>
-    <version>1.2.8</version>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>3.8.1</version>
   </c:dependency>
 
-  <dependency alias="log4j"/>
-  
-  <c:inline-properties>
-    depot.csv = file://localhost/${basedir}/lib
-  </c:inline-properties>
+  <dependency alias="log4j">
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>2.8.9</version>
+  </dependency>
 
-  
   <mkdir dir="tmp" />
-  <!-- TODO: what is the name of my file?? -->
-  <!-- read dependencies and append them to project.dependencies .. -->
-  <c:scndeps var="dependencies" debug="true">
-	<include name="test-scndeps.xml" />
+
+  <c:scndeps var="dlist">
+    <include name="test-scndeps.xml" />
   </c:scndeps>
-	
-  <:set var="project.dependencies" value=" #{list(project.dependencies,dependencies)} " />	
-	
-  <echo>DEPENDENCY</echo>
-  <c:writedeps fmt="maven"  />
-  <echo>M1</echo>
-  <c:writedeps fmt="m1path"  />
-  <echo>M2</echo>
-  <c:writedeps fmt="m2path"  />
-  <echo>= ALIAS =</echo>
-  <c:writedeps fmt="alias" ifs="," out="alias.txt"/>
+
+  <c:for var="d" in=" dependencies ">
+    <c:set>
+      x = d.scope
+    </c:set>
+    <c:echo>#{x}</c:echo>
+  </c:for>
   
+
+  <c:echo>
+    ;; we got 
+    #{ dlist }
+  </c:echo>
+  <c:set>
+    ;; like any other variable ..
+    dependencies = \
+    append(dependencies,dlist)
+  </c:set>
+
+  <c:for var="d" in=" dependencies ">
+    <c:echo>#{d}</c:echo>
+  </c:for>
+  <!-- write dependencies in format alias  -->
+  <c:for var="d" in=" dependencies ">
+    <c:when test=" not empty d.alias ">
+      <c:set>
+        x = d.scope
+      </c:set>
+      <c:echo>
+        [1] #{d.alias} | #{d.location.name} | #{d.file} | #{d.scope} | 
+      </c:echo>
+    </c:when>
+  </c:for>
+  <!-- write dependencies in format MI (maven 1) -->
+  <c:for var="d" in=" dependencies ">
+    <c:echo>[2] #{d.m1path}</c:echo>
+  </c:for>
+  <!-- write dependencies in format M2 (maven 2) -->
+  <c:for var="d" in=" dependencies ">
+    <c:echo>[3] |#{d.m2path}|</c:echo>
+  </c:for>
+  <c:echo>There are #{size(dependencies)} ..</c:echo>
+  <c:for var="d" in=" dependencies ">
+    <c:echo>
+      [4] | #{d.location.name} | #{d.file} | #{d.scope} | 
+    </c:echo>
+  </c:for>
 </project>

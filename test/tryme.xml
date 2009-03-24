@@ -1,18 +1,38 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <macrodef name="expect">
-    <attribute name="cand" />
-    <attribute name="this" />
-    <sequential>
-      <c:unless test=" '@{this}' == '@{cand}' ">
-        <c:fail message="unexpected '@{cand}', expected '@{this}'" />
-      </c:unless>
-    </sequential>
+
+
+  <macrodef name="dependency">
+    <attribute name="alias" default="" />
+    <element name="groupId" />
+    <element name="artifactId" />
+    <element name="version" />
+    <sequential />
   </macrodef>
+
+  <c:dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>3.8.1</version>
+  </c:dependency>
+
+  <dependency alias="log4j">
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>2.8.9</version>
+  </dependency>
+
+  <mkdir dir="tmp" />
+
+  <c:scndeps var="dlist">
+    <include name="tryme.xml" />
+  </c:scndeps>
+
+  <c:for var="d" in=" dlist ">
+    <c:set>
+      x = d.scope
+    </c:set>
+    <c:echo>#{x}</c:echo>
+  </c:for>
   
-  <c:switch value="foo" >
-    <matches re="foo|bar" var="mo"  debug="true" >
-      <c:echo> #{mo[0]} </c:echo>
-    </matches>
-  </c:switch>
 
 </project>

@@ -143,7 +143,7 @@ public class Dependency
   /* The materialized dependency */
   protected File file = null;
   /* The location of this dependency's declaration */
-  protected String loc = null;
+  protected File location = null;
   /* The alternative location from where to get the artifact */
   protected String alt;
   /* The url used for remote retrieval */
@@ -174,7 +174,7 @@ public class Dependency
     d.scope = this.scope;
     d.props = this.props;
     d.file = this.file;
-    d.loc = this.loc;
+    d.location = this.location;
     d.alt = this.alt;
     d.url = this.url;
     d.mode = this.mode;
@@ -337,18 +337,19 @@ public class Dependency
   /**
    * @return loc where this dependency has been declared
    */
-  public String getLocation()
+  public File getLocation()
   {
-    return this.loc;
+    return this.location;
   }
 
   /**
    * @param x
    *          this dependency has been declared in loc <code>x</code>.
    */
-  public void setLocation(String x)
+  public Dependency setLocation(File location)
   {
-    this.loc = x;
+    this.location = location;
+    return this;
   }
 
   public void setFile(File file)
@@ -361,6 +362,15 @@ public class Dependency
     return this.file;
   }
 
+  public String getBasename() {
+    return basename();
+  }
+  public String getM1path() {
+    return this.m1path();
+  }
+  public String getM2path() {
+    return this.m2path();
+  }
   /*
    * Returns the basename of the calculated 'loc name'. Example: Assume that we
    * have a dependency for

@@ -19,12 +19,29 @@
 package net.haefelingerit.flaka.el;
 
 import java.io.File;
+import java.util.Arrays;
 
 import de.odysseus.el.misc.TypeConverterImpl;
 
 @SuppressWarnings("serial")
 public class TypeConverter extends TypeConverterImpl
 {
+  protected String coerceToString(Object value) {
+    if (value == null) {
+      return "";
+    }
+    if (value instanceof String) {
+      return (String)value;
+    }
+    if (value instanceof Enum) {
+      return ((Enum<?>)value).name();
+    }
+    if (value.getClass().isArray())
+      return Arrays.toString((Object[])value);
+    return value.toString();
+  }
+  
+  
   protected Boolean coerceToBoolean(Object value)
   {
     if (value == null)

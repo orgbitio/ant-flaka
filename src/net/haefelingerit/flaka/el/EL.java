@@ -18,8 +18,10 @@
 
 package net.haefelingerit.flaka.el;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -672,16 +674,26 @@ public final class EL
     return eval(expr, Object.class);
   }
 
+  public File tofile(String expr)
+  {
+    Object obj;
+    obj = eval(expr,File.class);
+    return (File)obj;
+  }
+
   public String tostr(String expr)
   {
-    String s;
     Object obj;
     obj = eval(expr, String.class);
     if (obj == null)
-      s = "";
-    else
-      s = (obj instanceof String) ? (String) obj : obj.toString();
-    return s;
+      return "";
+    if (! (obj instanceof String))
+      return obj.toString();
+    if (obj.getClass().isArray()) {
+      String[] arr = (String[])obj;
+      return Arrays.toString(arr);
+    }
+    return (String)obj;
   }
 
   public boolean tobool(String expr)

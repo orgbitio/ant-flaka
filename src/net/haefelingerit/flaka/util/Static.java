@@ -1726,6 +1726,14 @@ final public class Static
     return ctxref == null ? expr : ctxref.toobj("#{"+expr+"}");
   }
 
+  
+  final static public File el2file(Project project, String expr)
+  {
+    EL ctxref = el(project);
+    expr = "#{" + (expr == null ? "''" : expr)+"}";
+    return ctxref == null ? null : ctxref.tofile(expr);
+  }
+  
   /**
    * Evaluate a EL expression in a boolean context.
    * 

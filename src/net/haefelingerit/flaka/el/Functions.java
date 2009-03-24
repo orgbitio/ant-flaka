@@ -193,7 +193,9 @@ public class Functions
         }
       } else
       {
-        L.add(obj);
+        /* null is like the empty list */
+        if (obj != null)
+          L.add(obj);
       }
     }
     return L;

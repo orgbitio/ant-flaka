@@ -22,10 +22,7 @@
 package net.haefelingerit.flaka;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import net.haefelingerit.flaka.dep.Scanner;
@@ -33,6 +30,7 @@ import net.haefelingerit.flaka.util.MatchingTask;
 import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.Project;
 
 /**
  * 
@@ -41,83 +39,59 @@ import org.apache.tools.ant.DirectoryScanner;
  */
 public class ScanDeps extends MatchingTask
 {
-  protected String var = "project.dependencies";
-  protected File dir = null;
-  protected Scanner scanner;
+  protected String var;
+  protected String dir = "''.tofile";
+  protected List list;
+
+  // protected Scanner scanner;
 
   public void setVar(String var)
   {
-    this.var = Static.trim2(var, this.var);
+    this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void setDir(File dir)
+  public void setDir(String dir)
   {
     this.dir = dir;
   }
 
-  protected void scan4deps(File file)
+  protected void scan(String fname)
   {
-    String fname;
-    InputStream is = null;
-
-    fname = file.getAbsolutePath();
-    if (file.isFile() == false)
-    {
-      debug("ignored reading deps from " + fname);
-      return;
-    }
-    debug("scanning dependencies from `" + fname + "' ..");
-    try
-    {
-      is = new FileInputStream(file);
-      /* parse a stream */
-      this.scanner.reset();
-      this.scanner.scan(is);
-      this.scanner.annotate(file);
-    } catch (Exception e)
-    {
-      debug("error reading dependencies from `" + fname + "' (ignored)", e);
-    } finally
-    {
-      Static.close(is);
-    }
-
+    File file;
+    Scanner scanner;
+    Project project;
+    
+    project = this.getProject();
+    file = Static.toFile(project, fname);
+    this.list = new ArrayList();
+    scanner = new Scanner(project,this.list);
+    scanner.scan(file);
   }
 
-  protected DirectoryScanner getds()
+  protected DirectoryScanner getds(File dir)
   {
     DirectoryScanner ds = null;
-    File dir = this.dir;
-    if (dir == null)
-      dir = this.toFile(null);
-    ds = super.getDirectoryScanner(dir);
+    if (dir != null)
+      ds = super.getDirectoryScanner(dir);
     return ds;
   }
 
   public void execute()
   {
-    DirectoryScanner ds = getds();
-    String[] filelist;
+    Project project;
+    DirectoryScanner ds;
+    String[] args;
 
-    this.scanner = new Scanner(this.getProject());
-    filelist = ds.getIncludedFiles();
-    for (int i = 0; i < filelist.length; ++i)
+    project = getProject();
+    ds = getds(Static.el2file(project, this.dir));
+    if (ds != null)
     {
-      File file = this.toFile(filelist[i]);
-      scan4deps(file);
-
-      /* Assign or merge my dependencies with project.dependencies */
-      Collection C;
-      C = (Collection) this.getref(this.var);
-      // TODO: make sure not to include twice?
-      if (C != null)
-        C.addAll(this.scanner.list);
-      else
+      args = ds.getIncludedFiles();
+      for (int i = 0; i < args.length; ++i)
       {
-        List list = new ArrayList();
-        list.addAll(this.scanner.list);
-        makeref(this.var, list);
+        scan(args[i]);
       }
     }
+    Static.assign(project, this.var, this.list, Static.VARREF);
   }
 }

@@ -86,7 +86,7 @@ public class GetDeps extends Task
   {
     int cntr = 0;
     Dependency d;
-    String f;
+    File f;
     String s, pfx;
     long kB;
     Printf pf;
