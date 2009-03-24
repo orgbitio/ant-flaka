@@ -1,5 +1,8 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
 
+	<!-- install global handler to simplify life -->
+	<c:install-reference-handler/>
+	
   <macrodef name="dependency">
     <attribute name="alias" default="" />
     <element name="groupId" />
@@ -79,15 +82,13 @@
 
   <c:for var="d" in=" dependencies ">
     <c:for var="r" in=" repos ">
-      <c:echo>
-        downloading .. #{d.shortname} from #{r}
-      </c:echo>
       <c:set>
-        url  ::= concat(r,'/',d.m2path)
-        name ::= d.basename
+        url  = concat(r,'/',d.m2path)
+      	dest = 'build/lib/#{d.basename}'.tofile
       </c:set>
-      <echo>url=${url} => ${name}</echo>
-      <get src="${url}" dest="build/lib/${name}" verbose="on" />
+    	<c:when test=" not dest.exists ">
+    	  <get src="#{url}" dest="#{dest}" verbose="on" />
+    	</c:when>
     </c:for>
   </c:for>
 </project>
