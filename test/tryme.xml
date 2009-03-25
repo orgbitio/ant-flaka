@@ -1,44 +1,33 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-
-
-  <macrodef name="dependency">
-    <attribute name="alias" default="" />
-    <element name="groupId" />
-    <element name="artifactId" />
-    <element name="version" />
-    <sequential />
-  </macrodef>
-
-  <c:dependency>
-    <groupId>junit</groupId>
-    <artifactId>junit</artifactId>
-    <version>3.8.1</version>
-  </c:dependency>
-
-  <dependency alias="log4j">
-    <groupId>log4j</groupId>
-    <artifactId>log4j</artifactId>
-    <version>2.8.9</version>
-  </dependency>
-
-  <mkdir dir="tmp" />
-
-  <c:scndeps var="dlist">
-    <include name="tryme.xml" />
-  </c:scndeps>
-
-	<!-- install handler able to resolve #{..} -->
-	<c:install-reference-handler />
+  <property name="cvstag.ver" value="${x}" />
+	<property name="project.cvstag" value="2.0" />
+	<property name="cvstag.ver" value="1.0" />
 	
-  <property name="foo" value="bar" />
 	<c:set>
-	 foo = 'bar'
+		project.version = property[ 'cvstag.ver' ]
+		project.version = property[ 'project.cvstag' ]
+		project.version = 'SNAPSHOT'
 	</c:set>
-  <echo>
-  	property foo => ${foo}
-  	variable foo => #{foo}
-  	
-  	ant.file    => ${ant.file}
-  </echo>
 	
+  <c:choose>
+     <c:when test=" has.property['cvstag.ver'] ">
+       <c:properties>
+         project.version = ${cvstag.ver}
+       </c:properties>
+     </c:when>
+     <c:when test=" has.property['project.cvstag']">
+       <c:properties>
+         project.version = ${project.cvstag}
+       </c:properties>
+     </c:when>
+     <c:otherwise>
+       <c:properties>
+         project.version = SNAPSHOT
+       </c:properties>
+     </c:otherwise>
+   </c:choose>
+
+	 <c:echo>
+	 	 project.version = ${project.version}
+	 </c:echo>
 </project>

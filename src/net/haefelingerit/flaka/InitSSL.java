@@ -260,7 +260,7 @@ public class InitSSL extends Task
   protected File getDefaultTrustStore()
   {
     final String fname = "depot.keystore"; /* default name */
-    final String clazz = "net.haefelingerit.flaka.Static"; /* search here .. */
+    final String clazz = "net.haefelingerit.flaka.Break"; /* search here .. */
 
     String path;
     File F = null;

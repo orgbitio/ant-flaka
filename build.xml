@@ -1,11 +1,24 @@
-<project xmlns:f="antlib:net.haefelingerit.flaka" name="flaka">
-  <f:properties>
+<project xmlns:c="antlib:net.haefelingerit.flaka" name="flaka">
+  <c:properties>
     baseline = HEAD
     res.dir =   
-  </f:properties>
+  </c:properties>
+
+  <c:dependencies>
+    <c:dependency alias="ant" />
+    <c:dependency alias="junit" scope="test" />
+    <c:dependency alias="commons-httpclient" scope="compile inline" />
+    <c:dependency alias="commons-codec" scope="compile inline" />
+    <c:dependency alias="commons-logging" scope="compile inline" version="1.1"/>
+    <c:dependency alias="jdom" scope="compile inline"/>
+    <c:dependency alias="juel" scope="compile inline"/>
+    <!-- Not required for building, but running Ant scripts -->
+    <!-- within Eclipse -->
+    <c:dependency name="ant-launcher" scope="eclipse"/>
+  </c:dependencies>
 
   <!-- Initialize Framework -->
-  <f:init />
+  <c:init />
 
   <macrodef name="resources-copy" backtrace="true">
     <attribute name="dst" default="${obj.dir}"/>
@@ -13,20 +26,20 @@
     <sequential>
       <!-- @{src} must exits, c:otherwise fileset fails -->
       <echo>@src = |a@{src}a|</echo>
-      <f:when test="-d ' @{src} '">
-        <f:copy-and-replace src="@{src}" dst="@{dst}">
+      <c:when test="-d ' @{src} '">
+        <c:copy-and-replace src="@{src}" dst="@{dst}">
           <exclude name="**/*.java"/>
           <type type="file"/>
-        </f:copy-and-replace>
-      </f:when>
+        </c:copy-and-replace>
+      </c:when>
     </sequential>
   </macrodef>
 
   <!-- override package init macro -->
   <macrodef name="package-init">
     <sequential>
-      <f:package-init />
-      <f:copy-and-replace 
+      <c:package-init />
+      <c:copy-and-replace 
           src = "ant" 
           dst = "${obj.dir}/net/haefelingerit/flaka"
           />
@@ -43,43 +56,31 @@
       </javac>
   </presetdef>
 
-  <dependencies>
-    <dependency alias="ant" />
-    <dependency alias="junit" scope="test" />
-    <dependency alias="commons-httpclient" scope="compile inline" />
-    <dependency alias="commons-codec" scope="compile inline" />
-    <dependency alias="commons-logging" scope="compile inline" version="1.1"/>
-    <dependency alias="jdom" scope="compile inline"/>
-    <dependency alias="juel" scope="compile inline"/>
-    <!-- Not required for building, but running Ant scripts -->
-    <!-- within Eclipse -->
-    <dependency name="ant-launcher" scope="eclipse"/>
-  </dependencies>
 
   <macrodef name="package">
     <sequential>
       <echo>Using local package ..</echo>
-      <f:package />
+      <c:package />
       <!-- package all artefacts in scope 'inline' -->
-      <f:unset var="x" />
-      <f:find dir="${lib.dir}" var="x">
-        <f:dependency-selector scope="inline" />
-    </f:find>
-    <f:when test="-n '${x}'">
-      <f:for var="file" in="${x}">
+      <c:unset var="x" />
+      <c:find dir="${lib.dir}" var="x">
+        <c:dependency-selector scope="inline" />
+    </c:find>
+    <c:when test="-n '${x}'">
+      <c:for var="file" in="${x}">
         <sequential>
           <echo>inlining @{file} ..</echo>
-          <f:update-dist-jar jar="${jar.name}">
+          <c:update-dist-jar jar="${jar.name}">
             <zipfileset src="@{file}" />
-          </f:update-dist-jar>
+          </c:update-dist-jar>
         </sequential>
-      </f:for>
-    </f:when>
+      </c:for>
+    </c:when>
     </sequential>
   </macrodef>
 
   <target name=".classpath">
-    <f:dotclasspath />
+    <c:dotclasspath />
   </target>		
 
   <presetdef name="javadoc">
@@ -105,16 +106,12 @@
     <javadoc destdir= "${build.dir}/javadoc"  />
   </target>
   
-  <target name="install-javadoc" depends="javadoc">
-    <f:install-javadoc />
-  </target>
-
   <target name="compile">
-    <f:compile />
+    <c:compile />
   </target>
 	
   <target name="copy-resources">
-    <f:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
+    <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
   </target>
 
 

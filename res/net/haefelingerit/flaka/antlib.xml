@@ -1016,26 +1016,38 @@
       <!-- has been set by user or not. However, we do not override any user -->
       <!-- settings.                                                         -->
       <c:choose>
-        <c:when test="-d WEB-INF">
-          <property name="project.type" value="war-package"/>
-          <property name="web.dir"   value="." />
+        <c:when test=" 'WEB-INF'.tofile.isdir ">
+          <c:set>
+            project.type := 'war-package'
+            web.dir      := ''
+          </c:set>
         </c:when>
-        <c:when test="-d web/WEB-INF">
-          <property name="project.type" value="war-package"/>
-          <property name="web.dir"   value="web" />
+        <c:when test=" 'web/WEB-INF'.tofile.isdir ">
+          <c:set>
+            project.type := 'war-package'
+            web.dir      := 'web'
+          </c:set>
         </c:when>
-        <c:when test="-d src/main/webapp/WEB-INF">
-          <property name="project.type" value="war-package"/>
-          <property name="web.dir"   value="src/main/webapp" />
+        <c:when test=" 'src/main/webapp/WEB-INF'.isdir ">
+          <c:set>
+            project.type := 'war-package'
+            web.dir      := 'src/main/webapp'
+          </c:set>
         </c:when>
-        <c:when test="-d ear/META-INF -o -f META-INF/application.xml">
-          <property name="project.type" value="ear-package"/>
+        <c:when test=" 'ear/META-INF'.tofile.isdir or 'META-INF/application.xml'.tofile.isfile ">
+          <c:set>
+            project.type := 'ear-package'
+          </c:set>
         </c:when>
         <c:otherwise>
-          <property name="project.type" value="jar-package" />
+          <c:set>
+            project.type := 'jar-package'
+          </c:set>
         </c:otherwise>
       </c:choose>
-      <echo>** project.type is `${project.type}'</echo>
+      <c:echo>
+        ** project.type is `${project.type}'
+      </c:echo>
     </sequential>
   </macrodef>
 
@@ -2163,19 +2175,19 @@
   <macrodef name="init-user-properties" backtrace="true">
     <sequential>
       <!-- read environment variables -->   
-      <c:property environment="env"/>
+      <property environment="env"/>
       
       <!-- load properties from build.properties -->
-      <c:property file="build.properties"/>
+      <property file="build.properties"/>
       
       <!-- load properties from build.properties -->
-      <c:property file="project.properties"/>
+      <property file="project.properties"/>
       
       <!-- load user properties -->
-      <c:property file="${env.HOME}/.build.properties"/>
+      <property file="${env.HOME}/.build.properties"/>
       
       <!-- load user properties -->
-      <c:property file="${user.home}/.build.properties"/>
+      <property file="${user.home}/.build.properties"/>
     </sequential>
   </macrodef>
 
@@ -2253,6 +2265,22 @@
     </sequential>
   </macrodef>
 
+
+  <macrodef name="ifndef">
+    <attribute name="property" default=""/>
+    <attribute name="reference" default=""/>
+    <element name="then" implicit="true" optional="true" />
+    <sequential>
+      <c:unless test="not empty property and has.property['@property'] ">
+        <then />
+      </c:unless>
+      <c:unless test="not empty reference and has.var['@reference'] ">
+        <then />
+      </c:unless>
+    </sequential>
+  </macrodef>
+      
+
   <macrodef name="auto-init" backtrace="true">
     <sequential>
       <c:logo text="HELLO, Flaka @project.version@" width="68" />
@@ -2262,22 +2290,22 @@
 
       <!-- set the version of Flaka -->
       <c:set>
-        flaka.version := @project.version@
+        flaka.version := '@project.version@'
       </c:set>
       
       <!-- init ssl -->
       <c:initssl verifycertificate="off"/>
 
       <!-- install property handler -->
-      <c:ifndef property="no.property-handler">
-        <c:property-handler/>
-      </c:ifndef>
+      <c:install-reference-handler/>
       
 
       <!-- make sure that this properties do not exist -->
-      <c:unset>os.is.windows os.is.unix</c:unset>
+      <c:unset>
+        os.is.windows os.is.unix
+      </c:unset>
       <c:set>
-        ant.exe := ${ant.home}/bin/ant
+        ant.exe := '${ant.home}/bin/ant'
       </c:set>
       
       <!-- check whether we are running on windows -->
@@ -2290,9 +2318,9 @@
         <os family="unix"/>
       </condition>
       
-      <c:when test="-P os.is.windows">
+      <c:when test=" has.property['os.is.windows'] ">
         <c:set>
-          ant.exe := ${ant.home}/bin/ant.bat
+          ant.exe := '${ant.home}/bin/ant.bat'
         </c:set>
       </c:when>
       
@@ -2301,160 +2329,92 @@
       
       <!-- configure properties -->
       <c:set-default-target name="default"/>
-      
-      <c:ifndef property="project.name">
-        <c:choose>
-          <c:when test="-P project">
-            <c:property name="project.name" value="${project}"/>
-          </c:when>
-          <c:when test="-P ant.project.name">
-            <c:property name="project.name" value="${ant.project.name}"/>
-          </c:when>
-          <c:otherwise>
-            <c:property name="project.name" value="${basename ${dirname ${ant.file}}}"/>
-          </c:otherwise>
-        </c:choose>
-      </c:ifndef>
-      
+
+      <c:set>
+        project.name := property[ 'project' ]
+        project.name := property[ 'ant.project.name' ]
+        ;; name of base folder if not set
+        project.name := ''.tofile.name 
+      </c:set>
+
       <c:guess-project-type/>
       
       <!-- default value -->
-      <c:property name="project.type" value="jar"/>
+      <c:set>
+        project.type := 'jar'
+      </c:set>
       
       <!-- set a couple of cvs related properties prefixed with stem  -->
       <!-- project (project.cvsroot,project.cvstag etc)               -->
-
+      
       <c:cvsstat stem="project" arg="${ant.file}" preserve="true" />
 
       <!-- special handling for 'project.cvsroot' - if not set, then -->
       <!-- create it by using (a) environment  variable CVSROOT or   -->
       <!-- (b) build it by using property $user.name                 -->
       
-      <c:ifndef property="project.cvsroot">
-        <c:choose>
-          <c:when test="-P env.CVSROOT">
-            <c:property name="project.cvsroot" value="${env.CVSROOT}"/>
-          </c:when>
-          <c:otherwise>
-            <c:property name="project.cvsroot" value=":pserver:${user.name}@haefelinger.it:/var/cvsroot"/>
-          </c:otherwise>
-        </c:choose>
-      </c:ifndef>
-      
-      <!-- If we have a CVS tag, tokenize it via extension point analyse-cvs-tag. -->
-      <!-- This will create a set of properties to be used for certain default    -->
-      <!-- values. This extension point is properly documented. Please read       -->
-      <!-- http://w/Flaka/API/analyse-cvs-tag -->
-      
-      <c:ifdef property="project.cvstag">
-        <echo>analyzing project.cvstag (${project.cvstag})..</echo>
-        <analyse-cvs-tag tag="${project.cvstag}" stem="cvstag" />
-      </c:ifdef>
-
-      <!-- derive project version from cvs tag - if not already set  -->
-      <!-- if there is not cvs tag then we are using SNAPSHOT        -->
-
-      <c:ifndef property="project.version">
-        <c:choose>
-          <c:when test="-P cvstag.ver">
-            <c:inline-properties>
-              project.version = ${cvstag.ver}
-            </c:inline-properties>
-          </c:when>
-          <c:when test="-P project.cvstag">
-            <c:inline-properties>
-              project.version = ${project.cvstag}
-            </c:inline-properties>
-          </c:when>
-          <c:otherwise>
-            <c:inline-properties>
-              project.version = SNAPSHOT
-            </c:inline-properties>
-          </c:otherwise>
-        </c:choose>
-      </c:ifndef>
-
-      <!-- If a milestone is available, append the milestone to the version. -->
-      <!-- Example: v-3_20_rc_5_0  => version = 3.20rc5_0 -->
-      <c:ifdef property="cvstag.mst">
-        <c:switch value="${cvstag.mst}" stem="__z">
-          <case match="/^([^_]*?)_(.*)$/">
-            <c:set> 
-              project.version := ${project.version}${__z.g1}${__z.g2}
-            </c:set>
-          </case>
-          <case match="/^([^_]*?)$/">
-            <c:set>
-              project.version := ${project.version}${__z.g1}0
-            </c:set>
-          </case>
-        </c:switch>
-      </c:ifdef>
-
-      <!-- normalize project version (might be in tag format here) -->
       <c:set>
-        project.version := ${subst v-,,${subst _,.,${project.version}}}
+        ;; set property project.cvsroot
+        project.cvsroot := property['env.CVSROOT']
+        project.cvsroot := ':pserver:${user.name}@haefelinger.it:/var/cvsroot'
+
+        ;; set property project.version ..
+        project.version := property['cvstag.ver'] 
+        project.version := property['project.cvstag']
+        project.version := 'SNAPSHOT'
       </c:set>
 
 
-      <c:ifdef property="cvstag.env">
-        <c:set>
-          project.name := ${project.name}-${cvstag.env}
-        </c:set>
-      </c:ifdef>
+      <c:set>
+        ;; TODO: we need a replace(regex,str) here
+        project.version ::= '${subst v-,,${subst _,.,${project.version}}}'
+      </c:set>
 
 
-      <!-- if there's no cvs tag use HEAD instead -->
-      <!--  TODO: -->
+      <c:set>
+        ; set to empty string if not already set
+        project.cvsdir := ''
+      </c:set>
       
-      <c:ifndef property="project.cvsdir">
-        <c:property name="project.cvsdir" value=""/>
-      </c:ifndef>
-      
-
-      <!-- derive cvs alias name from cvsdir                         -->
-      <c:ifndef property="project.cvsalias">
-        <c:ifdef property="project.cvsdir">
-          <c:property name="project.cvsalias" value="${subst /,_,${project.cvsdir}}"/>
-        </c:ifdef>
-      </c:ifndef>
-
 
       <!-- java sources ? -->
-      <c:ifndef property="src.dir">
-        <c:set-if-have-file var="src.dir" in="
-                                              src
-                                              src/java
-                                              src/main/java
-                                              " >
+      <c:unless test="has.var['src.dir]">
+        <c:set-if-have-file var="src.dir">
+          <try>
+            src
+            src/java
+            src/main/java
+          </try>
           <filter>
             <include name="**/*.java" />
           </filter>
         </c:set-if-have-file>
-      </c:ifndef>
+      </c:unless>
       
-      <c:property name="test.pat"  value="**/*Test"/>
+      <c:set>
+        test.pat := '**/*Test'
+      </c:set>
       <!-- test src directory ? -->
-      <c:ifndef property="test.src.dir">
-        <c:set-if-have-file var="test.src.dir" in="
-                                                   test
-                                                   test/src
-                                                   test/java
-                                                   test/src/java
-                                                   testsuite
-                                                   testsuite/src
-                                                   testsuite/src/java
-                                                   src/test/java
-                                                   ">
-          <info>
-            <echo>checking @{dir} for unit tests [${test.pat}.java]: ${@{counter}}</echo>
-          </info>
-          <filter>
-            <include name="${test.pat}.java"/>
-          </filter>
-        </c:set-if-have-file>
-        <echo>test.src.dir = ${test.src.dir}</echo>
-      </c:ifndef>
+      <c:set-if-have-file var="test.src.dir">
+        <try>
+          test
+          test/src
+          test/java
+          test/src/java
+          testsuite
+          testsuite/src
+          testsuite/src/java
+          src/test/java
+        </try>
+        <filter>
+          <include name="${test.pat}.java"/>
+        </filter>
+      </c:set-if-have-file>
+      
+      <c:echo>
+        test.src.dir = ${test.src.dir}
+      </c:echo>
+
       
       <!-- application/library resources -->
       <c:ifndef property="res.dir">
@@ -2469,7 +2429,6 @@
       
       <!-- test application/library resources -->
       <c:ifndef property="test.res.dir">
-        
         <c:if-dir-exists-set property="test.res.dir" dir="${test.src.dir}"/>
         <c:if-dir-exists-set property="test.res.dir" dir="test/resources"/>
         <c:if-dir-exists-set property="test.res.dir" dir="test/resources/src"/>
@@ -2480,73 +2439,75 @@
         <c:if-dir-exists-set property="test.res.dir" dir="src/test/resources"/>
       </c:ifndef>
 
+      <c:properties>
+        ;; by default we're going to show evaluted properties.
+        apropos.fmt = eval
       
-      <!-- by default we're going to show evaluted properties. -->
-      <c:property name="apropos.fmt" value="eval"/>
-      
-      <c:property name="depot.10.url" value="${env.DEPOT}"/>
-      <c:property name="depot.11.url" value="http://haefelingerit.net/depot"/>
-
-      <c:property name="depxml.0.url" value="${ant.file}"/>
-      <c:property name="depxml.1.url" value="dependencies.xml"/>
-      <c:property name="depxml.2.url" value="project.xml"/>
-      <c:property name="depxml.3.url" value="pom.xml"/>
+        depot.10.url = ${env.DEPOT}
+        depot.11.url = http://haefelingerit.net/depot
+        
+        depxml.0.url = ${ant.file}
+        depxml.1.url = dependencies.xml
+        depxml.2.url = project.xml
+        depxml.3.url = pom.xml
       
       
-      <!-- standard properties -->
-      <c:property name="project.vendor" value="Unknown Vendor (set project.vendor pls)"/>
-      <c:ifndef property="src.dir">
-        <echo>&HSEPNL;source directory not set, compilation disabled&NL;&HSEP;</echo>
-      </c:ifndef>
-      
-      <c:property name="build.dir" value="build"/>
-      <c:property name="dist.dir" value="${build.dir}/dist"/>
-      <c:property name="lib.dir" value="${build.dir}/lib"/>
-      <c:property name="javadoc.dir" value="${build.dir}/javadoc"/>
-      <c:property name="obj.dir" value="${build.dir}/obj"/>
-      <c:property name="tmp.dir" value="${build.dir}/tmp"/>
-      <c:property name="var.dir" value="${build.dir}/var"/>
-
-      <!--  TODO: -->
-      <c:property name="baseline"          value="DEVL"/>
-      <c:property name="baseline.via"      value="HTTP" />
-      <c:property name="baseline.dir"      value="${build.dir}/baseline"/>
-      <c:property name="baseline.rev"      value="HEAD"/>
-      <c:property name="baseline.cvsdir"   value="var/baselines"/>
-      <c:property name="baseline.cvsroot"  value="${project.cvsroot}"/>
-      <c:property name="baseline.httproot" value="http://haefelingerit.net/baseline" />
-
-      <c:property name="test.src.dir"     value="test"/>
-      <c:property name="test.obj.dir"     value="${build.dir}/test/obj"/>
-      <c:property name="test.xml.dir"     value="${build.dir}/test/xml"/>
-
-      <c:inline-properties>
+        ;; standard properties
+        project.vendor = Unknown Vendor (set project.vendor pls)
+        
+        build.dir = build
+        dist.dir = ${build.dir}/dist
+        lib.dir = ${build.dir}/lib
+        javadoc.dir = ${build.dir}/javadoc
+        obj.dir = ${build.dir}/obj
+        tmp.dir = ${build.dir}/tmp
+        var.dir = ${build.dir}/var
+        
+        ;; TODO:
+        baseline = DEVL
+        baseline.via = HTTP
+        baseline.dir = ${build.dir}/baseline
+        baseline.rev = HEAD
+        baseline.cvsdir = var/baselines
+        baseline.cvsroot = ${project.cvsroot}
+        baseline.httproot = http://haefelingerit.net/baseline
+        
+        test.src.dir = test
+        test.obj.dir = ${build.dir}/test/obj
+        test.xml.dir = ${build.dir}/test/xml
+        
         testclient.src.dir = src/testclient/java
         testclient.res.dir = src/testclient/resources
         testclient.obj.dir = ${build.dir}/testclient/obj
         testclient.xml.dir = ${build.dir}/testclient/xml
         testclient.pat     = **/*Test
-      </c:inline-properties>
-      
-      <c:property name="package.name" value=""/>
-      <c:property name="package.location" value="${subst \.,/, ${package.name}}"/>
-      <c:property name="version.jar" value="${project.version}.jar"/>
-      <c:property name="project.title" value="${project.name}"/>
-      <c:property name="jar.name" value="${project.name}-${version.jar}"/>
-      <c:property name="war.name" value="${project.name}-${project.version}.war"/>
-      <c:property name="ear.name" value="${project.name}-${project.version}.ear"/>
-      <c:property name="classpath.file" value=".classpath"/>
-      <c:property name="depot.regex"  value="depot\.\d+\.url"/>
-      <c:property name="depxml.regex" value="depxml\.\d+\.url"/>
-      
-      <c:inline-properties>
+        
+        package.name = 
+        package.location = ${subst \.,/, ${package.name}}
+        version.jar = ${project.version}.jar
+        project.title = ${project.name}
+        jar.name = ${project.name}-${version.jar}
+        war.name = ${project.name}-${project.version}.war
+        ear.name = ${project.name}-${project.version}.ear
+        classpath.file = .classpath
+        depot.regex = depot\.\d+\.url
+        depxml.regex = depxml\.\d+\.url
+        
         uploadtask.endpoint = http://haefelingerit.net/upload
         uploadtask.debug    = false
         uploadtask.category = component
         uploadtask.rcfile   = ${user.home}/.flaka.d/upload.conf
         uploadtask.folder   = ${dist.dir}
         uploadtask.pattern  = *.jar
-      </c:inline-properties>
+      </c:properties>
+
+      <c:unless test="has.property['src.dir']">
+        <c:echo>
+          &HSEP;
+          source directory not set, compilation disabled
+          &HSEP;
+        </c:echo>
+      </c:unless>
 
       <c:property-by-regex sep="," property="depot.csv" regex="${depot.regex}"/>
       <c:property-by-regex sep="," property="depxml.csv" regex="${depxml.regex}"/>
@@ -2559,17 +2520,19 @@
       <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
       
       <c:switch value="${project.type}">
-        <case match="war-package">
-          <echo>testing property web.dir = `${web.dir}'</echo>
-          <c:unless test="-P web.dir -a -d ${web.dir}">
-            <echo>&NL;&HSEP;</echo>
-            <echo>Property "web.dir" not defined or not a directory but required</echo>
-            <echo>in order to build a war-package.</echo>
-            <echo>web.dir = `${web.dir}'</echo>
-            <echo>&HSEP;&NL;</echo>
+        <matches re="war-package" >
+          <c:echo>testing property web.dir = `${web.dir}'</c:echo>
+          <c:unless test=" not (has.property['web.dir'] and '${web.dir}'.tofile.isdir)">
+            <c:echo>
+              &HSEP;
+              Property "web.dir" not defined or not a directory but required
+              in order to build a war-package.
+              web.dir = `${web.dir}'
+              &HSEP;
+            </c:echo>
             <fail message="invalid property web.dir = `${web.dir}'" /> 
           </c:unless>
-        </case>
+        </matches>
       </c:switch>
 
       <!--=========================================================-->
@@ -2578,10 +2541,7 @@
 
       <!-- compile java source files -->
       <c:switch value="${build.type}">
-        <c:case match="user-defined">
-          <!-- do not init -->
-        </c:case>
-        <c:case match="debug">
+        <c:matches re="debug">
           <presetdef name="javac">
             <javac 
                 destdir      = "${obj.dir}" 
@@ -2596,39 +2556,9 @@
                 fork="yes"
                 />
           </presetdef>
-        </c:case>
-        <c:default>
-          <presetdef name="javac">
-            <javac 
-                destdir       = "${obj.dir}" 
-                classpathref  = "${javac.classpath}" 
-                debug="off" 
-                deprecation="on" 
-                optimize="on" 
-                listfiles="off" 
-                encoding="ASCII" 
-                includeAntRuntime="no" 
-                includeJavaRuntime="no" 
-                fork="yes"
-                />
-          </presetdef>
-        </c:default>
+        </c:matches>
       </c:switch>
       
-      
-      <!-- rmic class files -->
-      <c:switch value="${build.type}">
-        <c:case match="debug">
-          <presetdef name="rmic">
-            <rmic base="${obj.dir}" stubversion="1.2" classpathref="javac.classpath" sourcebase="${src.dir}"/>
-          </presetdef>
-        </c:case>
-        <c:default>
-          <presetdef name="rmic">
-            <rmic base="${obj.dir}" stubversion="1.2" classpathref="javac.classpath" sourcebase="${src.dir}"/>
-          </presetdef>
-        </c:default>
-      </c:switch>
       
       <!-- junit -->
       <presetdef name="junit">
@@ -2677,12 +2607,6 @@
       <c:init-directories/>
       
       <!--=========================================================-->
-      <!-- LOAD DEPENDENCIES                                       -->
-      <!--=========================================================-->
-
-      <c:dependencies-load/>
-      
-      <!--=========================================================-->
       <!-- CLASSPATHS                                              -->
       <!--=========================================================-->
 
@@ -2694,7 +2618,7 @@
         </fileset>
       </path>
       
-      <c:when test="-d '${res.dir}'">
+      <c:when test=" '${res.dir}'.tofile.isdir ">
         <c:path-prepend refid="javac.classpath">
           <pathelement location="${res.dir}"/>
         </c:path-prepend>
@@ -2710,14 +2634,6 @@
         </fileset>
       </path>
       
-      <!--
-          <c:when test="-d '${test.res.dir}'">
-          <c:path-prepend refid="junit.classpath">
-          <pathelement location="${test.res.dir}"/>
-          </c:path-prepend>
-          </c:when>
-      -->
-
       <!-- define a classpath consisting of all dependencies       -->
       <!-- regardless their scope.                                 -->
       <path id="deps.classpath">
@@ -2879,11 +2795,12 @@
 
   <macrodef name="set-if-have-file">
     <attribute name="var" />
-    <attribute name="in" />
+    <element name="try" />
     <element name="filter" optional="true"/>
     <sequential>
       <c:rescue>
         <vars>
+          __list__
           __dir__
           __x__
         </vars>
@@ -2892,11 +2809,14 @@
           u
         </properties>
         <sequential>
+          <c:list var="__list__" el="false">
+            <try />
+          </c:list>
           <c:set>
             ;; make sure that var is gone 
             @{var} = null
           </c:set>
-          <c:for var=" __dir__ " in="@{in}">
+          <c:for var=" __dir__ " in="__list__">
             <c:when test="not __dir__.tofile.isdir" >
               <c:continue />
             </c:when>

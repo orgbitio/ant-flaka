@@ -5,7 +5,7 @@
 	</macrodef>
 	<!--  does nothing -->
 	<c:set />
-	
+
 	<!--
 	prepare variables and properties for removal testing later
 	-->
@@ -49,19 +49,19 @@
 		p4 ::= null
 		p5 ::= ''
 	</c:set>
-	
+
 	<c:fail test="has.var.v0" />
 	<c:fail test="has.var.v1" />
 	<c:fail test="not has.var.v2" />
-	
+
 	<fail if="p0" />
 	<fail if="p1" />
 	<fail unless="p2" />
-	
+
 	<fail if="p3" />
 	<fail if="p4" />
 	<fail unless="p5" />
-	
+
 	<!-- Test again, this time on existing vars and properties -->
 	<c:set>
 		;; remove V0 and V2
@@ -80,27 +80,27 @@
 		P4 ::= null
 		P5 ::= ''
 	</c:set>
-	
+
 	<c:fail test="has.var.V0" />
 	<c:fail test="has.var.V1" />
 	<c:fail test="not has.var.V2" />
-	
+
 	<fail unless="P0" />
 	<fail unless="P1" />
 	<fail unless="P2" />
-	
+
 	<fail if="P3" />
 	<fail if="P4" />
 	<fail unless="P5" />
-	
+
 	<!-- xxxxxxxxxxxxxxxx end suite 0x1 xxxxxxxxxxxxxxxxxxx -->
-	
+
 	<c:set>
 		v0 = null
 		v1 = null
 		v2 = null
 	</c:set>
-	
+
 	<!--  removes (!) reference x -->
 	<c:set>
 		x = null
@@ -126,7 +126,7 @@
 		<fail message="[1e] **error, target barfoo is defined" />
 	</c:when>
 
-	
+
 	<c:unless test=" '${ant.file}'.tofile.isfile " debug="true">
 		<fail message="[2a] ${ant.file} is a file !!" />
 	</c:unless>
@@ -137,4 +137,19 @@
 		<fail message="[2c] ${ant.file}  contains something" />
 	</c:unless>
 
+
+	<property name="p1" value="2.0" />
+
+	<c:set>
+	    project.version := property[ 'shall not exist' ]
+	    project.version := property[ 'p1' ]
+	    project.version := 'SNAPSHOT'
+  </c:set>
+	<echo>
+	 project.version = |${project.version}|
+	</echo>
+  <fail unless="project.version" />
+	<c:fail test=" '${project.version}' != '2.0' ">
+		project.version=|${project.version}|, expected |0.0|
+	</c:fail>
 </project>

@@ -136,23 +136,27 @@ public class MSet extends Task
         debug("line " + tr.lineno + ": syntax error '" + line + "'");
         continue;
       }
-      // otherwise:
-      k = project.replaceProperties(M.group(1));
-      v = project.replaceProperties(M.group(3));
-      o = null;
       try
       {
+        type = howto(M.group(2));
+        k = project.replaceProperties(M.group(1));
         k = Static.elresolve(project, k);
+        // TODO: if we assign a property in 'set-if-not-defined' mode, then
+        // we do not need to evaluate the right side if that property exists
+        // already (cause it wont be changed anyway).
+        if (type == Static.PROPTY && project.getProperty(k) != null)
+          continue;
+        v = project.replaceProperties(M.group(3));
         v = Static.elresolve(project, v);
         o = Static.el2obj(project, v);
+        Static.assign(project, k, o, type);
+
       } catch (Exception e)
       {
         if (this.debug)
           debug("line " + tr.lineno + ": error evaluating EL expression (ignored) in "
-              + Static.q(v));
+              + Static.q(line));
       }
-      type = howto(M.group(2));
-      Static.assign(project, k, o, type);
     }
   }
 }
