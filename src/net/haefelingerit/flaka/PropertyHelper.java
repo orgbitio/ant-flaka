@@ -18,8 +18,6 @@
 
 package net.haefelingerit.flaka;
 
-import java.util.Enumeration;
-
 import net.haefelingerit.flaka.util.PropertyHandler;
 
 import org.apache.tools.ant.BuildException;

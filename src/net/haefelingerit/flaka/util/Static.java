@@ -50,6 +50,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.haefelingerit.flaka.el.EL;
 
+import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
@@ -71,6 +72,9 @@ final public class Static
   static final public int VARREF = 0x1;
   static final public int PROPTY = 0x2;
   static final public int WRITEPROPTY = 0x3;
+
+  static final Class CLASS_TASK = org.apache.tools.ant.Task.class;
+  static final Class CLASS_MACRO = org.apache.tools.ant.taskdefs.MacroInstance.class;
 
   /**
    * Assign an object either as variable or as property to a given project.
@@ -1041,135 +1045,120 @@ final public class Static
     return clazz != null && base != null && base.isAssignableFrom(clazz);
   }
 
-  static final public ComponentHelper getcomph(Project P)
+  static final public ComponentHelper comphelper(Project P)
   {
     return ComponentHelper.getComponentHelper(P);
   }
 
+  static final public AntTypeDefinition compdef(Project project,String property) {
+    return Static.comphelper(project).getDefinition(property);
+  }
+  
   /** shortcut to create a component */
-  static final public Object getcomp(Project P, String s)
+  static final public Object makecomp(Project P, String s)
   {
-    return getcomph(P).createComponent(s);
+    return comphelper(P).createComponent(s);
   }
 
   /** shortcut to get a component's class */
   static final public Class getclass(Project P, String s)
   {
-    return getcomph(P).getComponentClass(s);
+    return comphelper(P).getComponentClass(s);
   }
 
-  static final public boolean isdefined(Project P, String property)
-  {
-    boolean b = false;
-    if (property != null && P != null)
-    {
-      b = P.getProperty(property) != null;
-    }
-    return b;
-  }
 
   static final public boolean isproperty(Project P, String property)
   {
-    boolean b = false;
-    if (property != null && P != null)
-    {
-      b = P.getProperty(property) != null;
-    }
-    return b;
+    return property(P,property) == null ? false : true;
   }
-
+  
+  
   static final public boolean isreference(Project P, String id)
   {
-    boolean b = false;
-    if (id != null && P != null)
-    {
-      b = P.getReference(id) != null;
-    }
-    return b;
+    return reference(P,id) == null ? false : true;
   }
-
-  static final public Object getref(Project P, String id)
-  {
-    Object obj = null;
-    if (id != null && P != null)
-    {
-      obj = P.getReference(id);
-    }
-    return obj;
-  }
-
+  
   static final public boolean istarget(Project P, String s)
   {
+    return P.getTargets().containsKey(s);
+  }
+
+  static final public boolean istask(Project P, String s)
+  {
+    Class clazz;
     boolean b = false;
-    if (s != null && P != null)
-    {
-      b = P.getTargets().containsKey(s);
-    }
+    /** check whether we are a macro or a task */
+    clazz = getclass(P, s);
+    b = issubclass(clazz, org.apache.tools.ant.Task.class);
     return b;
   }
 
-  /**
-   * Test whether <code>s</code> is a Macro or Task in project * <code>P</code>.
-   * * *
-   * 
-   * @return true if <code>s<code> is a subclass of class Task.
-   */
-
-  static final public boolean ismacroOrtask(Project P, String s)
+  final static public boolean istaskdef(Project P, String s)
   {
     boolean b = false;
-    if (s != null && P != null)
-    {
-      /** check whether we are a macro or a task */
-      Class C = getclass(P, s);
-      b = issubclass(C, org.apache.tools.ant.Task.class);
-      verbose(P, "ismacroOrtask(..," + s + ") = " + b);
-    }
+    /** check whether we are a taskdef but not a macrodef  */
+    Class C = getclass(P, s);
+    boolean b1, b2;
+    b1 = issubclass(C, org.apache.tools.ant.taskdefs.MacroInstance.class);
+    b2 = issubclass(C, org.apache.tools.ant.Task.class);
+    b = b2 && !b1;
     return b;
   }
-
-  /**
-   * Test whether <code>s</code> is a Macro project <code>P</code>. * *
-   * 
-   * @return true if <code>s<code> is a subclass of class <code>
-   * * MacroInstance</code>.
-   */
-
-  final static public boolean ismacro(Project P, String s)
+  
+  final static public boolean ismacrodef(Project P, String s)
   {
     boolean b = false;
-    if (s != null && P != null)
-    {
-      /** check whether we are a macro or a task */
-      Class C = getclass(P, s);
-      b = issubclass(C, org.apache.tools.ant.taskdefs.MacroInstance.class);
-      verbose(P, "ismacro(..," + s + ") = " + b);
-    }
+    /** check whether we are a macrodef */
+    Class C = getclass(P, s);
+    b = issubclass(C, org.apache.tools.ant.taskdefs.MacroInstance.class);
     return b;
   }
 
-  /**
-   * Test whether <code>s</code> is a Taskdef in project <code>P</code>. * *
-   * 
-   * @return true if <code>s<code> is Taskdef.
-   */
-
-  final static public boolean istask(Project P, String s)
+  
+  static final public String property(Project P, String property)
   {
-    boolean b = false;
-    if (s != null && P != null)
-    {
-      /** check whether we are a macro or a task */
-      Class C = getclass(P, s);
-      boolean b1, b2;
-      b1 = issubclass(C, org.apache.tools.ant.taskdefs.MacroInstance.class);
-      b2 = issubclass(C, org.apache.tools.ant.Task.class);
-      b = b2 && !b1;
-      verbose(P, "istask(..," + s + ") = " + b);
-    }
-    return b;
+    return P.getProperty(property);
+  }
+  
+  static final public Object reference(Project P, String id)
+  {
+    return P.getReference(id);
   }
 
+  static final public Object target(Project project,String property)
+  {
+    return project.getTargets().get(property);
+  }
+ 
+  static final public AntTypeDefinition taskdef(Project project,String property)
+  {
+    return istaskdef(project,property) ? compdef(project, property) : null;
+  }
+  
+  static final public AntTypeDefinition macrodef(Project project,String property)
+  {
+    return ismacrodef(project,property) ? compdef(project, property) : null;
+  }
+  
+  static final public AntTypeDefinition task(Project project,String property)
+  {
+    return istask(project,property) ? compdef(project, property) : null;
+  }
+  
+  static final public Object type(Project project,String property)
+  {
+    Object obj = null;
+    obj = project.getDataTypeDefinitions().get(property);
+    return obj;
+  }
+  
+  static final public Object filter(Project project,String property)
+  {
+    Object obj = null;
+    obj = project.getGlobalFilterSet().getFilterHash().get(property);
+    return obj;
+  }
+  
  
   final static public String patternAsRegex(String glob)
   {

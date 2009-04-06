@@ -38,7 +38,6 @@ import javax.el.ResourceBundleELResolver;
 
 import net.haefelingerit.flaka.util.Static;
 
-import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
 
@@ -88,9 +87,7 @@ public class Resolver extends ELResolver
     static final int TYPE = 6;
     static final int FILTER = 7;
     static final int TARGET = 8;
-    static final Class CLASS_TASK = org.apache.tools.ant.Task.class;
-    static final Class CLASS_MACRO = org.apache.tools.ant.taskdefs.MacroInstance.class;
-
+ 
     public Object lookup(ELContext context, String property);
   }
 
@@ -112,32 +109,36 @@ public class Resolver extends ELResolver
         context.setPropertyResolved(true);
         return this;
       }
+      // TODO: move var in it's own namespace
       if (this.what.matches("reference|var"))
       {
         context.setPropertyResolved(true);
-        return this.project.getReference(property) == null ? Boolean.FALSE : Boolean.TRUE;
+        return new Boolean(Static.isreference(this.project, property));
       }
       if (this.what.matches("property"))
       {
         context.setPropertyResolved(true);
-        return this.project.getProperty(property) == null ? Boolean.FALSE : Boolean.TRUE;
+        return new Boolean(Static.isproperty(this.project, property));
       }
       if (this.what.matches("target"))
       {
         context.setPropertyResolved(true);
-        return this.project.getTargets().contains(property) ? Boolean.FALSE : Boolean.TRUE;
+        return new Boolean(Static.istarget(this.project,property));
       }
       if (this.what.matches("task"))
       {
         context.setPropertyResolved(true);
-        ComponentHelper ch = Static.getcomph(this.project);
-        AntTypeDefinition atd = ch.getDefinition(property);
-        if (atd != null)
-        {
-          Class C;
-          C = atd.getExposedClass(this.project);
-          return Static.issubclass(C, CLASS_TASK) ? Boolean.TRUE : Boolean.TRUE;
-        }
+        return new Boolean(Static.istask(this.project,property));
+      }
+      if (this.what.matches("taskdef"))
+      {
+        context.setPropertyResolved(true);
+        return new Boolean(Static.istaskdef(this.project,property));
+      }
+      if (this.what.matches("macrodef"))
+      {
+        context.setPropertyResolved(true);
+        return new Boolean(Static.ismacrodef(this.project,property));
       }
       return Boolean.FALSE;
     }
@@ -145,7 +146,7 @@ public class Resolver extends ELResolver
 
   static public class ProjectWrapper implements Wrapper, Iterable
   {
- 
+
     protected Project project;
     protected int what;
 
@@ -175,64 +176,49 @@ public class Resolver extends ELResolver
         case Wrapper.PROPERTY:
         {
           context.setPropertyResolved(true);
-          r = this.project.getProperty(property);
+          r= Static.property(this.project,property);
           break;
         }
         case Wrapper.REFERENCE:
         {
           context.setPropertyResolved(true);
-          r = this.project.getReference(property);
+          r = Static.reference(this.project,property);
           break;
         }
         case Wrapper.TARGET:
         {
           context.setPropertyResolved(true);
-          r = this.project.getTargets().get(property);
+          r = Static.target(this.project,property);
           break;
         }
         case Wrapper.TASKDEF:
         {
           context.setPropertyResolved(true);
-          ComponentHelper ch = Static.getcomph(this.project);
-          AntTypeDefinition atd = ch.getDefinition(property);
-          if (atd != null)
-          {
-            Class C;
-            C = atd.getExposedClass(this.project);
-            r = Static.issubclass(C, CLASS_TASK) ? atd : null;
-          }
+          r = Static.taskdef(this.project,property);
           break;
         }
         case Wrapper.MACRODEF:
         {
           context.setPropertyResolved(true);
-          ComponentHelper ch = Static.getcomph(this.project);
-          AntTypeDefinition atd = ch.getDefinition(property);
-          if (atd != null)
-          {
-            Class C;
-            C = atd.getExposedClass(this.project);
-            r = Static.issubclass(C, CLASS_MACRO) ? atd : null;
-          }
+          r = Static.macrodef(this.project,property);
           break;
         }
         case Wrapper.TASK:
         {
           context.setPropertyResolved(true);
-          ComponentHelper ch = Static.getcomph(this.project);
-          r = ch.getDefinition(property);
+          r = Static.task(this.project,property);
           break;
         }
         case Wrapper.TYPE:
         {
           context.setPropertyResolved(true);
-          r = this.project.getDataTypeDefinitions().get(property);
+          r = Static.type(this.project,property);
           break;
         }
         case Wrapper.FILTER:
         {
           context.setPropertyResolved(true);
-          r = this.project.getGlobalFilterSet().getFilterHash().get(property);
+          r = Static.filter(this.project,property);
           break;
         }
       }
@@ -263,7 +249,7 @@ public class Resolver extends ELResolver
         case Wrapper.MACRODEF:
         case Wrapper.TASK:
         {
-          ComponentHelper ch = Static.getcomph(this.project);
+          ComponentHelper ch = Static.comphelper(this.project);
           size = ch.getTaskDefinitions().size();
           break;
         }
@@ -305,7 +291,7 @@ public class Resolver extends ELResolver
         case Wrapper.MACRODEF:
         case Wrapper.TASK:
         {
-          ComponentHelper ch = Static.getcomph(this.project);
+          ComponentHelper ch = Static.comphelper(this.project);
           s = ch.getTaskDefinitions().toString();
           break;
         }
@@ -349,7 +335,7 @@ public class Resolver extends ELResolver
         case Wrapper.TASK:
         {
           // TODO: improve
-          ComponentHelper ch = Static.getcomph(this.project);
+          ComponentHelper ch = Static.comphelper(this.project);
           iter = ch.getTaskDefinitions().keySet().iterator();
           break;
         }

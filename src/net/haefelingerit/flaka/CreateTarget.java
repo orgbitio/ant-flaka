@@ -121,7 +121,7 @@ public class CreateTarget extends Task
       for (int i = 0; i < list.length; ++i)
       {
         word = list[i];
-        obj = Static.getcomp(getProject(), word);
+        obj = Static.makecomp(getProject(), word);
 
         if (obj == null)
         {

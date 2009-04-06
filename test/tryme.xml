@@ -9,9 +9,25 @@
 		</sequential>
 	</macrodef>
 
-  <c:fail test="task['apropos']" />
-  <c:fail test="has.task['apropos']" />
+	<c:let>
+		apropos = 'antlib:net.haefelingerit.flaka:apropos'
+		let     = 'antlib:net.haefelingerit.flaka:let'
+	</c:let>
+	
+	<c:fail test="not task[apropos]" />
+	<c:fail test="not has.task[apropos]" />
+	<c:fail test="taskdef[apropos]" />
+	<c:fail test="has.taskdef[apropos]" />
+	<c:fail test="not macrodef[apropos]" />
+	<c:fail test="not has.macrodef[apropos]" />
 
+  <c:fail test="not task[let]" />
+  <c:fail test="not has.task[let]" />
+  <c:fail test="not taskdef[let]" />
+  <c:fail test="not has.taskdef[let]" />
+  <c:fail test="macrodef[let]" />
+  <c:fail test="has.macrodef[let]" />
+	
 
 	<c:echo>
     tasks     : #{ size(task) }
@@ -46,7 +62,7 @@
 
 	<c:fail test="task['apropos']" />
 	<c:fail test="has.task['apropos']" />
-  <c:fail test="not task['antlib:net.haefelingerit.flaka:apropos'] "/>
+	<c:fail test="not task['antlib:net.haefelingerit.flaka:apropos'] " />
 	<c:run-local-macro name="apropos" />
-	
+
 </project>

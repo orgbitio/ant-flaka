@@ -135,7 +135,7 @@ public class RunMacro extends Task
     Param P;
     Object obj;
 
-    obj = Static.getcomp(getProject(), m);
+    obj = Static.makecomp(getProject(), m);
     if (obj == null)
     {
       onerror("`" + m + "' neither marco nor task.");
