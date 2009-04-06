@@ -30,9 +30,9 @@
   </c:scndeps>
 
   <c:for var="d" in=" dependencies ">
-    <c:set>
+    <c:let>
       x = d.scope
-    </c:set>
+    </c:let>
     <c:echo>#{x}</c:echo>
   </c:for>
 
@@ -41,11 +41,11 @@
     ;; we got 
     #{ dlist }
   </c:echo>
-  <c:set>
+  <c:let>
     ;; like any other variable ..
     dependencies = \
     append(dependencies,dlist)
-  </c:set>
+  </c:let>
 
   <c:for var="d" in=" dependencies ">
     <c:echo>#{d}</c:echo>
@@ -53,9 +53,9 @@
   <!-- write dependencies in format alias  -->
   <c:for var="d" in=" dependencies ">
     <c:when test=" not empty d.alias ">
-      <c:set>
+      <c:let>
         x = d.scope
-      </c:set>
+      </c:let>
       <c:echo>
         [1] #{d.alias} | #{d.location.name} | #{d.file} | #{d.scope} | 
       </c:echo>
@@ -82,10 +82,10 @@
 
   <c:for var="d" in=" dependencies ">
     <c:for var="r" in=" repos ">
-      <c:set>
+      <c:let>
         url  = concat(r,'/',d.m2path)
       	dest = 'build/lib/#{d.basename}'.tofile
-      </c:set>
+      </c:let>
     	<c:when test=" not dest.exists ">
     	  <get src="#{url}" dest="#{dest}" verbose="on" />
     	</c:when>

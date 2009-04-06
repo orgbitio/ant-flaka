@@ -10,9 +10,9 @@
     <property name="another-property" value="true" />
     <sequential>
       <property name="p0" value="true" />
-      <c:set>
+      <c:let>
         v0 = 3*5
-     </c:set>
+     </c:let>
      <property name="wish-you-where-here" value="true"/>
     </sequential>
   </c:rescue>
@@ -28,10 +28,10 @@
   <!--  again, this define we check whether values are  -->
   <!--  restored -->
 
-  <c:set>
+  <c:let>
     v1 = 3 * 5
     p1 := 'hello'
-  </c:set>
+  </c:let>
   <c:fail unless="p1" />
   <c:fail test="not has.var.v1" />
   <c:fail test="property.p1 != 'hello'" />
@@ -46,9 +46,9 @@
     </properties>
     <sequential>
       <property name="p1" value="foobar" />
-      <c:set>
+      <c:let>
         v1 = 0
-     </c:set>
+     </c:let>
     </sequential>
   </c:rescue>
   

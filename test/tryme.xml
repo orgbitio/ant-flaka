@@ -1,33 +1,52 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <property name="cvstag.ver" value="${x}" />
-	<property name="project.cvstag" value="2.0" />
-	<property name="cvstag.ver" value="1.0" />
-	
-	<c:set>
-		project.version = property[ 'cvstag.ver' ]
-		project.version = property[ 'project.cvstag' ]
-		project.version = 'SNAPSHOT'
-	</c:set>
-	
-  <c:choose>
-     <c:when test=" has.property['cvstag.ver'] ">
-       <c:properties>
-         project.version = ${cvstag.ver}
-       </c:properties>
-     </c:when>
-     <c:when test=" has.property['project.cvstag']">
-       <c:properties>
-         project.version = ${project.cvstag}
-       </c:properties>
-     </c:when>
-     <c:otherwise>
-       <c:properties>
-         project.version = SNAPSHOT
-       </c:properties>
-     </c:otherwise>
-   </c:choose>
 
-	 <c:echo>
-	 	 project.version = ${project.version}
-	 </c:echo>
+
+	<macrodef name="greeting">
+		<sequential>
+			<c:echo>
+        Hello, World!
+      </c:echo>
+		</sequential>
+	</macrodef>
+
+  <c:fail test="task['apropos']" />
+  <c:fail test="has.task['apropos']" />
+
+
+	<c:echo>
+    tasks     : #{ size(task) }
+    taskdefs  : #{ size(taskdef) }
+    macrodefs : #{ size(macrodef)}  
+  </c:echo>
+
+	<c:choose>
+		<c:when test="task['greeting']">
+			<c:run-macro name="greeting" />
+		</c:when>
+		<otherwise>
+			<c:echo>
+      Task greeting does not exist .."
+      </c:echo>
+		</otherwise>
+	</c:choose>
+
+	<c:let>
+    i = 0
+  </c:let>
+	<c:for var="x" in="task">
+		<c:switch value="x">
+			<c:matches glob="antlib:net*:apro*" debug="false">
+				<c:let>i = i + 1</c:let>
+				<c:echo>
+				  #{i}: #{x} => #{task[x]}
+				 </c:echo>
+			</c:matches>
+		</c:switch>
+	</c:for>
+
+	<c:fail test="task['apropos']" />
+	<c:fail test="has.task['apropos']" />
+  <c:fail test="not task['antlib:net.haefelingerit.flaka:apropos'] "/>
+	<c:run-local-macro name="apropos" />
+	
 </project>

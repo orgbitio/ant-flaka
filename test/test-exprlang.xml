@@ -21,21 +21,21 @@
 	<c:when test=" z ">
 		<fail message="[4]  isnil" />
   	</c:when>
-	<c:set>
+	<c:let>
           z = 
-        </c:set>
+        </c:let>
 	<c:when test=" z ">
 		<fail message="[5]  isnil" />
 	</c:when>
-	<c:set>
+	<c:let>
           z = 
-        </c:set>
+        </c:let>
 	<c:when test="z">
 		<fail message="[6]  isnil" />
 	</c:when>
-	<c:set>
+	<c:let>
            z = ''
-        </c:set>
+        </c:let>
 	<c:when test="not has.var.z">
 		<fail message="[7a]  reference to z must exits by now?" />
 	</c:when>
@@ -45,9 +45,9 @@
 	<c:unless test="empty z">
 		<fail message="[7c] empty" />
  	 </c:unless>
-  <c:set>
+  <c:let>
     z = ' '
-  </c:set>
+  </c:let>
   <c:when test="empty z">
     <fail message="[9]" />
   </c:when>

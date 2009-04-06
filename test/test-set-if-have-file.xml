@@ -32,11 +32,11 @@
   <!--  scan for files in folders given by L, stop with first matching
   folder. Var will contain matching files.
    -->
-  <c:set-if-have-file var="x" in=" L ">
+  <c:let-if-have-file var="x" in=" L ">
     <filter>
       <include name="**/*.java" />
     </filter>
-  </c:set-if-have-file>
+  </c:let-if-have-file>
 
   <c:echo>
     empty  x => #{empty x}

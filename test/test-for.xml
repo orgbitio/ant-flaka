@@ -13,26 +13,26 @@
   <c:for var="x" in="list(a, b, c)" />
   
   
-  <c:set>
+  <c:let>
     x = null
-  </c:set>
+  </c:let>
   <c:fail test="has.var.x" />
   <c:for var="x" />
   <c:for var="x" in="'foobar'" >
     <c:fail test="not has.var.x" />
-    <c:set>
+    <c:let>
       ;; set property px
       px := x
-    </c:set>
+    </c:let>
   </c:for>  
   <!--  test that px is set and that x is not set -->
   <c:fail test="has.var.x" />
   <fail unless="px" />	
   
   <!--  same again, this time we check that x is restored -->
-  <c:set>
+  <c:let>
     x = 'foo'
-  </c:set>
+  </c:let>
   <c:fail test="not has.var.x and x != 'foo'" />
   <c:for var="x" in="'foobar'" >
     <c:fail test="not has.var.x and x != 'foobar'" />
@@ -55,9 +55,9 @@
   -->
   <c:for var="i" in=" list(1,2,3,4,5) ">
     <c:echo>i = #{i} (break test)</c:echo>
-    <c:set>
+    <c:let>
       X#{i} := #{i} 
-    </c:set>
+    </c:let>
     <c:when test=" i gt 2">
       <c:break />
     </c:when>
@@ -87,9 +87,9 @@
         <c:continue />
       </c:when>
       <c:echo>i = #{i} (continue test)</c:echo>
-      <c:set>
+      <c:let>
         X#{i} := #{i}
-      </c:set>
+      </c:let>
   </c:for>
 
   <fail message="X1 *is* defined"  if="X1" />

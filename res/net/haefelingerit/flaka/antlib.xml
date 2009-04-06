@@ -35,7 +35,7 @@
   <taskdef name="initssl" classname="net.haefelingerit.flaka.InitSSL" />
   <taskdef name="logo" classname="net.haefelingerit.flaka.Logo" />
   <taskdef name="make-dir" classname="net.haefelingerit.flaka.Mkdir" />
-  <taskdef name="set" classname="net.haefelingerit.flaka.MSet" />
+  <taskdef name="let" classname="net.haefelingerit.flaka.MSet" />
   <taskdef name="properties" classname="net.haefelingerit.flaka.Property" />
   <taskdef name="inline-properties" classname="net.haefelingerit.flaka.Property" />
   <taskdef name="property-by-regex" classname="net.haefelingerit.flaka.Select" />
@@ -65,12 +65,25 @@
     <attribute name="name" />
     <sequential>
       <c:choose>
-        <when test="-M '@{name}'">
+        <when test=" has.task['@{name}'] ">
+         <c:echo>yyy</c:echo>
           <c:run-macro name="@{name}" />
         </when>
-        <when test="-M 'antlib:net.haefelingerit.flaka:@{name}'">
+        <when test=" has.task[ 'antlib:net.haefelingerit.flaka:@{name}'] ">
+          <c:echo>xxx</c:echo>
           <c:run-macro name="antlib:net.haefelingerit.flaka:@{name}" />
         </when>
+        <otherwise>
+          <c:echo>
+            macro @{name} IS NOT defined.
+            Tasks:
+            #{task}
+            Macrodefs:
+            #{macrodef}
+            Taskdefs:
+            #{taskdef}
+          </c:echo>
+        </otherwise>
       </c:choose>
     </sequential>
   </macrodef>
@@ -752,14 +765,14 @@
     <sequential>
       <c:choose>
         <c:when test=" not has.property.subdirs">
-          <c:set>
+          <c:let>
             subdirs := '@{dir}'
-          </c:set>
+          </c:let>
         </c:when>
         <c:otherwise>
-          <c:set>
+          <c:let>
             subdirs ::= concat(property['subdirs'],'@{dir}')
-          </c:set>
+          </c:let>
         </c:otherwise>
       </c:choose>
     </sequential>
@@ -1017,32 +1030,32 @@
       <!-- settings.                                                         -->
       <c:choose>
         <c:when test=" 'WEB-INF'.tofile.isdir ">
-          <c:set>
+          <c:let>
             project.type := 'war-package'
             web.dir      := ''
-          </c:set>
+          </c:let>
         </c:when>
         <c:when test=" 'web/WEB-INF'.tofile.isdir ">
-          <c:set>
+          <c:let>
             project.type := 'war-package'
             web.dir      := 'web'
-          </c:set>
+          </c:let>
         </c:when>
         <c:when test=" 'src/main/webapp/WEB-INF'.isdir ">
-          <c:set>
+          <c:let>
             project.type := 'war-package'
             web.dir      := 'src/main/webapp'
-          </c:set>
+          </c:let>
         </c:when>
         <c:when test=" 'ear/META-INF'.tofile.isdir or 'META-INF/application.xml'.tofile.isfile ">
-          <c:set>
+          <c:let>
             project.type := 'ear-package'
-          </c:set>
+          </c:let>
         </c:when>
         <c:otherwise>
-          <c:set>
+          <c:let>
             project.type := 'jar-package'
-          </c:set>
+          </c:let>
         </c:otherwise>
       </c:choose>
       <c:echo>
@@ -1065,7 +1078,7 @@
   <!--                        A P R O P O S                        -->
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <macrodef name="apropos" backtrace="true">
+  <macrodef name="apropos">
     <attribute name="debug" default="false" />
     <sequential>
       <c:echo debug="@{debug}">
@@ -1322,9 +1335,9 @@
         <loadfile srcfile="@{src}" property="hasalias.content" />
         <c:switch value="${hasalias.content}">
           <case match="/^\s*[^#\s]/" find="true" multiline="true">
-            <c:set>
+            <c:let>
               hasalias := null
-            </c:set>
+            </c:let>
           </case>
         </c:switch>
         <c:unset>
@@ -1666,10 +1679,10 @@
       <c:when test="-P rmi.class.name -a -n '${rmi.class.name}'">
         <c:for var="x" in="${rmi.class.name}">
           <sequential>
-            <c:set>
+            <c:let>
               y := x.replace('\\.','/')
               z := '**/${y}.class'
-            </c:set>
+            </c:let>
             <c:find dir="${obj.dir}" type="f" var="x">
               <include name="${z}"/>
             </c:find>
@@ -1687,9 +1700,9 @@
       </c:when>
       <!-- resource rmi.class.patternset -->
       <c:when test="-R rmi.class.patternset">
-        <c:set>
+        <c:let>
           x ::= null
-        </c:set>
+        </c:let>
         <c:find dir="${obj.dir}" type="f" var="x">
           <patternset refid="rmi.class.patternset"/>
         </c:find>
@@ -2141,34 +2154,27 @@
 
   <macrodef name="init-directories" backtrace="true">
     <sequential>
-      <!-- make sure that we have this properties set -->
-      <c:if-not-set-fail property="build.dir"/>
-      <c:if-not-set-fail property="lib.dir"/>
-      <c:if-not-set-fail property="obj.dir"/>
-      <c:if-not-set-fail property="dist.dir"/>
-      <c:if-not-set-fail property="test.obj.dir"/>
-      <c:if-not-set-fail property="test.xml.dir"/>
-      <c:if-not-set-fail property="testclient.obj.dir"/>
-      <c:if-not-set-fail property="testclient.xml.dir"/>
-      
-      <c:make-dir dir="${build.dir}"/>
-      <c:make-dir dir="${lib.dir}"/>
-      <c:make-dir dir="${obj.dir}"/>
-      <c:make-dir dir="${dist.dir}"/>
-      <c:make-dir dir="${test.obj.dir}"/>
-      <c:make-dir dir="${test.xml.dir}"/>
-      <c:make-dir dir="${testclient.obj.dir}"/>
-      <c:make-dir dir="${testclient.xml.dir}"/>
-
-      <!-- make sure that this directories exist -->
-      <c:assert test="-d '${build.dir}'"/>
-      <c:assert test="-d '${lib.dir}'"/>
-      <c:assert test="-d '${obj.dir}'"/>        
-      <c:assert test="-d '${dist.dir}'"/>
-      <c:assert test="-d '${test.obj.dir}'"/>
-      <c:assert test="-d '${test.xml.dir}'"/>
-      <c:assert test="-d '${testclient.obj.dir}'"/>
-      <c:assert test="-d '${testclient.xml.dir}'"/>
+      <c:rescue>
+        <vars>
+          d
+          dirlist
+        </vars>
+        <c:list var="dirlist" el="false">
+          build.dir
+          lib.dir
+          obj.dir
+          dist.dir
+          test.obj.dir
+          test.xml.dir
+          testclient.obj.dir
+          testclient.xml.dir
+        </c:list>
+        <c:for var="d" in="dirlist">
+          <c:assert test="has.property[d]"/>
+          <c:make-dir dir="property[d]"/>
+          <c:assert test="property[d].tofile.isdir"/>
+        </c:for>
+      </c:rescue>
     </sequential>
   </macrodef>
 
@@ -2211,55 +2217,55 @@
       <!-- A tag may have optionally a so called branch tag. We strip this branch off -->
       <!-- and do not take it into account for the version or the artefact name. Note -->
       <!-- that whitespace characters are automtically stripped. -->
-      <c:set>
+      <c:let>
         __z := @{tag}
-      </c:set>
+      </c:let>
 
       <c:switch value="@{tag}" stem="__z">
         <case match="/^(.*?)--(.*?)$/">
-          <c:set>
+          <c:let>
             __z         := ${__z.g1}
             @{stem}.bch := ${__z.g2}
-          </c:set>
+          </c:let>
         </case>
       </c:switch>
 
       <!-- Check whether we have a milestone -->
       <c:switch value="${__z}" stem="__z">
         <case match="/^(.*?_\d+)_([a-z].*)$/">
-          <c:set>
+          <c:let>
             __z         := ${__z.g1}
             @{stem}.mst := ${__z.g2}
-          </c:set>
+          </c:let>
         </case>
       </c:switch>
 
       <c:switch value="${__z}" stem="__z">
         <!-- A standard "non-environmental" tag -->
         <case match="/^([a-z])-(\d+(?:_\d+)*)$/">
-          <c:set>
+          <c:let>
             @{stem}.typ := ${__z.g1}
             @{stem}.ver := ${__z.g2}
-          </c:set>
+          </c:let>
         </case>
         <!-- A environment tag with at most three numbers -->
         <!-- Example: v-env_X_Y -->
         <case match="/^([a-z])-([a-z][^_]*)_(\d+(?:_\d+){0,2})$/" >
-          <c:set>
+          <c:let>
             @{stem}.typ := ${__z.g1}
             @{stem}.env := ${__z.g2}
             @{stem}.ver := ${__z.g3}
-          </c:set>
+          </c:let>
         </case>
         <!-- A environment tag with 4 or more numbers -->
         <!-- Example: v-env_X_Y_Z_R -->
         <case match="/^([a-z])-([a-z][^_]*)_(\d+(?:_\d+){2})_(\d+(?:_\d+)*)$/" >
-          <c:set>
+          <c:let>
             @{stem}.typ := ${__z.g1}
             @{stem}.env := ${__z.g2}
             @{stem}.ver := ${__z.g3}
             @{stem}.rev := ${__z.g4}
-          </c:set>
+          </c:let>
         </case>
       </c:switch>
     </sequential>
@@ -2289,9 +2295,9 @@
       <c:requires-ant atleast="1.7.0"/>  
 
       <!-- set the version of Flaka -->
-      <c:set>
+      <c:let>
         flaka.version := '@project.version@'
-      </c:set>
+      </c:let>
       
       <!-- init ssl -->
       <c:initssl verifycertificate="off"/>
@@ -2304,9 +2310,9 @@
       <c:unset>
         os.is.windows os.is.unix
       </c:unset>
-      <c:set>
+      <c:let>
         ant.exe := '${ant.home}/bin/ant'
-      </c:set>
+      </c:let>
       
       <!-- check whether we are running on windows -->
       <condition property="os.is.windows">
@@ -2319,9 +2325,9 @@
       </condition>
       
       <c:when test=" has.property['os.is.windows'] ">
-        <c:set>
+        <c:let>
           ant.exe := '${ant.home}/bin/ant.bat'
-        </c:set>
+        </c:let>
       </c:when>
       
       <!-- read user properties -->
@@ -2330,19 +2336,19 @@
       <!-- configure properties -->
       <c:set-default-target name="default"/>
 
-      <c:set>
+      <c:let>
         project.name := property[ 'project' ]
         project.name := property[ 'ant.project.name' ]
         ;; name of base folder if not set
         project.name := ''.tofile.name 
-      </c:set>
+      </c:let>
 
       <c:guess-project-type/>
       
       <!-- default value -->
-      <c:set>
+      <c:let>
         project.type := 'jar'
-      </c:set>
+      </c:let>
       
       <!-- set a couple of cvs related properties prefixed with stem  -->
       <!-- project (project.cvsroot,project.cvstag etc)               -->
@@ -2353,7 +2359,7 @@
       <!-- create it by using (a) environment  variable CVSROOT or   -->
       <!-- (b) build it by using property $user.name                 -->
       
-      <c:set>
+      <c:let>
         ;; set property project.cvsroot
         project.cvsroot := property['env.CVSROOT']
         project.cvsroot := ':pserver:${user.name}@haefelinger.it:/var/cvsroot'
@@ -2362,19 +2368,19 @@
         project.version := property['cvstag.ver'] 
         project.version := property['project.cvstag']
         project.version := 'SNAPSHOT'
-      </c:set>
+      </c:let>
 
 
-      <c:set>
+      <c:let>
         ;; TODO: we need a replace(regex,str) here
         project.version ::= '${subst v-,,${subst _,.,${project.version}}}'
-      </c:set>
+      </c:let>
 
 
-      <c:set>
+      <c:let>
         ; set to empty string if not already set
         project.cvsdir := ''
-      </c:set>
+      </c:let>
       
 
       <!-- java sources ? -->
@@ -2391,9 +2397,9 @@
         </c:set-if-have-file>
       </c:unless>
       
-      <c:set>
+      <c:let>
         test.pat := '**/*Test'
-      </c:set>
+      </c:let>
       <!-- test src directory ? -->
       <c:set-if-have-file var="test.src.dir">
         <try>
@@ -2812,10 +2818,10 @@
           <c:list var="__list__" el="false">
             <try />
           </c:list>
-          <c:set>
+          <c:let>
             ;; make sure that var is gone 
             @{var} = null
-          </c:set>
+          </c:let>
           <c:for var=" __dir__ " in="__list__">
             <c:when test="not __dir__.tofile.isdir" >
               <c:continue />
@@ -2824,9 +2830,9 @@
               <filter />
             </c:find>
             <c:when test="not empty __x__">
-              <c:set>
+              <c:let>
                 @{var} = list(__dir__,append(__x__))
-              </c:set>
+              </c:let>
               <c:break />
             </c:when>
           </c:for>

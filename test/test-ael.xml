@@ -4,9 +4,9 @@
   </description>
   
   <property name="name" value="PROPERTY name" />
-  <c:set>
+  <c:let>
     name =  'REFERENCE name'
-  </c:set>
+  </c:let>
 
   <target name="name" description="TARGET name" />
   <macrodef name="name1">
@@ -15,9 +15,9 @@
     </sequential>
   </macrodef>
   
-  <c:set>
+  <c:let>
     foo.bar = 'some string (reference)'
-  </c:set>
+  </c:let>
   <property name="foo.bar" value="some string (property)'" />
   
   <taskdef name="name" classname="net.haefelingerit.flaka.Echo" />
@@ -25,9 +25,9 @@
   <property name="ant" value="###ANT###" />
   <property name="el"  value="###EL####" />
 
-  <c:set>
+  <c:let>
     antfile =  '${ant.file}'.tofile 
-  </c:set>
+  </c:let>
   <c:echo debug="true">
     #files? : #{size(antfile.parent.list)}
  

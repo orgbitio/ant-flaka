@@ -61,7 +61,7 @@
     b b
   </c:echo>
   <echo>=======</echo>
-  <c:set>
+  <c:let>
     f = ''.tofile
-  </c:set>
+  </c:let>
 </project>

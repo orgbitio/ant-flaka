@@ -1,7 +1,7 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <c:set>
+  <c:let>
     _var_ = 'list'
-  </c:set>
+  </c:let>
   <c:echo>
     #{_var_}
   </c:echo>

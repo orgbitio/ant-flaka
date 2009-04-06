@@ -1,11 +1,11 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
 	<property name="Z" value="zzz" />
 	<property name="comment" value=";" />
-	<c:set comment="${comment}">
+	<c:let comment="${comment}">
 		s = '${Z}'
 		f = '${ant.file}'
 		F = '#{f}'
-	</c:set>
+	</c:let>
 	<echo>
 		s = ${s}
 	</echo>
@@ -14,14 +14,14 @@
 		f = #{f}
 		F = #{F}
 	</c:echo>
-	<c:set comment=";">
+	<c:let comment=";">
 		;; set variable x \\
 		to false
 		x= \
 		false
-	</c:set>
-	<c:set comment="#"># set property x
-		x:=false</c:set>
+	</c:let>
+	<c:let comment="#"># set property x
+		x:=false</c:let>
 	<c:echo>
 		var x = #{x}
 		property x = ${x}
@@ -34,18 +34,18 @@
 		<fail message="[0a] but property x must exist by now." />
 	</c:unless>
 
-	<c:set>
+	<c:let>
 		z = false
-	</c:set>
+	</c:let>
 	<c:unless test="has.var.z">
 		<fail message="[1a] but z is a *existing* reference" />
 	</c:unless>
 	<c:when test="not has.var.z">
 		<fail message="[2b] but z is a *existing* reference" />
 	</c:when>
-	<c:set>
+	<c:let>
 		z = null
-	</c:set>
+	</c:let>
 	<c:when test="has.var.z">
 		<c:echo>#{reference}</c:echo>
 		<fail message="[2a] but z is a *non existing* reference" />
@@ -68,9 +68,9 @@
 		<fail message="[4b]  but property z does not exist" />
 	</c:unless>
 
-	<c:set>
+	<c:let>
 		f = '${ant.file}'.tofile
-	</c:set>
+	</c:let>
 	
 	<c:when test="not f">
 		<fail message="[5a]  but f is an existing file" />
@@ -78,18 +78,18 @@
 	<c:unless test="f">
 		<fail message="[5b]  but f is an existing file" />
 	</c:unless>
-	<c:set>
+	<c:let>
 		f = '--${ant.file}'.tofile
-	</c:set>
+	</c:let>
 	<c:when test="f">
 		<fail message="[6a] does not exist" />
 	</c:when>
 	<c:unless test="not f">
 		<fail message="[6b]  but f is an existing file" />
 	</c:unless>
-	<c:set>
+	<c:let>
 		b = false
-	</c:set>
+	</c:let>
 	<c:when test="b">
 		<fail message="[7a] but b must evaluate to false" />
 	</c:when>

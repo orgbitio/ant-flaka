@@ -1,7 +1,7 @@
 <project xmlns:c="antlib:net.haefelingerit.flaka">
-  <c:set>
+  <c:let>
     foo = 'foo'
-  </c:set>
+  </c:let>
   <c:properties>
     ; this is \
     a comment

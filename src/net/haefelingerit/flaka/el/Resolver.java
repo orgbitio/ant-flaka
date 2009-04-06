@@ -88,6 +88,8 @@ public class Resolver extends ELResolver
     static final int TYPE = 6;
     static final int FILTER = 7;
     static final int TARGET = 8;
+    static final Class CLASS_TASK = org.apache.tools.ant.Task.class;
+    static final Class CLASS_MACRO = org.apache.tools.ant.taskdefs.MacroInstance.class;
 
     public Object lookup(ELContext context, String property);
   }
@@ -128,17 +130,22 @@ public class Resolver extends ELResolver
       if (this.what.matches("task"))
       {
         context.setPropertyResolved(true);
-        return this.project.getTaskDefinitions().contains(property) ? Boolean.FALSE : Boolean.TRUE;
+        ComponentHelper ch = Static.getcomph(this.project);
+        AntTypeDefinition atd = ch.getDefinition(property);
+        if (atd != null)
+        {
+          Class C;
+          C = atd.getExposedClass(this.project);
+          return Static.issubclass(C, CLASS_TASK) ? Boolean.TRUE : Boolean.TRUE;
+        }
       }
       return Boolean.FALSE;
     }
   }
 
-  static public class ProjectWrapper implements Wrapper
+  static public class ProjectWrapper implements Wrapper, Iterable
   {
-    private final static Class CLASS_TASK = org.apache.tools.ant.Task.class;
-    private final static Class CLASS_MACRO = org.apache.tools.ant.taskdefs.MacroInstance.class;
-
+ 
     protected Project project;
     protected int what;
 
@@ -314,6 +321,50 @@ public class Resolver extends ELResolver
         }
       }
       return s;
+    }
+
+    public Iterator iterator()
+    {
+      Iterator iter = null;
+      // TODO Auto-generated method stub
+      switch (this.what)
+      {
+        case Wrapper.PROPERTY:
+        {
+          iter = this.project.getProperties().keySet().iterator();
+          break;
+        }
+        case Wrapper.REFERENCE:
+        {
+          iter = this.project.getReferences().keySet().iterator();
+          break;
+        }
+        case Wrapper.TARGET:
+        {
+          iter = this.project.getTargets().keySet().iterator();
+          break;
+        }
+        case Wrapper.TASKDEF:
+        case Wrapper.MACRODEF:
+        case Wrapper.TASK:
+        {
+          // TODO: improve
+          ComponentHelper ch = Static.getcomph(this.project);
+          iter = ch.getTaskDefinitions().keySet().iterator();
+          break;
+        }
+        case Wrapper.TYPE:
+        {
+          iter = this.project.getDataTypeDefinitions().keySet().iterator();
+          break;
+        }
+        case Wrapper.FILTER:
+        {
+          iter = this.project.getGlobalFilterSet().getFilterHash().keySet().iterator();
+          break;
+        }
+      }
+      return iter;
     }
   }
 

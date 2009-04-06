@@ -5,10 +5,10 @@
     p0x1 = p0x1
   </c:properties>
   <property name="p0x2" value="p0x2" />
-  <c:set>
+  <c:let>
     p0x3 := 'p0x3'
     p0x4 ::= #{'p0x4'}
-   </c:set>
+   </c:let>
   <fail unless="p0x1" />
   <fail unless="p0x2" />
   <fail unless="p0x3" />

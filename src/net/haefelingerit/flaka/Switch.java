@@ -303,6 +303,7 @@ public class Switch extends Task
     boolean b;
     Match c;
     Sequential s;
+    String v;
 
     /* we need a value to do something .. */
     if (this.value == null)
@@ -319,10 +320,11 @@ public class Switch extends Task
 
     b = false;
     c = null;
+    v = Static.el2str(getProject(),this.value);
     for (int i = 0; !b && i < this.cases.size(); i++)
     {
       c = (Match) this.cases.get(i);
-      b = c.tryvalue(this.value);
+      b = c.tryvalue(v);
     }
     s = b ? c : this.defaultcase;
     if (s != null)

@@ -4,12 +4,12 @@
 		<sequential />
 	</macrodef>
 	<!--  does nothing -->
-	<c:set />
+	<c:let />
 
 	<!--
 	prepare variables and properties for removal testing later
 	-->
-	<c:set>
+	<c:let>
 		;; 
 		V0 = 0
 		V1 = 0
@@ -20,7 +20,7 @@
 		P3 := ''
 		P4 := ''
 		P5 := ''
-	</c:set>
+	</c:let>
 	<!-- test that we vars and props prepared -->
 	<c:fail test="not has.var.V0" />
 	<c:fail test="not has.var.V1" />
@@ -33,7 +33,7 @@
 	<fail unless="P5" />
 
 	<!-- Test the meaning of null and void on non existing vars and props -->
-	<c:set>
+	<c:let>
 		;; do not create v0 and v1, creates v2
 		v0 =
 		v1 = null
@@ -48,7 +48,7 @@
 		p3 ::= 
 		p4 ::= null
 		p5 ::= ''
-	</c:set>
+	</c:let>
 
 	<c:fail test="has.var.v0" />
 	<c:fail test="has.var.v1" />
@@ -63,7 +63,7 @@
 	<fail unless="p5" />
 
 	<!-- Test again, this time on existing vars and properties -->
-	<c:set>
+	<c:let>
 		;; remove V0 and V2
 		V0 =
 		V1 = null
@@ -79,7 +79,7 @@
 		P3 ::= 
 		P4 ::= null
 		P5 ::= ''
-	</c:set>
+	</c:let>
 
 	<c:fail test="has.var.V0" />
 	<c:fail test="has.var.V1" />
@@ -95,19 +95,19 @@
 
 	<!-- xxxxxxxxxxxxxxxx end suite 0x1 xxxxxxxxxxxxxxxxxxx -->
 
-	<c:set>
+	<c:let>
 		v0 = null
 		v1 = null
 		v2 = null
-	</c:set>
+	</c:let>
 
 	<!--  removes (!) reference x -->
-	<c:set>
+	<c:let>
 		x = null
 		x :=
 		z = true
 		antfile = property['ant.file'].tofile
-	</c:set>
+	</c:let>
 
 	<fail message="[1a] **error, property x *is not* defined here: x=${x}" if="x" />
 
@@ -140,11 +140,11 @@
 
 	<property name="p1" value="2.0" />
 
-	<c:set>
+	<c:let>
 	    project.version := property[ 'shall not exist' ]
 	    project.version := property[ 'p1' ]
 	    project.version := 'SNAPSHOT'
-  </c:set>
+  </c:let>
 	<echo>
 	 project.version = |${project.version}|
 	</echo>

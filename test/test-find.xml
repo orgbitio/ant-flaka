@@ -2,9 +2,9 @@
 
   <c:property-handler/>
 
-  <c:set>
+  <c:let>
       basefolder = '${ant.file}'.tofile.parent
-  </c:set>
+  </c:let>
   <c:echo>
     basefolder = #{basefolder}
   </c:echo>

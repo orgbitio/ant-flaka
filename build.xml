@@ -20,40 +20,12 @@
   <!-- Initialize Framework -->
   <c:init />
 
-  <macrodef name="resources-copy" backtrace="true">
-    <attribute name="dst" default="${obj.dir}"/>
-    <attribute name="src" default="${src.dir}"/>
-    <sequential>
-      <!-- @{src} must exits, c:otherwise fileset fails -->
-      <echo>@src = |a@{src}a|</echo>
-      <c:when test="-d ' @{src} '">
-        <c:copy-and-replace src="@{src}" dst="@{dst}">
-          <exclude name="**/*.java"/>
-          <type type="file"/>
-        </c:copy-and-replace>
-      </c:when>
-    </sequential>
-  </macrodef>
-
-  <!-- override package init macro -->
-  <macrodef name="package-init">
-    <sequential>
-      <c:package-init />
-      <c:copy-and-replace 
-          src = "ant" 
-          dst = "${obj.dir}/net/haefelingerit/flaka"
-          />
-    </sequential>
-  </macrodef>
-
   <presetdef name="junit">
     <junit dir="test"  />
   </presetdef>
 
   <presetdef name="javac">
-      <javac source="1.5" debug="true">
-        <!-- elements -->
-      </javac>
+    <javac source="1.5" debug="true" />
   </presetdef>
 
 
@@ -61,28 +33,26 @@
     <sequential>
       <echo>Using local package ..</echo>
       <c:package />
-      <!-- package all artefacts in scope 'inline' -->
-      <c:unset var="x" />
+      <!-- inline all artefacts in scope 'inline' -->
+      <c:unset>
+        x
+      </c:unset>
       <c:find dir="${lib.dir}" var="x">
         <c:dependency-selector scope="inline" />
-    </c:find>
-    <c:when test="-n '${x}'">
-      <c:for var="file" in="${x}">
-        <sequential>
-          <echo>inlining @{file} ..</echo>
-          <c:update-dist-jar jar="${jar.name}">
-            <zipfileset src="@{file}" />
-          </c:update-dist-jar>
-        </sequential>
-      </c:for>
-    </c:when>
+      </c:find>
+      <c:when test="-n '${x}'">
+        <c:for var="file" in="${x}">
+          <sequential>
+            <echo>inlining @{file} ..</echo>
+            <c:update-dist-jar jar="${jar.name}">
+              <zipfileset src="@{file}" />
+            </c:update-dist-jar>
+          </sequential>
+        </c:for>
+      </c:when>
     </sequential>
   </macrodef>
-
-  <target name=".classpath">
-    <c:dotclasspath />
-  </target>		
-
+  
   <presetdef name="javadoc">
     <javadoc
         packagenames    = "net.haefelingerit.flaka.*"
@@ -100,16 +70,6 @@
     </javadoc>
   </presetdef>
 
-  
-  <target name="javadoc">
-    <mkdir dir="${build.dir}/javadoc" />
-    <javadoc destdir= "${build.dir}/javadoc"  />
-  </target>
-  
-  <target name="compile">
-    <c:compile />
-  </target>
-	
   <target name="copy-resources">
     <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
   </target>

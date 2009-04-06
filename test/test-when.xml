@@ -25,9 +25,9 @@
 	<when test="not 'a b c' ">
 		<fail message=" 'a b c' evaluating to false" />
 	</when>
-	<c:set>
+	<c:let>
 		f = ''.tofile
-	</c:set>
+	</c:let>
 	<when test="not f">
 		<fail message=" f evaluates to false??" />
 	</when>
