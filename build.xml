@@ -74,5 +74,8 @@
     <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
   </target>
 
+	<target name="apropos">
+	 <c:apropos />
+	</target>
 
 </project>

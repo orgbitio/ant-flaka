@@ -437,18 +437,8 @@
   </macrodef>
 
 
-  <macrodef name="init" backtrace="true">
+  <macrodef name="extension-points" backtrace="true">
     <sequential>
-      <!--
-          :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      -->
-      <!--
-          A rather long list of "extension points"
-      -->
-      <!--
-          :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      -->
-
       <presetdef name="reload-baseline">
         <c:reload-baseline />
       </presetdef>
@@ -622,13 +612,16 @@
       <presetdef name="compile-rmi">
         <c:compile-rmi />
       </presetdef>
+    </sequential>
+  </macrodef>
 
+  <macrodef name="init">
+    <sequential>
+      <c:extension-points />
       <c:define-targets />
 
-      <!-- install component handler -->
-      <c:unless test=" has.property['no.component-handler'] ">
-        <c:component-handler install="true" fail="false" />
-      </c:unless>
+      <!-- TODO: required ?? -->
+      <c:component-handler install="true" fail="false" />
 
       <!--=============================================================-->
       <!-- war                                                         -->
@@ -1087,10 +1080,6 @@
         project.vendor          #{ property['project.vendor'] }
         project.version         #{ property['project.version'] }
         project.env             #{ property['project.env'] }
-        project.cvsdir          #{ property['project.cvsdir'] }
-        project.cvsalias        #{ property['project.cvsalias'] }
-        project.cvstag          #{ property['project.cvstag'] }
-        project.cvsroot         #{ property['project.cvsroot'] }
         project.type            #{ property['project.type'] }
         project.title           #{ property['project.title'] }
 
@@ -1110,11 +1099,8 @@
 
         /* Baseline */
         baseline                #{ property['baseline'] }
-        baseline.via            #{ property['baseline.via'] }
         baseline.dir            #{ property['baseline.dir'] }
         baseline.rev            #{ property['baseline.rev'] }
-        baseline.cvsdir         #{ property['baseline.cvsdir'] }
-        baseline.cvsroot        #{ property['baseline.cvsroot'] }
         baseline.httproot       #{ property['baseline.httproot'] }
 
         /* Unit tests */
@@ -1123,12 +1109,6 @@
         test.obj.dir            #{ property['test.obj.dir'] }
         test.pat                #{ property['test.pat'] }
 
-        /* HTTP Unit tests */
-        testclient.src.dir      #{ property['testclient.src.dir'] }
-        testclient.res.dir      #{ property['testclient.res.dir'] }
-        testclient.obj.dir      #{ property['testclient.obj.dir'] }
-        testclient.pat          #{ property['testclient.pat'] }
-        
         /* RMI */
         rmi.class.name          #{ property['rmi.class.name'] }
         package.name            #{ property['package.name'] }
@@ -2308,7 +2288,8 @@
 
       <!-- make sure that this properties do not exist -->
       <c:unset>
-        os.is.windows os.is.unix
+        os.is.windows 
+        os.is.unix
       </c:unset>
       <c:let>
         ant.exe := '${ant.home}/bin/ant'
@@ -2350,38 +2331,9 @@
         project.type := 'jar'
       </c:let>
       
-      <!-- set a couple of cvs related properties prefixed with stem  -->
-      <!-- project (project.cvsroot,project.cvstag etc)               -->
-      
-      <c:cvsstat stem="project" arg="${ant.file}" preserve="true" />
-
-      <!-- special handling for 'project.cvsroot' - if not set, then -->
-      <!-- create it by using (a) environment  variable CVSROOT or   -->
-      <!-- (b) build it by using property $user.name                 -->
-      
       <c:let>
-        ;; set property project.cvsroot
-        project.cvsroot := property['env.CVSROOT']
-        project.cvsroot := ':pserver:${user.name}@haefelinger.it:/var/cvsroot'
-
-        ;; set property project.version ..
-        project.version := property['cvstag.ver'] 
-        project.version := property['project.cvstag']
         project.version := 'SNAPSHOT'
       </c:let>
-
-
-      <c:let>
-        ;; TODO: we need a replace(regex,str) here
-        project.version ::= '${subst v-,,${subst _,.,${project.version}}}'
-      </c:let>
-
-
-      <c:let>
-        ; set to empty string if not already set
-        project.cvsdir := ''
-      </c:let>
-      
 
       <!-- java sources ? -->
       <c:unless test="has.var['src.dir]">
@@ -2417,21 +2369,19 @@
         </filter>
       </c:set-if-have-file>
       
-      <c:echo>
-        test.src.dir = ${test.src.dir}
-      </c:echo>
-
-      
-      <!-- application/library resources -->
-      <c:ifndef property="res.dir">
-        <c:if-dir-exists-set property="res.dir" dir="${src.dir}"/>
-        <c:if-dir-exists-set property="res.dir" dir="resources"/>
-        <c:if-dir-exists-set property="res.dir" dir="resources/src"/>
-        <c:if-dir-exists-set property="res.dir" dir="resources/java"/>
-        <c:if-dir-exists-set property="res.dir" dir="resources/src/java"/>
-        <!-- maven -->
-        <c:if-dir-exists-set property="res.dir" dir="src/main/resources"/>
-      </c:ifndef>
+      <c:set-if-have-file var="res.dir">
+        <try>
+          ${src.dir}
+          resources
+          resources/src
+          resources/java
+          resources/src/java
+          src/main/resources
+        </try>
+        <filter>
+          <exclude name="**/*.java" />
+        </filter>
+      </c:set-if-have-file>
       
       <!-- test application/library resources -->
       <c:ifndef property="test.res.dir">
@@ -2525,7 +2475,7 @@
       <!--:: Make sure that required properties are set                    ::-->
       <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
       
-      <c:switch value="${project.type}">
+      <c:switch value=" '${project.type}' ">
         <matches re="war-package" >
           <c:echo>testing property web.dir = `${web.dir}'</c:echo>
           <c:unless test=" not (has.property['web.dir'] and '${web.dir}'.tofile.isdir)">
@@ -2546,7 +2496,7 @@
       <!--=========================================================-->
 
       <!-- compile java source files -->
-      <c:switch value="${build.type}">
+      <c:switch value=" '${build.type}' ">
         <c:matches re="debug">
           <presetdef name="javac">
             <javac 
@@ -2823,15 +2773,24 @@
             @{var} = null
           </c:let>
           <c:for var=" __dir__ " in="__list__">
-            <c:when test="not __dir__.tofile.isdir" >
+            <c:let>
+              __dir__ = __dir__.tofile
+            </c:let>
+            <c:echo>
+              trying #{__dir__}
+            </c:echo>
+            <c:when test="not __dir__.isdir" >
               <c:continue />
             </c:when>
             <c:find dir=" __dir__ " var="__x__">
               <filter />
             </c:find>
+            <c:echo>
+              => #{__x__}
+            </c:echo>
             <c:when test="not empty __x__">
               <c:let>
-                @{var} = list(__dir__,append(__x__))
+                @{var} := __dir__.toabs
               </c:let>
               <c:break />
             </c:when>
