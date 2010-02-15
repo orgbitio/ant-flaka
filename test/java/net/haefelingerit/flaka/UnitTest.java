@@ -18,12 +18,12 @@
 
 package net.haefelingerit.flaka;
 
+import it.haefelinger.flaka.el.EL;
+import it.haefelinger.flaka.el.Functions;
+import it.haefelinger.flaka.util.Static;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.haefelingerit.flaka.el.EL;
-import net.haefelingerit.flaka.el.Functions;
-import net.haefelingerit.flaka.util.Static;
 
 import org.apache.tools.ant.Project;
 

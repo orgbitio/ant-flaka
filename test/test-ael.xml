@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka" name="PROJECT NAME">
+<project xmlns:c="antlib:it.haefelinger.flaka" name="PROJECT NAME">
   <description>
     Test (E)expression (L)angugage
   </description>
@@ -20,7 +20,7 @@
   </c:let>
   <property name="foo.bar" value="some string (property)'" />
   
-  <taskdef name="name" classname="net.haefelingerit.flaka.Echo" />
+  <taskdef name="name" classname="it.haefelinger.flaka.Echo" />
   
   <property name="ant" value="###ANT###" />
   <property name="el"  value="###EL####" />

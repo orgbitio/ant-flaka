@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
 
   <c:dependency name="log4j" scope="runtime provided">
     <groupId>log4j</groupId>

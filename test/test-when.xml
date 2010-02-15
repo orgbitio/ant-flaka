@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
 	<presetdef name="when">
 		<c:when debug="true" />
 	</presetdef>

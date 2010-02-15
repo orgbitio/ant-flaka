@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka" xmlns:foo="foobar">
+<project xmlns:c="antlib:it.haefelinger.flaka" xmlns:foo="foobar">
 
   <c:let>
     i = 0

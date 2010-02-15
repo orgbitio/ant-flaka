@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
   <c:find dir="${basedir}">
     <include name="lib/*.jar" />
   </c:find>

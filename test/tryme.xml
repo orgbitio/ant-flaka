@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
 
 
 	<macrodef name="greeting">
@@ -10,8 +10,8 @@
 	</macrodef>
 
 	<c:let>
-		apropos = 'antlib:net.haefelingerit.flaka:apropos'
-		let     = 'antlib:net.haefelingerit.flaka:let'
+		apropos = 'antlib:it.haefelinger.flaka:apropos'
+		let     = 'antlib:it.haefelinger.flaka:let'
 	</c:let>
 	
 	<c:fail test="not task[apropos]" />
@@ -62,7 +62,7 @@
 
 	<c:fail test="task['apropos']" />
 	<c:fail test="has.task['apropos']" />
-	<c:fail test="not task['antlib:net.haefelingerit.flaka:apropos'] " />
+	<c:fail test="not task['antlib:it.haefelinger.flaka:apropos'] " />
 	<c:run-local-macro name="apropos" />
 
 </project>

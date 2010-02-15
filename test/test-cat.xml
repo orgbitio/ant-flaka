@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
   <mkdir dir="tmp" />
   <echo message="hello world" file="tmp/greeting.txt" />
   <c:cat src="tmp/greeting.txt" />

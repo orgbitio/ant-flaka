@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:net.haefelingerit.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka">
 
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!-- Initial test to check whether set/unset works properly. Both tasks are -->
