@@ -6,13 +6,13 @@
 
   <c:dependencies>
     <c:dependency scope="compile">
-      <groupId>org.apache.ant</groupId>
+      <groupId>org/apache/ant</groupId>
       <artifactId>ant</artifactId>
       <version>1.7.1</version>
     </c:dependency>
 
     <c:dependency scope="eclipse">
-      <groupId>org.apache.ant</groupId>
+      <groupId>org/apache/ant</groupId>
       <artifactId>ant-launcher</artifactId>
       <version>1.7.1</version>
     </c:dependency>
@@ -62,26 +62,27 @@
   </c:echo>
   
   <c:list var="depots">
-    ;; my own depot
-    'http://haefelingerit.net/depot'
+    ;; Depot in M2 structure.
+    ;; Just contains dependencies required to build flaka.
+    'http://download.haefelinger.it/flaka/dependencies'
   </c:list>
 
   <c:for var="d" in=" dependencies ">
     <c:for var="r" in=" depots ">
       <c:let>
-        url  = concat(r,'/',d.m2path)
+        url  =  concat(r,'/',d.m2path)
       	file = '${lib.dir}/#{d.basename}'.tofile
       </c:let>
-      <c:when test=" file.exists" >
-        <c:break />
+      <c:when test=" not(file.exists)" >
+        <get src="#{url}" dest="#{file}" verbose="off" />
       </c:when>
-      <get src="#{url}" dest="#{file}" verbose="off" />
     </c:for>
   </c:for>
 
   <c:let>
     filelist = null
   </c:let>
+
   <c:for var="d" in=" dependencies">
     <c:echo>
       #{d.scope}
@@ -95,17 +96,6 @@
     </c:switch>
   </c:for>
 
-  <c:find var="deps" dir="${lib.dir}">
-    <include name="*" />
-    <c:basename-selector var="filelist" />
-  </c:find>
-
-  <c:echo>
-    ==== dependencies ====
-    #{deps}
-    ======================
-  </c:echo>
-  
   
   <macrodef name="package">
     <sequential>
