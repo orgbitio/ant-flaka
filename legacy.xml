@@ -1,15 +1,37 @@
 <project name="flaka">
-  <!-- pure Ant build file to build flaka without flaka -->
-  <property name="url-depot" value="http://localhost/depot" />
+  <!--
+      ;;
+      ;; This a Ant build script.
+      ;;
+      ;; It shall build Flaka from scratch. Notice that you need to satisfy
+      ;; some requirements. Please consult README.txt for details.
+      ;;
+  -->
+
+  <!--
+      This is the property pointing to a Maven 2 like repository to satisfy 
+      dependency libraries.
+  -->
+  <property 
+      name="url-depot" 
+      value="http://download.haefelinger.it/flaka/dependencies" 
+      />
+
   
+  <available 
+      file="build/lib/fetched/README.txt" 
+      property="libs.fetched"/>
+
+    
   <macrodef name="fetch-required-jars">
     <sequential>
     <fetchjar group="junit" name="junit" version="3.8.1" />
-    <fetchjar group="juel-impl" name="juel" version="2.1.1-rc4" />
     <fetchjar group="jdom" name="jdom" version="1.0" />
     <fetchjar group="commons-httpclient" name="commons-httpclient" version="3.1" />
     <fetchjar group="org/apache/ant" name="ant-launcher" version="1.7.1" />
     <fetchjar group="org/apache/ant" name="ant" version="1.7.1" />
+    <!-- JUEL has not been uploaded into a Maven 2 repository yet -->
+    <fetchjar group="juel-impl" name="juel" version="2.1.1-rc4" />
     </sequential>
   </macrodef>
 
@@ -21,11 +43,77 @@
     <sequential>
       <echo>fetching @{name} ..</echo>
       <mkdir dir="build/lib" />
-      <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" dest="build/lib/@{name}-@{version}.jar" verbose="On"/>
+      <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
+           dest="build/lib/@{name}-@{version}.jar" 
+           verbose="On"/>
     </sequential>
   </macrodef>
 
-  <target name="init" >
+  <target name="init" unless="libs.fetched">
     <fetch-required-jars />
+    <mkdir dir="build/lib/fetched/" />
+    <tstamp>
+      <format property="libs.fetched" pattern="dd-MM-yyyy HH:mm:ss -Z" />
+    </tstamp>
+    <echo file="build/lib/fetched/README.txt">
+      ====================================================================
+      Remove this file's parent folder (or this file) to re-fetch required 
+      libraries from repository.
+      ====================================================================
+      
+      Last repository used:
+      ${url-depot}
+
+      This file has been created:
+      ${libs.fetched}
+    </echo>
   </target>
+
+  
+  <target name="clean" >
+    <sequential>
+      <delete dir="build/classes" />
+    </sequential>
+  </target>
+
+  <target name="compile" depends="clean, init">
+    <sequential>
+      <!-- Todo: use M2 names -->
+      <mkdir dir="build/classes"/>
+      <javac srcdir="src" destdir="build/classes">
+        <classpath>
+          <fileset dir="build/lib">
+            <include name="**/*.jar"/>
+          </fileset>
+        </classpath>
+      </javac>
+    </sequential>
+  </target>
+
+
+  <macrodef name="package">
+    <attribute name="distdir" default="build/staged" />
+    <attribute name="libfile" default="flaka.jar" />
+    <attribute name="objdir"  default="build/classes" />
+    <sequential>
+      <delete file="@{distdir}/@{libfile}" />
+      <mkdir dir="@{distdir}" />
+      <jar jarfile="@{distdir}/@{libfile}">
+        <fileset dir="@{objdir}">
+          <include name="**/*.class" />
+          <include name="**/antlib.xml" />
+        </fileset>
+        <fileset dir="src">
+          <include name="**/antlib.xml" />
+        </fileset>
+      </jar>
+    </sequential>
+  </macrodef>
+
+  <target name="package" depends="compile">
+    <sequential>
+      <package />
+    </sequential>
+  </target>
+
 </project>

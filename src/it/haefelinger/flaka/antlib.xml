@@ -5,7 +5,6 @@
 <!ENTITY HSEPNL "&HSEP;&NL;" >
 ]>
 <antlib xmlns:c="ant:current">
-  <typedef name="basename-selector" classname="it.haefelinger.flaka.BasenameSelector" />
   <typedef name="dependency-selector" classname="it.haefelinger.flaka.dep.Select" />
   <typedef name="filterset" classname="it.haefelinger.flaka.FilterSet" />
   <typedef name="istext-selector" classname="it.haefelinger.flaka.IsText" />
