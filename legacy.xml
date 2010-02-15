@@ -1,106 +1,31 @@
-<project xmlns:f="antlib:ant.epoline" name="flaka">
-  <f:inline-properties>
-    baseline = HEAD
-    res.dir =   
-  </f:inline-properties>
-
-  <!-- import targets and boot -->
-  <!-- TODO: rename to boot -->
-  <f:import />
-
-  <!-- override package init macro -->
-  <macrodef name="package-init">
-    <sequential>
-      <f:package-init />
-      <!-- copy all files - replace tokens in textual files -->
-      <f:copy-and-replace 
-          src = "res" 
-          dst = "${obj.dir}"
-          />
-    </sequential>
-  </macrodef>
-
-  <presetdef name="junit">
-    <junit dir="test"  />
-  </presetdef>
-
-  <presetdef name="javac">
-      <javac debug="true">
-      </javac>
-  </presetdef>
-
-  <dependencies>
-    <dependency name="ant" />
-    <dependency name="ant-launcher" scope="eclipse"/>
-    <dependency name="junit" scope="test" />
-    <dependency name="commons-httpclient" scope="compile inline" />
-    <!--
-    <dependency name="commons-codec" scope="compile inline" />
-    <dependency name="commons-logging" scope="compile inline" version="1.1"/>
-    -->
-    <dependency name="jdom" scope="compile inline"/>
-    <dependency name="juel" scope="compile inline"/>
-  </dependencies>
-
-  <macrodef name="package">
-    <sequential>
-      <echo>Using local package ..</echo>
-      <f:package />
-      <!-- package all artefacts in scope 'inline' -->
-      <f:unset var="x" />
-      <f:find dir="${lib.dir}" var="x">
-        <f:dependency-selector scope="inline" />
-    </f:find>
-    <f:when test="-n '${x}'">
-      <f:for var="file" in="${x}">
-        <sequential>
-          <echo>inlining @{file} ..</echo>
-          <f:update-dist-jar jar="${jar.name}">
-            <zipfileset src="@{file}" />
-          </f:update-dist-jar>
-        </sequential>
-      </f:for>
-    </f:when>
-    </sequential>
-  </macrodef>
-
-  <target name=".classpath">
-    <f:dotclasspath />
-  </target>		
-
-  <presetdef name="javadoc">
-    <javadoc
-        packagenames    = "it.haefelinger.flaka.*"
-        sourcepath      = "${src.dir}"
-        classpathref    = "javac.classpath"
-        >
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
-      <link href="http://www.jdom.org/docs/apidocs" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://javadoc.haefelingerit.net/org.apache.ant/1.7.1" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol/2.8.2" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.juel/2.1" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
-    </javadoc>
-  </presetdef>
-
-  <target name="javadoc">
-    <mkdir dir="${build.dir}/javadoc" />
-    <javadoc destdir = "${build.dir}/javadoc" />
-  </target>
+<project name="flaka">
+  <!-- pure Ant build file to build flaka without flaka -->
+  <property name="url-depot" value="http://localhost/depot" />
   
-  <target name="install-javadoc" depends="javadoc">
-    <f:install-javadoc />
-  </target>
+  <macrodef name="fetch-required-jars">
+    <sequential>
+    <fetchjar group="junit" name="junit" version="3.8.1" />
+    <fetchjar group="juel-impl" name="juel" version="2.1.1-rc4" />
+    <fetchjar group="jdom" name="jdom" version="1.0" />
+    <fetchjar group="commons-httpclient" name="commons-httpclient" version="3.1" />
+    <fetchjar group="org/apache/ant" name="ant-launcher" version="1.7.1" />
+    <fetchjar group="org/apache/ant" name="ant" version="1.7.1" />
+    </sequential>
+  </macrodef>
 
-  <target name="compile">
-    <f:compile />
-  </target>
-	
-  <target name="copy-resources">
-    <f:copy-and-replace src="${basedir}/ant" dst="${obj.dir}" />
-  </target>
 
+  <macrodef name="fetchjar">
+    <attribute name="group" />
+    <attribute name="name" />
+    <attribute name="version" />
+    <sequential>
+      <echo>fetching @{name} ..</echo>
+      <mkdir dir="build/lib" />
+      <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" dest="build/lib/@{name}-@{version}.jar" verbose="On"/>
+    </sequential>
+  </macrodef>
 
+  <target name="init" >
+    <fetch-required-jars />
+  </target>
 </project>
