@@ -1,4 +1,22 @@
-<project name="flaka">
+<project name="flaka" default="package">
+  <description>
+    === This is the build script building the Flaka project from scratch ===
+
+    Use option -p to see a list of targets. By  default, Flaka gets compiled
+    and packaged as
+
+          ${basedir}/flaka.jar
+
+     You can then use that file to  build this project again using the Flaka
+     based  build script `build.xml' if you wish, but there is no need to do
+     so.
+     
+     Please make sure to have red the build instructions in file
+
+         ${basedir}/README.txt
+
+     Good Luck.
+  </description>
   <!--
       ;;
       ;; This a Ant build script.
@@ -92,7 +110,7 @@
 
 
   <macrodef name="package">
-    <attribute name="distdir" default="build/staged" />
+    <attribute name="distdir" default="${basedir}" />
     <attribute name="libfile" default="flaka.jar" />
     <attribute name="objdir"  default="build/classes" />
     <sequential>

@@ -32,3 +32,15 @@ uploaded at http://download.haefelinger.it/flaka/dependencies. This is
 also the location where `legacy.xml' tries to satisfy those
 requirements. The libraries itself are not shipped in Flaka's
 distribution package.
+
+
+-- Usage __
+
+
+Once build, you can use Flaka to execute build scripts like 
+
+  $ ant -lib flaka.jar
+
+Notice that flaka.jar is prepacked with all those dependency libraries
+flaka requires. There is no need to download them or make them
+available in an extra step.
