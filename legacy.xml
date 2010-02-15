@@ -70,7 +70,7 @@
 
   <presetdef name="javadoc">
     <javadoc
-        packagenames    = "net.haefelingerit.flaka.*"
+        packagenames    = "it.haefelinger.flaka.*"
         sourcepath      = "${src.dir}"
         classpathref    = "javac.classpath"
         >
