@@ -74,9 +74,20 @@ public class TextReader extends BufferedReader
     }
   }
 
+  /**
+   * Ignore this line if 
+   * (a) empty (contains ws only)
+   * (b) matches a comment line
+   * @param line not null
+   * @return true if line to be ignored
+   */
   protected boolean ignore(String line)
   {
-    return this.comment.matcher(line).find();
+    if (this.comment != null && this.comment.matcher(line).find()) 
+        return true;
+    if (line.matches("\\s*"))
+      return true;
+    return false;
   }
 
   /**
@@ -110,43 +121,70 @@ public class TextReader extends BufferedReader
     return line;
   }
 
+  protected String _read_() throws IOException {
+    // Notice that readLine() returns null if EOF has been reached. It
+    // does not throw an IO exception being called on a stream having
+    // seen EOF.
+    String line = super.readLine();
+    if (line != null)
+      this.lineno += 1;
+    return line;
+  }
+  
   /**
-   * Return the next line but comment lines, supports continuation lines.
+   * Read next line from underlying stream. This method 
+   * is the essential low level method which supporting continuation 
+   * lines. 
+   * Notice that neither empty lines nor comments are ignored. This
+   * must be done by the callee. 
    */
-
+  protected String _next_()
+  {
+    String accu = null;
+    try
+    {
+      String line = _read_();
+      while (line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
+      {
+        if (accu == null)
+          accu = "";
+        accu += line.substring(0, line.length() - 1);
+        // Special case
+        // "\ EOF"  , "\ NL EOF"
+        // reading next line throws IO exception. In that case do not throw
+        // away the accu.
+        line = _read_();
+      }
+      if (line != null) {
+        if (accu == null)
+          accu = "";
+        accu += line;
+      }
+    } catch (IOException ioe)
+    {
+      // TODO: send debug message
+      /* do nothing here */
+    }
+    return accu;
+  }
+  
+  
+  
   /*
-   * (non-Javadoc)
+   * Read the next line. Ignores comment lines and empty lines if desired.
    * 
    * @see java.io.BufferedReader#readLine()
    */
   public String readLine()
   {
     String line;
-    String accu;
 
-    accu = null;
-    line = next();
-
-    while (accu == null && line != null)
+    line = _next_();
+    while (line != null && ignore(line))
     {
-      accu = "";
-
-      /* Continuation line */
-      while (this.continuation && line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
-      {
-        accu += line.substring(0, line.length() - 1);
-        line = next();
-      }
-
-      /* Add last line */
-      accu += line;
-      if (this.skipempty && accu.matches("\\s*"))
-      {
-        accu = null;
-        line = next();
-      }
+      line = _next_();
     }
-    return accu;
+    return line;
   }
 
 }

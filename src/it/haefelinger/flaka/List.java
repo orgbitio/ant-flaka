@@ -36,12 +36,13 @@ public class List extends Task
 {
   protected String var;
   protected String text;
+  // TODO: move this as general property into 'Task' ?
   protected String comment;
   protected java.util.List list;
 
   public void setComment(String s)
   {
-    this.comment = Static.trim3(getProject(), s, null);
+    this.comment = Static.trim3(getProject(), s,this.comment);
   }
 
   public void setVar(String var)

@@ -5,6 +5,11 @@
 PRG="$0"
 progname=$(basename "$0")
 
+##
+## programs
+##
+echon=/bin/echo
+
 # need this for relative symlinks
 while test -h "$PRG"  
 do
@@ -28,13 +33,14 @@ L=$(find "$FLAKA_HOME/test" -name test-\*.xml)
 G=""
 F=""
 for x in ${L} ; do
-  /bin/echo -n testing $x ..
-  if $ant --noconfig -lib $FLAKA_HOME/build/dist -f $x 1>/dev/null 2>&1 ; then
+  cmd="$ant --noconfig -lib $FLAKA_HOME/flaka.jar -f $x"
+  $echon $cmd
+  if $cmd 1>/dev/null 2>&1 
+  then
     G="$G $x"
-    /bin/echo "ok"
   else
-    F="$F $x"
-    /bin/echo "no"
+    F="$F:$cmd"
+    $echon '# >> no << '
   fi
 done
 
@@ -47,6 +53,9 @@ cat <<EOF
 FAILED
 ===============================================================
 EOF
+_ifs=$IFS
+IFS=:
 for x in $F ; do
   echo $x
 done
+IFS=${_ifs}
