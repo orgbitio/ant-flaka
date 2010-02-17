@@ -40,7 +40,6 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   protected boolean debug = true;
   protected String comment = ";";
   protected String shift = "";
-  protected char ic = '>';
 
   public Echo()
   {
@@ -70,33 +69,24 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       this.comment = s;
   }
 
+  /**
+   * Set the shift attribute.
+   * 
+   * When set, then every line dumped will be prefixed by shome shift
+   * characters.
+   * 
+   * By default shifting is disabled.
+   * 
+   * The general format of this attribute is <code>\d+(.*)</code>.
+   * 
+   * 
+   * 
+   * @param s
+   */
   public void setShift(String s)
   {
-    Pattern p;
-    Matcher m;
-
-    s = Static.trim3(getProject(), s, "");
-    p = Pattern.compile("(\\d+)\\*?(.*)");
-    m = p.matcher(s);
-
-    if (m.matches())
-    {
-      int times = Integer.parseInt(m.group(1));
-      String what = Static.trim2(m.group(2), " ");
-      StringBuilder accu = new StringBuilder();
-      for (int i = 0; i < times; ++i)
-        accu.append(what);
-      this.shift = accu.toString();
-    } else
-    {
-      this.shift = s;
-    }
-  }
-
-  public void setIc(String s)
-  {
-    s = Static.trim2(s, "" + this.ic);
-    this.ic = s.charAt(0);
+    /* do not trim, leave as is */
+    this.shift = s;
   }
 
  
@@ -115,6 +105,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       tr.setResolveContLines(true);
       tr.setComment(this.comment);
       tr.setSkipws(true);
+      tr.setShift(this.shift);
       
       // Read all text in one go instead line by line.
       this.message = tr.read();

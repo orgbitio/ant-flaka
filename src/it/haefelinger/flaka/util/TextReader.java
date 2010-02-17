@@ -69,6 +69,7 @@ public class TextReader
   protected boolean continuation = true;
   protected String text;
   protected boolean skipws = false;
+  protected String shift;
   protected BufferedReader bufreader;
  
   public TextReader(String text)
@@ -89,7 +90,29 @@ public class TextReader
     this.skipws = b;
     return this;
   }
-  
+  public TextReader setShift(String s)
+  { 
+    this.shift = null;
+    if (s != null && s.matches("\\s*")==false)
+    {
+      Pattern P;
+      Matcher p;
+
+      P = Pattern.compile("\\s*(\\d+)(.*)");
+      p = P.matcher(s);
+
+      if (p.matches())
+      { 
+        int times = Integer.parseInt(p.group(1));
+        String what = Static.trim2(p.group(2), " ");
+        StringBuilder accu = new StringBuilder();
+        for (int i = 0; i < times; ++i)
+          accu.append(what);
+        this.shift = accu.toString();
+      } 
+    }
+    return this;
+  }
   public TextReader setComment(String comment)
   {
     this.comment = makepattern(Static.trim2(comment,null));
@@ -298,6 +321,8 @@ public class TextReader
     {
       line = null;
     }
+    if (line != null && this.shift != null)
+      line = this.shift + line;
     return line;
   }
 
