@@ -92,13 +92,13 @@ public class Property extends Task
 
     tr = new TextReader(this.text).setComment(this.comment);
     // TODO: set proper line number
-    tr.skipempty = true;
+    tr.setSkipEmpty(true);
 
     while ((line = tr.readLine()) != null)
     {
       if (!(M = regex.matcher(line)).matches())
       {
-        Static.debug(getProject(), "line " + tr.lineno + ": bad property line '" + line + "'");
+        Static.debug(getProject(), "line : bad property line '" + line + "'");
         continue;
       }
       // otherwise:
@@ -112,8 +112,7 @@ public class Property extends Task
         v = Static.elresolve(project, v);
       } catch (Exception e)
       {
-        int where = tr.lineno;
-        Static.debug(project, "line " + where + ": error evaluating EL expression (ignored) in "
+        Static.debug(project, "line : error evaluating EL expression (ignored) in "
             + Static.q(v));
       }
       Static.assign(project, k, v, Static.PROPTY);

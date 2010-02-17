@@ -1,0 +1,165 @@
+<project xmlns:c="antlib:it.haefelinger.flaka" name="flaka">
+  <c:let>
+    lib.dir := 'build/lib'
+  </c:let>
+
+
+  <c:dependencies>
+    <c:dependency scope="compile">
+      <groupId>org/apache/ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.7.1</version>
+    </c:dependency>
+
+    <c:dependency scope="eclipse">
+      <groupId>org/apache/ant</groupId>
+      <artifactId>ant-launcher</artifactId>
+      <version>1.7.1</version>
+    </c:dependency>
+
+    <c:dependency scope="test">
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </c:dependency>
+
+    <c:dependency scope="compile inline">
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+    </c:dependency>
+
+    <c:dependency scope="compile inline">
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+    </c:dependency>
+
+    <c:dependency scope="compile inline">
+      <groupId>juel-impl</groupId>
+      <artifactId>juel</artifactId>
+      <version>2.1.1-rc4</version>
+    </c:dependency>
+  </c:dependencies>
+
+  <presetdef name="junit">
+    <junit dir="test"  />
+  </presetdef>
+
+  <presetdef name="javac">
+    <javac source="1.5" debug="true" />
+  </presetdef>
+  
+  <c:scndeps var="dependencies">
+    <include name="build.xml" />
+  </c:scndeps>
+  
+  <c:install-property-handler />
+
+  <c:echo>
+    #{dlist}
+  </c:echo>
+  
+  <c:list var="depots">
+    ;; Depot in M2 structure.
+    ;; Just contains dependencies required to build flaka.
+    'http://repo1.maven.org/maven2'
+    ;;'http://download.haefelinger.it/flaka/dependencies'
+  </c:list>
+
+  <c:for var="d" in=" dependencies ">
+    <c:for var="r" in=" depots ">
+      <c:let>
+        url  =  concat(r,d.m2path)
+        file = '${lib.dir}/#{d.basename}'.tofile
+      </c:let>
+      <c:when test=" not(file.exists)" >
+        <mkdir dir="${lib.dir}" />
+        <get src="#{url}" dest="#{file}" verbose="off" ignoreerrors="true"/>
+      </c:when>
+    </c:for>
+  </c:for>
+
+  <!-- Report missing dependencies and abort if one is missing -->
+  <c:echo>
+    ====================================
+    checking for missing dependencies ..
+    ====================================
+  </c:echo>
+  <c:for var="d" in=" dependencies ">
+    <c:let>
+      file = '${lib.dir}/#{d.basename}'.tofile
+    </c:let>
+    <c:when test=" not(file.exists) ">
+      <c:let>
+        missing = append(missing,d)
+      </c:let>
+    </c:when>
+  </c:for>
+  
+  <c:echo>
+    #missing: #{size(missing)} 
+  </c:echo>
+
+  <c:when test=" not(empty missing) ">
+    <c:echo>
+      >> Not all dependencies are fetched. &lt;&lt;
+      
+      The following dependencies are missing:
+    </c:echo>
+    <c:for var="d" in=" missing ">
+      <c:echo>#{d.basename}</c:echo>
+    </c:for>
+    <c:echo>>> panic, unable to continue. &lt;&lt;</c:echo>
+    <fail />
+  </c:when>
+
+  <c:let>
+    deps-compile = null
+  </c:let>
+
+  <c:for var=" d " in=" dependencies">
+    <c:echo>
+      #{d.scope}
+    </c:echo>
+    <c:switch value=" d.scope " >
+      <matches glob="*compile*">
+        <c:let>
+          deps-compile = append(deps-compile,d)
+        </c:let>
+      </matches>
+    </c:switch>
+  </c:for>
+
+  
+  <macrodef name="package">
+    <sequential>
+    </sequential>
+  </macrodef>
+  
+  <presetdef name="javadoc">
+    <javadoc
+        packagenames    = "it.haefelinger.flaka.*"
+        sourcepath      = "${src.dir}"
+        classpathref    = "javac.classpath"
+        >
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
+      <link href="http://www.jdom.org/docs/apidocs" />
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://javadoc.haefelingerit.net/org.apache.ant/1.7.1" />
+      <link href="http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol/2.8.2" />
+      <link href="http://javadoc.haefelingerit.net/net.sourceforge.juel/2.1" />
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
+    </javadoc>
+  </presetdef>
+
+  <target name="copy-resources">
+    <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
+  </target>
+
+  <target name="apropos">
+    <c:apropos />
+  </target>
+
+</project>

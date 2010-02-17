@@ -20,35 +20,88 @@ package it.haefelinger.flaka.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TextReader extends BufferedReader
+/**
+ * A class to read and massage text.
+ * 
+ * Text read from an element needs to undergo certain changes before
+ * it can be further processed. Typical changes are:
+ * <ol>
+ * <li>remove comment lines
+ * <li>merge continuation lines
+ * <li>ignore empty lines
+ * <li>strip unwanted leading whitespace 
+ * </ol>
+ * This class shall handle this. Each of the changes can be turned on
+ * individually. By default, no changes are done.
+ * 
+ * However, even if no changes are applied, the input text may differ
+ * from the output. That is because the output is accumulated by 
+ * reading line by line. When reading a line, newline terminators are
+ * honoured but eventually replaced by a uniform "\n". If the input 
+ * ends with a newline, that newline is missing. This <it>feature</it>
+ * has its routes in the underlying Reader class. That class allows to 
+ * read line by line but whatever the newline character is, it's just
+ * swallowed by that class.
+ * 
+ * After having used readLine() or read(), this object becomes dirty,
+ * i.e. setting attributes may or may not taken into account. Setting
+ * the following attributes are known to work:
+ * <ol>
+ * <li>setSkipEmpty</li>
+ * <li>setComment</li>
+ * </ol>
+ * 
+ * @author geronimo
+ *
+ */
+/**
+ * @author geronimo
+ *
+ */
+public class TextReader 
 {
   protected Pattern comment;
-  public boolean skipempty = true;
-  public int lineno = 0;
-  public boolean continuation = true;
-
-  public TextReader(Reader reader)
-  {
-    super(reader);
-    setComment(";");
-  }
-
+  protected boolean skipempty = true;
+  protected boolean continuation = true;
+  protected String text;
+  protected boolean skipws = false;
+  protected BufferedReader bufreader;
+ 
   public TextReader(String text)
   {
-    this(new StringReader(text));
+    this.text = text;
   }
-
-  public TextReader setComment(String comment)
+  public TextReader()
   {
-    makeregex(Static.trim2(comment, ";"));
+    this.text = "";
+  }
+  public TextReader setText(String text)
+  {
+    this.text = text;
     return this;
   }
-
-  public TextReader setContinuation(boolean b)
+  public TextReader setSkipws(boolean b)
+  {
+    this.skipws = b;
+    return this;
+  }
+  
+  public TextReader setComment(String comment)
+  {
+    this.comment = makepattern(Static.trim2(comment,null));
+    return this;
+  }
+  public TextReader setComment(Pattern comment)
+  {
+    this.comment = comment;
+    return this;
+  }
+  
+  public TextReader setResolveContLines(boolean b)
   {
     this.continuation = b;
     return this;
@@ -60,24 +113,65 @@ public class TextReader extends BufferedReader
     return this;
   }
 
-  protected void makeregex(String s)
+  /**
+   * A small helper function generating a regular expression pattern.
+   * 
+   * The pattern generated is meant to define the begin of a comment
+   * line. When using this pattern, use the Pattern.search() method
+   * instead of match.
+   * 
+   * The pattern holds essentially the following regular expression
+   * <pre>
+   * ^\s*\Q{s}\E
+   * </pre>
+   * where {s} denotes parameter <code>s</code> and where <code>\Q</code>
+   * means: treat upcoming chars literally until reaching <code>\E</code>.
+   * In other words, meta regular expression characters like <code>*</code>
+   * and the like are not honoured.
+   * 
+   * @param s null allowed
+   * @return null if s is null, otherwise proper RE pattern.
+   */
+  static public Pattern makepattern(String s)
   {
-    try
+    Pattern P;
+    
+    if (s == null)
+      P = null;
+    else 
     {
-      String regex;
-      regex = "^\\s*" + Pattern.quote(s);
-      this.comment = Pattern.compile(regex);
-    } catch (Exception e)
-    {
-      /* TODO: error */
-      // this.debug("error compiling regex '"+s+"'", e);
+      try
+      {
+        String p;
+        p = "^\\s*" + Pattern.quote(s);
+        P = Pattern.compile(p);
+      } catch (Exception e)
+      {
+        /* This can't happen cause the RE above is valid 
+         * regardless of s's value.
+         */
+        P = null;
+      }
     }
+    return P;
   }
 
   /**
-   * Ignore this line if 
-   * (a) empty (contains ws only)
-   * (b) matches a comment line
+   * A method checking whether a input line shall be ignored or not.
+   * 
+   * The given line is expected to hold any character but newline terminators.
+   * Such a line is typically given using the readLine() method of a Reader
+   * class. 
+   * 
+   * A line is ignored if 
+   * <ol>
+   * <li>being a comment line</li>
+   * <li>empty</li>
+   * </ol>
+   * However, checks wheather a comment line are only executed if a comment
+   * pattern has been installed. Empty lines are removed if attribute skipempty
+   * has been set to true.
+   * 
    * @param line not null
    * @return true if line to be ignored
    */
@@ -85,88 +179,88 @@ public class TextReader extends BufferedReader
   {
     if (this.comment != null && this.comment.matcher(line).find()) 
         return true;
-    if (line.matches("\\s*"))
+    if (this.skipempty && line.matches("\\s*"))
       return true;
     return false;
   }
 
-  /**
-   * Read next line from underlying stream, skipping (continued) comment lines
-   */
-  public String next()
-  {
-    String line;
-    try
-    {
-      line = super.readLine();
-      this.lineno += 1;
-      /* comment ? */
-      if (line != null && ignore(line))
-      {
-        /* ignore this lines */
-        while (line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
-        {
-          line = super.readLine();
-          this.lineno += 1;
-        }
-        /* move on (save to call if EOF already seen?? => yes) */
-        line = super.readLine();
-        this.lineno += 1;
-      }
-    } catch (IOException ioe)
-    {
-      // TODO: send debug message
-      line = null;
-    }
-    return line;
-  }
 
-  protected String _read_() throws IOException {
-    // Notice that readLine() returns null if EOF has been reached. It
-    // does not throw an IO exception being called on a stream having
-    // seen EOF.
-    String line = super.readLine();
-    if (line != null)
-      this.lineno += 1;
-    return line;
-  }
   
   /**
-   * Read next line from underlying stream. This method 
-   * is the essential low level method which supporting continuation 
-   * lines. 
-   * Notice that neither empty lines nor comments are ignored. This
-   * must be done by the callee. 
+   * A helper method to strip unwanted whitespace from an input text.
+   * 
+   * This method is expected to be called on a input text consiting of
+   * multiple lines.
+   * 
+   * @param text
+   * @return
    */
-  protected String _next_()
+  final static public String stripws(String text)
   {
-    String accu = null;
-    try
-    {
-      String line = _read_();
-      while (line != null && line.endsWith("\\") && !line.endsWith("\\\\"))
-      {
-        if (accu == null)
-          accu = "";
-        accu += line.substring(0, line.length() - 1);
-        // Special case
-        // "\ EOF"  , "\ NL EOF"
-        // reading next line throws IO exception. In that case do not throw
-        // away the accu.
-        line = _read_();
-      }
-      if (line != null) {
-        if (accu == null)
-          accu = "";
-        accu += line;
-      }
-    } catch (IOException ioe)
-    {
-      // TODO: send debug message
-      /* do nothing here */
+    Pattern S,T,U;
+    Matcher s,t,u;
+    String out,prefix;
+    int n = 0;
+    // Match all ws at input's begin (includes \n)
+    // TODO: make me static
+    S = Pattern.compile("^\\s*");
+    // Match everthing after last \n (which must exist)
+    // TODO: make me static
+    T = Pattern.compile("\\n([^\\n]*)$");
+    
+    // create match object on input and execute RE on it.
+    s = S.matcher(text);
+    s.find();
+
+    // The matching sequence - must always find something. 
+    // TODO: Possible to avoid taking a substring??
+    prefix = s.group();
+    t = T.matcher(prefix);
+    if (t.find()) {
+      n = t.end(1) - t.start(1);
     }
-    return accu;
+    else
+    {
+      n = s.end() - s.start();
+    } 
+      
+    // Remove leading whitespace characters.
+    out = s.replaceFirst("");
+    if (n>0)
+    {
+      // Compile a pattern on the fly. 
+      // Matches a newline followed by {1,n} characters. Such a character
+      // must a whitespace character except a newline. 
+      // Is there a way to express this as a difference operation? Such
+      // as {\s - \n} ??
+      U = Pattern.compile("\\n[ \\t\\x0B\\f\\r]{1,"+n+"}");
+      u  = U.matcher(out);
+      out = u.replaceAll("\n");
+    }
+    return out;
+  } 
+  
+  /**
+   * A helper function to resolve continuation lines.
+   * 
+   * @param text
+   * @return
+   */
+  final public static String resolvecontlines(String text)
+  {
+    Pattern S = Pattern.compile("\\\\\\n|\\\\$");
+    Matcher s = S.matcher(text);
+    String out = s.replaceAll("");
+    return out;
   }
+  
+ 
+  final public static BufferedReader tobufreader(String text)
+  {
+    return new BufferedReader(new StringReader(text));
+  }
+  
+  
   
   
   
@@ -175,16 +269,53 @@ public class TextReader extends BufferedReader
    * 
    * @see java.io.BufferedReader#readLine()
    */
+  /**
+   * @return
+   */
   public String readLine()
   {
     String line;
-
-    line = _next_();
-    while (line != null && ignore(line))
+    if (this.bufreader == null)
     {
-      line = _next_();
+      /* massage */
+      // if skipws is on, strip out unwanted whitespace stuff.
+      if (this.skipws)
+        this.text = TextReader.stripws(this.text);
+      
+      // if resolve continuation lines is on, merge continuation lines 
+      if (this.continuation)
+        this.text = TextReader.resolvecontlines(this.text);
+      
+      /* initialize buffered reader */
+      this.bufreader = TextReader.tobufreader(this.text);
+    }
+    try {
+      while ( (line = this.bufreader.readLine())!=null && this.ignore(line)) {
+        // read another line
+      }
+    }
+    catch(IOException e)
+    {
+      line = null;
     }
     return line;
   }
 
+  public String read() 
+  {
+    String line;
+    String accu = null;
+    
+    while ((line = this.readLine())!=null)
+    {
+      if (accu == null)
+        accu = line;
+      else {
+        accu += "\n";
+        accu += line;
+      }
+    }
+    return accu;
+  }
+  
 }

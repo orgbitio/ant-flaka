@@ -1,154 +1,220 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="flaka">
-  <c:properties>
-    baseline = HEAD
-    res.dir =   
-  </c:properties>
+<project name="flaka" default="package">
+  <description>
+    === This is the build script building the Flaka project from scratch ===
 
-  <c:dependencies>
-    <c:dependency scope="compile">
-      <groupId>org/apache/ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>1.7.1</version>
-    </c:dependency>
+    Use option -p to see a list of targets. By  default, Flaka gets compiled
+    and packaged as
 
-    <c:dependency scope="eclipse">
-      <groupId>org/apache/ant</groupId>
-      <artifactId>ant-launcher</artifactId>
-      <version>1.7.1</version>
-    </c:dependency>
+          ${basedir}/flaka.jar
 
-    <c:dependency scope="test">
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-    </c:dependency>
+     You can then use that file to  build this project again using the Flaka
+     based  build script `build.xml' if you wish, but there is no need to do
+     so.
+     
+     Please make sure to have red the build instructions in file
 
-    <c:dependency scope="compile inline">
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-    </c:dependency>
+         ${basedir}/README.txt
 
-    <c:dependency scope="compile inline">
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.0</version>
-    </c:dependency>
+     Good Luck.
+     ==========
+  </description>
+  <!--
+      ;;
+      ;; This a Ant build script.
+      ;;
+      ;; It shall build Flaka from scratch. Notice that you need to satisfy
+      ;; some requirements. Please consult README.txt for details.
+      ;;
+  -->
 
-    <c:dependency scope="compile inline">
-      <groupId>juel-impl</groupId>
-      <artifactId>juel</artifactId>
-      <version>2.1.1-rc4</version>
-    </c:dependency>
-  </c:dependencies>
-
-  <!-- Initialize Framework -->
-  <c:init />
-
-  <presetdef name="junit">
-    <junit dir="test"  />
-  </presetdef>
-
-  <presetdef name="javac">
-    <javac source="1.5" debug="true" />
-  </presetdef>
-  
-  <c:scndeps var="dependencies">
-    <include name="build.xml" />
-  </c:scndeps>
-
-  <c:echo>
-    #{dlist}
-  </c:echo>
-  
-  <c:list var="depots">
-    ;; Depot in M2 structure.
-    ;; Just contains dependencies required to build flaka.
-    'http://download.haefelinger.it/flaka/dependencies'
-  </c:list>
-
-  <c:for var="d" in=" dependencies ">
-    <c:for var="r" in=" depots ">
-      <c:let>
-        url  =  concat(r,'/',d.m2path)
-      	file = '${lib.dir}/#{d.basename}'.tofile
-      </c:let>
-      <c:when test=" not(file.exists)" >
-        <get src="#{url}" dest="#{file}" verbose="off" />
-      </c:when>
-    </c:for>
-  </c:for>
-
-  <c:let>
-    filelist = null
-  </c:let>
-
-  <c:for var="d" in=" dependencies">
-    <c:echo>
-      #{d.scope}
-    </c:echo>
-    <c:switch value=" d.scope " >
-      <matches glob="*compile*">
-        <c:let>
-          filelist = append(filelist,d.basename.tofile)
-        </c:let>
-      </matches>
-    </c:switch>
-  </c:for>
+  <!--
+      =====================================================================
+      >> url-depot <<
+      This is the property pointing to a Maven 2 like repository to satisfy 
+      dependency libraries.
+      =====================================================================
+  -->
+  <property 
+      name="url-depot" 
+      value="http://download.haefelinger.it/flaka/dependencies" 
+      />
 
   
-  <macrodef name="package">
+  <!-- Define property libs.fetched if a certain file is available -->
+  <available 
+      file="build/lib/fetched/README.txt" 
+      property="libs.fetched"/>
+
+    
+  <!-- ;;
+       ;; Dependencies
+       ;; 
+       ;; List here the dependencies. Use type = 'inline' to specify whether
+       ;; the dependency gets merged with the final jar file.
+  -->
+  <macrodef name="fetch-required-jars">
     <sequential>
-      <c:echo>
-        Using *local* package procedure..
-      </c:echo>
-      <c:package />
-      <!-- inline all artefacts in scope 'inline' -->
-      <c:find dir="${lib.dir}" var="x">
-        <c:dependency-selector scope="inline" />
-      </c:find>
-      <c:choose>
-        <c:when test="not empty x">
-          <c:for var="file" in="x">
-            <c:echo>inlining #{file} ..</c:echo>
-            <c:update-dist-jar jar="${jar.name}">
-              <zipfileset src="#{file}" />
-            </c:update-dist-jar>
-          </c:for>
-        </c:when>
-        <otherwise>
-          <c:echo>
-            nothing to be inlined
-          </c:echo>
-        </otherwise>
-      </c:choose>
-      <c:echo>finished local package procedure</c:echo>
+      <fetchjar 
+          group="junit" 
+          name="junit" 
+          version="3.8.1" 
+          />
+      <fetchjar 
+          group="jdom" 
+          name="jdom" 
+          version="1.0"
+          type="inline"
+          />
+      <fetchjar 
+          group="commons-httpclient" 
+          name="commons-httpclient" 
+          version="3.1"
+          type="inline"
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant-launcher" 
+          version="1.7.1" 
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant" 
+          version="1.7.1" 
+          />
+      <!-- JUEL has not been uploaded into a Maven 2 repository yet -->
+      <fetchjar 
+          group="juel-impl" 
+          name="juel" 
+          version="2.1.1-rc4" 
+          type="inline"
+          />
     </sequential>
   </macrodef>
-  
-  <presetdef name="javadoc">
-    <javadoc
-        packagenames    = "it.haefelinger.flaka.*"
-        sourcepath      = "${src.dir}"
-        classpathref    = "javac.classpath"
-        >
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
-      <link href="http://www.jdom.org/docs/apidocs" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://javadoc.haefelingerit.net/org.apache.ant/1.7.1" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol/2.8.2" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.juel/2.1" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
-    </javadoc>
-  </presetdef>
 
-  <target name="copy-resources">
-    <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
+
+  <macrodef name="fetchjar">
+    <attribute name="group" />
+    <attribute name="name" />
+    <attribute name="version" />
+    <attribute name="type" default=""/>
+    <sequential>
+      <echo>fetching @{name} ..</echo>
+      <mkdir dir="build/lib" />
+      <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
+           dest="build/lib/@{name}-@{version}.jar" 
+           verbose="On"/>
+      <!-- Now it gets really cumbersome with standard Ant -->
+      <!-- All I want to say is that if type='inline', then I want to append some text -->
+      <!-- to a file. The way to do so is to define a (unused) property depending on   -->
+      <!-- that condition. Then, in the echo task below, I do add something depending  -->
+      <!-- on the property's value. Notice that task echo does *not* support 'if' or   -->
+      <!-- 'unless'. -->
+      <condition 
+          property="@{name}-@{version}.inline" 
+          value="@{name}-@{version}.jar&#10;" 
+          else="">
+        <equals 
+            arg1="@{type}" 
+            arg2="inline" 
+            casesensitive="true" 
+            trim="true" />
+      </condition>
+      <echo
+          file="build/lib/__inline__.txt" 
+          message="${@{name}-@{version}.inline}" 
+          append="true" />
+    </sequential>
+  </macrodef>
+
+  <target name="init" unless="libs.fetched">
+    <fetch-required-jars />
+    <mkdir dir="build/lib/fetched/" />
+    <tstamp>
+      <format property="libs.fetched" pattern="dd-MM-yyyy HH:mm:ss -Z" />
+    </tstamp>
+    <echo file="build/lib/fetched/README.txt">
+      ====================================================================
+      Remove this file's parent folder (or this file) to re-fetch required 
+      libraries from repository.
+      ====================================================================
+      
+      Last repository used:
+      ${url-depot}
+
+      This file has been created:
+      ${libs.fetched}
+    </echo>
   </target>
 
-  <target name="apropos">
-    <c:apropos />
+  
+  <target name="clean" >
+    <sequential>
+      <delete dir="build/classes" />
+    </sequential>
+  </target>
+
+  <target name="compile" depends="clean, init">
+    <sequential>
+      <!-- Todo: use M2 names -->
+      <mkdir dir="build/classes"/>
+      <javac srcdir="src" destdir="build/classes">
+        <classpath>
+          <fileset dir="build/lib">
+            <include name="**/*.jar"/>
+          </fileset>
+        </classpath>
+      </javac>
+    </sequential>
+  </target>
+
+  <macrodef name="zip-merge">
+    <attribute name="libfile" />
+    <element name="zip-element" implicit="true"/>
+    <sequential>
+      <zip destfile="@{libfile}" update="true">
+        <zip-element/>
+      </zip>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="inline-dependencies">
+    <attribute name="libfile" default="flaka.jar" />
+    <sequential>
+      <zip-merge libfile="@{libfile}">
+        <zipgroupfileset dir="build/lib">
+          <patternset>
+            <includesfile name="build/lib/__inline__.txt"/> 
+          </patternset>
+        </zipgroupfileset>
+      </zip-merge>
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="package">
+    <attribute name="distdir" default="${basedir}" />
+    <attribute name="libfile" default="flaka.jar" />
+    <attribute name="objdir"  default="build/classes" />
+    <sequential>
+      <delete file="@{distdir}/@{libfile}" />
+      <mkdir dir="@{distdir}" />
+      <jar jarfile="@{distdir}/@{libfile}">
+        <fileset dir="@{objdir}">
+          <include name="**/*.class" />
+          <include name="**/antlib.xml" />
+        </fileset>
+        <fileset dir="src">
+          <include name="**/antlib.xml" />
+        </fileset>
+      </jar>
+      <inline-dependencies />
+    </sequential>
+  </macrodef>
+
+  <target name="package" depends="compile">
+    <sequential>
+      <package />
+    </sequential>
   </target>
 
 </project>

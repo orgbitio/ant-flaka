@@ -21,13 +21,11 @@
  */
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.util.EchoReader;
 import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -40,7 +38,7 @@ import org.apache.tools.ant.Project;
 public class Echo extends org.apache.tools.ant.taskdefs.Echo
 {
   protected boolean debug = true;
-  protected String comment;
+  protected String comment = ";";
   protected String shift = "";
   protected char ic = '>';
 
@@ -54,9 +52,22 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.debug = b;
   }
 
+  /**
+   * Set the character  (sequence) identifying a comment line. A line
+   * having only whitespace characters before that character sequence
+   * will be ignored. In order to turn this feature off, provide the
+   * empty string or a string consisting of whitespace characters
+   * only.
+   * 
+   * The default comment sequence is <code>;</code>.
+   * @param s not null
+   */
   public void setComment(String s)
   {
-    this.comment = Static.trim2(s, this.comment);
+    if (s.matches("\\s*"))
+      this.comment = null;
+    else
+      this.comment = s;
   }
 
   public void setShift(String s)
@@ -88,47 +99,8 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.ic = s.charAt(0);
   }
 
-  protected String accumulate(TextReader reader)
-  {
-    String line;
-    StringBuilder accu;
-
-    accu = new StringBuilder();
-    line = reader.readLine();
-    while (line != null)
-    {
-      accu.append(line);
-      line = reader.readLine();
-      if (line != null)
-        accu.append('\n');
-    }
-    return accu.toString();
-  }
-
-  final private String prettyfy()
-  {
-    EchoReader er;
-
-    er = new EchoReader(this.message);
-    er.setComment(this.comment);
-    er.setContinuation(true);
-    er.setSkipEmpty(false);
-    er.shift = this.shift;
-    er.ic = this.ic;
-    return accumulate(er);
-  }
-
-  final private String strip()
-  {
-    TextReader tr;
-
-    tr = new TextReader(this.message);
-    tr.setComment(this.comment);
-    tr.setContinuation(false);
-    tr.setSkipEmpty(false);
-    return accumulate(tr);
-  }
-
+ 
+  
   public void execute() throws BuildException
   {
     Project project;
@@ -137,14 +109,19 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     {
       project = getProject();
 
-      /* strip comments */
-      this.message = strip();
-
+      TextReader tr = new TextReader();
+      tr.setText(this.message);
+      tr.setSkipEmpty(false);
+      tr.setResolveContLines(true);
+      tr.setComment(this.comment);
+      tr.setSkipws(true);
+      
+      // Read all text in one go instead line by line.
+      this.message = tr.read();
+      
       /* resolve all EL references in message */
       this.message = Static.elresolve(project, this.message);
 
-      /* format message */
-      this.message = prettyfy();
     }
 
     /* let my parent handle this */

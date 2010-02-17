@@ -51,7 +51,7 @@ public class Unset extends Task
 
     project = getProject();
     tr = new TextReader(this.text).setComment(this.comment);
-    tr.skipempty = true;
+    tr.setSkipEmpty(true);
 
     while ((line = tr.readLine()) != null)
     {

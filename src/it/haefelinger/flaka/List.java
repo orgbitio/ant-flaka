@@ -85,7 +85,7 @@ public class List extends Task
 
     /* get text reader */
     tr = new TextReader(this.text).setComment(this.comment);
-    tr.skipempty = true;
+    tr.setSkipEmpty(true);
 
     /* read line by line */
     while ((line = tr.readLine()) != null)
@@ -101,7 +101,7 @@ public class List extends Task
       } catch (Exception e)
       {
         if (this.debug)
-          debug("line " + tr.lineno + ": error evaluating EL expression (ignored) in "
+          debug("line : error evaluating EL expression (ignored) in "
               + Static.q(line));
       }
     }

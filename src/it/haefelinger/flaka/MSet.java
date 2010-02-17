@@ -127,14 +127,14 @@ public class MSet extends Task
     regex = getPropRegex();
 
     tr = new TextReader(this.text).setComment(this.comment);
-    tr.skipempty = true;
+    tr.setSkipEmpty(true);
 
     while ((line = tr.readLine()) != null)
     {
       /* eval text */
       if ((M = regex.matcher(line)).matches() == false)
       {
-        debug("line " + tr.lineno + ": syntax error '" + line + "'");
+        debug("line : syntax error '" + line + "'");
         continue;
       }
       try
@@ -155,7 +155,7 @@ public class MSet extends Task
       } catch (Exception e)
       {
         if (this.debug)
-          debug("line " + tr.lineno + ": error evaluating EL expression (ignored) in "
+          debug("line : error evaluating EL expression (ignored) in "
               + Static.q(line));
       }
     }
