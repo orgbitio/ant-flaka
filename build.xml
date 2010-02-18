@@ -39,10 +39,32 @@
       value="http://download.haefelinger.it/flaka/dependencies" 
       />
 
+  <property 
+      name="src.dir" 
+      value="src" 
+      />
   
+  <property 
+      name="build.dir" 
+      value="build" 
+      />
+  <property 
+      name="lib.dir" 
+      value="${build.dir}/lib" 
+      />
+  <property 
+      name="obj.dir" 
+      value="${build.dir}/classes" 
+      />
+  <property 
+      name="javadoc.dir" 
+      value="${build.dir}/javadoc" 
+      />
+
+
   <!-- Define property libs.fetched if a certain file is available -->
   <available 
-      file="build/lib/fetched/README.txt" 
+      file="${lib.dir}/fetched/README.txt" 
       property="libs.fetched"/>
 
     
@@ -99,9 +121,9 @@
     <attribute name="type" default=""/>
     <sequential>
       <echo>fetching @{name} ..</echo>
-      <mkdir dir="build/lib" />
+      <mkdir dir="${lib.dir}" />
       <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
-           dest="build/lib/@{name}-@{version}.jar" 
+           dest="${lib.dir}/@{name}-@{version}.jar" 
            verbose="On"/>
       <!-- Now it gets really cumbersome with standard Ant -->
       <!-- All I want to say is that if type='inline', then I want to append some text -->
@@ -120,7 +142,7 @@
             trim="true" />
       </condition>
       <echo
-          file="build/lib/__inline__.txt" 
+          file="${lib.dir}/__inline__.txt" 
           message="${@{name}-@{version}.inline}" 
           append="true" />
     </sequential>
@@ -128,11 +150,11 @@
 
   <target name="init" unless="libs.fetched">
     <fetch-required-jars />
-    <mkdir dir="build/lib/fetched/" />
+    <mkdir dir="${lib.dir}/fetched/" />
     <tstamp>
       <format property="libs.fetched" pattern="dd-MM-yyyy HH:mm:ss -Z" />
     </tstamp>
-    <echo file="build/lib/fetched/README.txt">
+    <echo file="${lib.dir}/fetched/README.txt">
       ====================================================================
       Remove this file's parent folder (or this file) to re-fetch required 
       libraries from repository.
@@ -144,22 +166,23 @@
       This file has been created:
       ${libs.fetched}
     </echo>
+    
   </target>
 
   
   <target name="clean" >
     <sequential>
-      <delete dir="build/classes" />
+      <delete dir="${obj.dir}" />
     </sequential>
   </target>
 
   <target name="compile" depends="clean, init">
     <sequential>
       <!-- Todo: use M2 names -->
-      <mkdir dir="build/classes"/>
-      <javac srcdir="src" destdir="build/classes">
+      <mkdir dir="${obj.dir}"/>
+      <javac srcdir="src" destdir="${obj.dir}">
         <classpath>
-          <fileset dir="build/lib">
+          <fileset dir="${lib.dir}">
             <include name="**/*.jar"/>
           </fileset>
         </classpath>
@@ -181,9 +204,9 @@
     <attribute name="libfile" default="flaka.jar" />
     <sequential>
       <zip-merge libfile="@{libfile}">
-        <zipgroupfileset dir="build/lib">
+        <zipgroupfileset dir="${lib.dir}">
           <patternset>
-            <includesfile name="build/lib/__inline__.txt"/> 
+            <includesfile name="${lib.dir}/__inline__.txt"/> 
           </patternset>
         </zipgroupfileset>
       </zip-merge>
@@ -194,7 +217,7 @@
   <macrodef name="package">
     <attribute name="distdir" default="${basedir}" />
     <attribute name="libfile" default="flaka.jar" />
-    <attribute name="objdir"  default="build/classes" />
+    <attribute name="objdir"  default="${obj.dir}" />
     <sequential>
       <delete file="@{distdir}/@{libfile}" />
       <mkdir dir="@{distdir}" />
@@ -216,5 +239,50 @@
       <package />
     </sequential>
   </target>
+
+
+
+
+  <presetdef name="javadoc">
+    <javadoc
+        packagenames    = "it.haefelinger.flaka.*"
+        sourcepath      = "${src.dir}"
+        >
+      <classpath>
+        <fileset dir="${lib.dir}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath> 
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
+      <link href="http://www.jdom.org/docs/apidocs" />
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://javadoc.haefelinger.it/org.apache.ant/1.7.1" />
+      <link href="http://javadoc.haefelinger.it/net.sourceforge.cruisecontrol/2.8.2" />
+      <link href="http://javadoc.haefelinger.it/net.sourceforge.juel/2.1" />
+      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
+    </javadoc>
+  </presetdef>
+
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       J A V A D O C S                       -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="javadoc-exec" >
+    <sequential>
+      <!-- create ${javadoc} directory -->
+      <mkdir dir="${javadoc.dir}"/>
+      <!-- classpath set by init-deps -->
+      <javadoc destdir="${javadoc.dir}" >
+        <fileset dir="${src.dir}" defaultexcludes="yes"/>
+      </javadoc>      
+    </sequential>
+  </macrodef>
+  
+  <target name="javadoc" depends="init">
+    <javadoc-exec />
+  </target>
+
 
 </project>
