@@ -104,7 +104,7 @@ public class TextReader
       if (p.matches())
       { 
         int times = Integer.parseInt(p.group(1));
-        String what = Static.trim2(p.group(2), " ");
+        String what = p.group(2);
         StringBuilder accu = new StringBuilder();
         for (int i = 0; i < times; ++i)
           accu.append(what);

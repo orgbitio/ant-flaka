@@ -1666,17 +1666,17 @@ final public class Static
     return P;
   }
 
-  /**
-   * Checks whether EL is enabled on project.
-   * 
-   * To disable EL, property (not reference) "ant.el" must be explicitly set to
-   * <code>false</code>.
-   */
-  final static public boolean haveEL(Project project)
-  {
-    String p = project.getProperty(Static.EL);
-    return p == null ? true : (p.matches("false") ? false : true);
-  }
+//  /**
+//   * Checks whether EL is enabled on project.
+//   * 
+//   * To disable EL, property (not reference) "ant.el" must be explicitly set to
+//   * <code>false</code>.
+//   */
+//  final static public boolean shaveEL(Project project)
+//  {
+//    String p = project.getProperty(Static.EL);
+//    return p == null ? true : (p.matches("false") ? false : true);
+//  }
 
   /**
    * Resolve embedded EL references in <code>text</code>.
