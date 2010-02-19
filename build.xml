@@ -213,6 +213,12 @@
       <delete dir="${obj.dir}" />
     </sequential>
   </target>
+  
+  <target name="clean-dist" >
+    <sequential>
+      <delete dir="${build.dir}" />
+    </sequential>
+  </target>
 
   <target name="compile" depends="clean, init">
     <sequential>
@@ -344,13 +350,51 @@
     <package-javadoc-exec />
   </target>
 
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    P A C K A G E - D I S T                  -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="package-dist-exec" >
+    <attribute name="prefix" default="flaka-${version}${patchv}/" />
+    <sequential>
+      <!-- create dist folder directory -->
+      <mkdir dir="${dist.dir}"/>
+      <zip zipfile="${dist.dir}/flaka-${version}${patchv}.zip">
+        <zipfileset dir="." prefix="@{prefix}">
+          <exclude name="build/" />
+          <exclude name=".project" />
+          <exclude name=".settings/" />
+          <exclude name=".classpath" />
+          <exclude name=".svn/" />
+          <exclude name=".git/" />
+          <exclude name="CVS" />
+          <exclude name="**/removeme/" />
+          <exclude name="tryme.xml" />
+          <exclude name="**/*tryme*" />
+          <exclude name="tmp/" />
+          <exclude name="var/" />
+        </zipfileset>
+      </zip>
+    </sequential>
+  </macrodef>
+
+
+  
+  <target name="package-dist" depends="package">
+    <package-dist-exec />
+  </target>
+
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                    P A C K A G E - A L L                    -->
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <target name="package-all" depends="package,package-javadoc">
-    <javadoc-exec />
-  </target>
+  <target name="package-all" 
+          depends="
+                   package,
+                   package-javadoc,
+                   package-dist
+                   " />
 
 
 </project>

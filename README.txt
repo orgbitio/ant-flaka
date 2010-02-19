@@ -47,13 +47,20 @@ Default target is "package".
 init            Download required libraries inot ${lib.dir} 
 compile         Just compile (Java) sources.
 test            Run unit tests
+
+javadoc         Generate javadoc files into ${javadoc.dir} 
+
 package         Build flaka-${version}${patchv}.jar in ${dist.dir} and
                 flaka.jar in base folder (to be used for debugging,
                 Eclipse etc).
+package-dist    Create dist package, contains everything needed to
+                build project from scratch (but dependency libraries)
 package-javadoc Generate and package Javadoc dist in ${dist.dir}
 package-all     Build all packages
-javadoc         Generate javadoc files into ${javadoc.dir} 
 
+
+clean           Remove generated Java class files
+clean-dist      Removes folder ${build.dir}, kind of 'hard' reset.
 
 __ Ant Properties ______________________________________________________________
 
