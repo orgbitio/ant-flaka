@@ -234,6 +234,49 @@
     </sequential>
   </target>
 
+  <macrodef name="test-init">
+    <sequential>
+      <mkdir dir="${build.dir}/test-classes" />
+      <javac srcdir="test" destdir="${build.dir}/test-classes"> 
+        <include name="**/*Test.java" />
+        <classpath>
+          <pathelement path="${obj.dir}"/>
+          <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+          </fileset>
+        </classpath>
+      </javac>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="test-exec">
+    <sequential>
+      <mkdir dir="${build.dir}/test" />
+      <junit>
+        <classpath>
+          <pathelement path="${obj.dir}"/>
+          <pathelement path="${build.dir}/test-classes"/>
+          <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+          </fileset>
+        </classpath>
+        <formatter type="brief" usefile="false"/>
+        <formatter type="xml"/>
+        <batchtest todir="${build.dir}/test">
+          <fileset dir="${build.dir}/test-classes">
+            <include name="**/*Test.class" />
+          </fileset>
+        </batchtest>
+        <jvmarg value="-ea"/>   
+      </junit>
+    </sequential>
+  </macrodef>
+
+  <target name="test" depends="compile" >
+    <test-init />
+    <test-exec />
+  </target>
+
   <macrodef name="zip-merge">
     <attribute name="libfile" />
     <element name="zip-element" implicit="true"/>
