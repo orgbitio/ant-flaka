@@ -239,9 +239,9 @@
   </macrodef>
 
   <macrodef name="inline-dependencies">
-    <attribute name="libfile" default="flaka.jar" />
+    <attribute name="file" default="flaka.jar" />
     <sequential>
-      <zip-merge libfile="@{libfile}">
+      <zip-merge libfile="@{file}">
         <zipgroupfileset dir="${lib.dir}">
           <patternset>
             <includesfile name="${lib.dir}/__inline__.txt"/> 
@@ -267,8 +267,15 @@
           <include name="**/antlib.xml" />
         </fileset>
       </jar>
-      <inline-dependencies />
-      <copy tofile="flaka.jar" verbose="true" overwrite="true" file="@{distfile}"  />
+      <inline-dependencies 
+          file="@{distfile}"
+          />
+      <copy 
+          tofile="flaka.jar" 
+          verbose="true" 
+          overwrite="true" 
+          file="@{distfile}"  
+          />
     </sequential>
   </macrodef>
 

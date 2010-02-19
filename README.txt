@@ -1,18 +1,19 @@
 
 
-__Build from scratch__
+__ Build from scratch  _________________________________________________________
 
-Build Flaka from scratch, i.e. without using Flaka, by using the
-provided build file `legacy.xml':
+Use build script 'build.xml' to build Flaka from scratch.
 
- $ ant -f legacy.xml
+ $ ant -f build.xml
 
 Notice: you need to satisfy the following requirements:
 
 1. Java 1.4 and newer
 2. Dependency Libraries (see below)
-3. A resonable new version of Ant (anything newer than 1.6 may do
+3. A resonable new version of Ant (anything newer than 1.7 may do
 well).
+
+__ Build dependencies __________________________________________________________
 
 The following libraries are required:
 
@@ -28,13 +29,17 @@ can be fetched from Juel's project home at
 http://juel.sourceforge.net/.
 
 To simplify things, all required dependency libaries have been
-uploaded at http://download.haefelinger.it/flaka/dependencies. This is
-also the location where `legacy.xml' tries to satisfy those
-requirements. The libraries itself are not shipped in Flaka's
-distribution package.
+uploaded at 
+ 
+ http://download.haefelinger.it/flaka/dependencies
 
 
-__Ant Targets _____________
+This is also the location used by `build.xml'. The dependency
+libraries  itself are not shipped as part of the distribution 
+package.
+
+
+__Ant Targets __________________________________________________________________
 
 Default target is "package".
 
@@ -50,7 +55,7 @@ package-all     Build all packages
 javadoc         Generate javadoc files into ${javadoc.dir} 
 
 
-__ Ant Properties _________
+__ Ant Properties ______________________________________________________________
 
 version        \d\.\d{2}       Major and twodigit minor version
 patchv         [\d\w-_]*       Patch version      
@@ -65,13 +70,14 @@ src.dir        src             Source code
 test.dir       test            Tests (unit, others)
 depot.url      (see below)     Base URL fetching dependencies
 
-__ Depot ___________________
+__ Depot ________________________________________________________________________
+
 
 http://download.haefelinger.it/flaka/dependencies contains all
 dependencies required. The structure of the depot is expected to
 satisfy a Maven 2 layout folder scheme.
 
-__Usage ___________________
+__ Usage ________________________________________________________________________
 
 
 Once build, you can use Flaka to execute build scripts like 
@@ -81,3 +87,14 @@ Once build, you can use Flaka to execute build scripts like
 Notice that flaka.jar is prepacked with all those dependency libraries
 flaka requires. There is no need to download them or make them
 available in an extra step.
+
+
+__ Why not using Flaka in building Flaka? ______________________________________
+
+Done on purpose to minimize the number of requirements to get
+going. To build Flaka by using Flaka, go ahead and use flaka.xml
+instead. In order to do so, you need obviously Flaka itself. Use the
+flaka.jar file provided as part of the package like
+
+ $ ant -lib flaka.jar -f flaka.xml ..
+
