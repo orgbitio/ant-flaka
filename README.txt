@@ -34,12 +34,49 @@ requirements. The libraries itself are not shipped in Flaka's
 distribution package.
 
 
--- Usage __
+__Ant Targets _____________
+
+Default target is "package".
+
+
+init            Download required libraries inot ${lib.dir} 
+compile         Just compile (Java) sources.
+test            Run unit tests
+package         Build flaka-${version}${patchv}.jar in ${dist.dir} and
+                flaka.jar in base folder (to be used for debugging,
+                Eclipse etc).
+package-javadoc Generate and package Javadoc dist in ${dist.dir}
+package-all     Build all packages
+javadoc         Generate javadoc files into ${javadoc.dir} 
+
+
+__ Ant Properties _________
+
+version        \d\.\d{2}       Major and twodigit minor version
+patchv         [\d\w-_]*       Patch version      
+
+build.dir      build           All generated stuff goes here
+lib.dir        build/lib       Dependency libraries
+obj.dir        build/classes   Compiled .class files
+javadoc.dir    build/javadoc   Generated Javadoc files
+dist.dir       build/dist      Distribution stuff
+
+src.dir        src             Source code
+test.dir       test            Tests (unit, others)
+depot.url      (see below)     Base URL fetching dependencies
+
+__ Depot ___________________
+
+http://download.haefelinger.it/flaka/dependencies contains all
+dependencies required. The structure of the depot is expected to
+satisfy a Maven 2 layout folder scheme.
+
+__Usage ___________________
 
 
 Once build, you can use Flaka to execute build scripts like 
 
-  $ ant -lib flaka.jar
+  $ ant -lib flaka.jar ..
 
 Notice that flaka.jar is prepacked with all those dependency libraries
 flaka requires. There is no need to download them or make them

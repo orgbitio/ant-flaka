@@ -1,17 +1,38 @@
 <project name="flaka" default="package">
   <description>
+    ========================================================================
     === This is the build script building the Flaka project from scratch ===
+    ========================================================================
 
     Use option -p to see a list of targets. By  default, Flaka gets compiled
     and packaged as
 
-          ${basedir}/flaka.jar
+          ${dist.dir}/flaka-${version}${patchv}.jar   
 
-     You can then use that file to  build this project again using the Flaka
-     based  build script `build.xml' if you wish, but there is no need to do
-     so.
+    In addition, file
+
+         ${basedir}/flaka.jar 
+
+    gets also created. Both files should be the same. The latter is intended 
+    when working on Flaka itself. Having a version-less jar  file  simplifies 
+    some configuration files, especially when using Eclipse.
+
+    Use target `package-all' to generate all distribution packages and pick
+    them from folder ${build.dir}.
+
+    You can at any time remove folder 
+
+      ${build.dir}.
+
+    manually in order to start building from scratch.
+
+    Run 
+
+      ant -p
+
+    for a list of targets.
      
-     Please make sure to have red the build instructions in file
+    Please make sure to have red the build instructions in file
 
          ${basedir}/README.txt
 
@@ -29,24 +50,41 @@
 
   <!--
       =====================================================================
-      >> url-depot <<
+      >> depot.url <<
       This is the property pointing to a Maven 2 like repository to satisfy 
       dependency libraries.
       =====================================================================
   -->
   <property 
-      name="url-depot" 
+      name="depot.url" 
       value="http://download.haefelinger.it/flaka/dependencies" 
       />
 
+  <property
+      name="version"
+      value="1.01"
+      />
+  <!-- patch version, increase for fixes. Initially empty. When using, -->
+  <!-- use something like '.4712' being 4712 the patch level used. -->  
+  <property
+      name="patchv"
+      value=""
+      />
   <property 
       name="src.dir" 
       value="src" 
       />
-  
+  <property 
+      name="test.dir" 
+      value="test" 
+      />
   <property 
       name="build.dir" 
       value="build" 
+      />
+  <property 
+      name="dist.dir" 
+      value="${build.dir}/dist" 
       />
   <property 
       name="lib.dir" 
@@ -122,7 +160,7 @@
     <sequential>
       <echo>fetching @{name} ..</echo>
       <mkdir dir="${lib.dir}" />
-      <get src="${url-depot}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
+      <get src="${depot.url}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
            dest="${lib.dir}/@{name}-@{version}.jar" 
            verbose="On"/>
       <!-- Now it gets really cumbersome with standard Ant -->
@@ -161,7 +199,7 @@
       ====================================================================
       
       Last repository used:
-      ${url-depot}
+      ${depot.url}
 
       This file has been created:
       ${libs.fetched}
@@ -215,13 +253,12 @@
 
 
   <macrodef name="package">
-    <attribute name="distdir" default="${basedir}" />
-    <attribute name="libfile" default="flaka.jar" />
-    <attribute name="objdir"  default="${obj.dir}" />
+    <attribute name="distdir"  default="${dist.dir}" />
+    <attribute name="distfile" default="${dist.dir}/flaka-${version}${patchv}.jar" />
+    <attribute name="objdir"   default="${obj.dir}" />
     <sequential>
-      <delete file="@{distdir}/@{libfile}" />
       <mkdir dir="@{distdir}" />
-      <jar jarfile="@{distdir}/@{libfile}">
+      <jar jarfile="@{distfile}">
         <fileset dir="@{objdir}">
           <include name="**/*.class" />
           <include name="**/antlib.xml" />
@@ -231,6 +268,7 @@
         </fileset>
       </jar>
       <inline-dependencies />
+      <copy tofile="flaka.jar" verbose="true" overwrite="true" file="@{distfile}"  />
     </sequential>
   </macrodef>
 
@@ -241,7 +279,9 @@
   </target>
 
 
-
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                       J A V A D O C                         -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
   <presetdef name="javadoc">
     <javadoc
@@ -265,22 +305,43 @@
   </presetdef>
 
 
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!--                       J A V A D O C S                       -->
-  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-
   <macrodef name="javadoc-exec" >
     <sequential>
-      <!-- create ${javadoc} directory -->
       <mkdir dir="${javadoc.dir}"/>
-      <!-- classpath set by init-deps -->
       <javadoc destdir="${javadoc.dir}" >
         <fileset dir="${src.dir}" defaultexcludes="yes"/>
       </javadoc>      
     </sequential>
   </macrodef>
+
+  <macrodef name="package-javadoc-exec" >
+    <sequential>
+      <!-- create dist folder directory -->
+      <mkdir dir="${dist.dir}"/>
+      <zip zipfile="${dist.dir}/flaka-javadoc-${version}.zip">
+        <zipfileset dir="${javadoc.dir}"
+                    prefix="it.haefelinger.flaka/"
+                    >
+          <include name="**/*" />
+        </zipfileset>
+      </zip>
+    </sequential>
+  </macrodef>
+
   
   <target name="javadoc" depends="init">
+    <javadoc-exec />
+  </target>
+  
+  <target name="package-javadoc" depends="javadoc">
+    <package-javadoc-exec />
+  </target>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    P A C K A G E - A L L                    -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <target name="package-all" depends="package,package-javadoc">
     <javadoc-exec />
   </target>
 
