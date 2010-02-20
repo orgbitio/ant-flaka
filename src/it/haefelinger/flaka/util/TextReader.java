@@ -271,7 +271,8 @@ public class TextReader
    */
   final public static String resolvecontlines(String text)
   {
-    Pattern S = Pattern.compile("\\\\\\n|\\\\$");
+    // TODO: move S into static 
+    Pattern S = Pattern.compile("(^|[^\\\\])(\\\\\\n|\\\\$)");
     Matcher s = S.matcher(text);
     String out = s.replaceAll("");
     return out;

@@ -1,4 +1,4 @@
-<project name="flaka" default="package">
+<project name="ant-flaka" default="package">
   <description>
     ========================================================================
     === This is the build script building the Flaka project from scratch ===
@@ -7,11 +7,11 @@
     Use option -p to see a list of targets. By  default, Flaka gets compiled
     and packaged as
 
-          ${dist.dir}/flaka-${version}${patchv}.jar   
+          ${dist.dir}/ant-flaka-${version}${patchv}.jar   
 
     In addition, file
 
-         ${basedir}/flaka.jar 
+         ${basedir}/ant-flaka.jar 
 
     gets also created. Both files should be the same. The latter is intended 
     when working on Flaka itself. Having a version-less jar  file  simplifies 
@@ -80,7 +80,7 @@
       />
   <property 
       name="build.dir" 
-      value="build" 
+      value="${basedir}/build" 
       />
   <property 
       name="dist.dir" 
@@ -288,7 +288,7 @@
   </macrodef>
 
   <macrodef name="inline-dependencies">
-    <attribute name="file" default="flaka.jar" />
+    <attribute name="file" default="ant-flaka.jar" />
     <sequential>
       <zip-merge libfile="@{file}">
         <zipgroupfileset dir="${lib.dir}">
@@ -303,7 +303,7 @@
 
   <macrodef name="package">
     <attribute name="distdir"  default="${dist.dir}" />
-    <attribute name="distfile" default="${dist.dir}/flaka-${version}${patchv}.jar" />
+    <attribute name="distfile" default="${dist.dir}/ant-flaka-${version}${patchv}.jar" />
     <attribute name="objdir"   default="${obj.dir}" />
     <sequential>
       <mkdir dir="@{distdir}" />
@@ -320,7 +320,7 @@
           file="@{distfile}"
           />
       <copy 
-          tofile="flaka.jar" 
+          tofile="ant-flaka.jar" 
           verbose="true" 
           overwrite="true" 
           file="@{distfile}"  
@@ -417,6 +417,7 @@
           <exclude name="**/*tryme*" />
           <exclude name="tmp/" />
           <exclude name="var/" />
+          <exclude name="test/**/*.jar" />
         </zipfileset>
       </zip>
     </sequential>

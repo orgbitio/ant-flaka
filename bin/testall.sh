@@ -33,7 +33,7 @@ L=$(find "$FLAKA_HOME/test" -name test-\*.xml)
 G=""
 F=""
 for x in ${L} ; do
-  cmd="$ant --noconfig -lib $FLAKA_HOME/flaka.jar -f $x"
+  cmd="$ant --noconfig -lib $FLAKA_HOME/ant-flaka.jar -f $x"
   $echon $cmd
   if $cmd 1>/dev/null 2>&1 
   then
