@@ -418,6 +418,7 @@
           <exclude name="tmp/" />
           <exclude name="var/" />
           <exclude name="test/**/*.jar" />
+          <exclude name="test/build/" />
         </zipfileset>
       </zip>
     </sequential>

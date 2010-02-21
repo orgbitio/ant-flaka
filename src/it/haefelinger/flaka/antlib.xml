@@ -32,7 +32,6 @@
   <taskdef name="export-task" classname="it.haefelinger.flaka.Export" />
   <taskdef name="find" classname="it.haefelinger.flaka.Find" />
   <taskdef name="for" classname="it.haefelinger.flaka.For" />
-  <taskdef name="getdeps" classname="it.haefelinger.flaka.GetDeps" />
   <taskdef name="initssl" classname="it.haefelinger.flaka.InitSSL" />
   <taskdef name="logo" classname="it.haefelinger.flaka.Logo" />
   <taskdef name="make-dir" classname="it.haefelinger.flaka.Mkdir" />
@@ -1151,12 +1150,7 @@
 
   <macrodef name="depends" backtrace="true">
     <sequential>
-      <c:dependencies-load/>
-      <c:writedeps 
-          var="project.dependencies" 
-          out="${ifdef depends.out,${depends.out}}" 
-          fmt="${ifdef depends.fmt,${depends.fmt}}"
-          />
+      <!-- TODO: rework -->
     </sequential>
   </macrodef>
 
@@ -1227,51 +1221,6 @@
     </sequential>
   </macrodef>
 
-  <macrodef name="dependencies-load" backtrace="true">
-    <attribute name="from" default="${depot.csv}"/>
-    <attribute name="debug" default="false" />
-    <sequential>
-      <mkdir dir="${build.dir}/pom" />
-      <mkdir dir="${build.dir}/lib" />
-      <!--  TODO: ugly (alternatives to provided a CS string? -->
-      <c:scndeps src="${project.dep.xml}" debug="@{debug}"/>
-      <c:writedeps 
-          out="${build.dir}/pom/alias.txt" 
-          fmt="alias"
-          debug = "true"
-          />
-      <c:hasalias src="${build.dir}/pom/alias.txt" />
-      <c:choose>
-        <when test="-P hasalias">
-          <echo>LOADING BASELINE</echo>
-          <c:baseline-checkout />
-          <c:resdeps />
-        </when>
-        <otherwise>
-          <echo>GO AHEAD WITHOUT BASELINE</echo>
-        </otherwise>
-      </c:choose>
-      <c:writedeps 
-          var="project.dependencies" 
-          out="${build.dir}/pom/dependencies.xml" 
-          fmt="maven"
-          debug="@{debug}"
-          />
-      <c:writedeps 
-          var="project.dependencies" 
-          out="${build.dir}/pom/m1path.txt" 
-          fmt="m1path"
-          debug="@{debug}"
-          />
-      <c:writedeps 
-          var="project.dependencies" 
-          out="${build.dir}/pom/m2path.txt" 
-          fmt="m2path"
-          debug="@{debug}"
-          />
-      <c:getdeps dst="${lib.dir}" src="@{from}" debug="@{debug}"/>
-    </sequential>
-  </macrodef>
 
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                       E C L I P S E                         -->

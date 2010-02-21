@@ -77,14 +77,17 @@
   </c:for>
   <c:list var="repos">
     ;; my own repo
-    'http://haefelingerit.net/depot'
+    'http://download.haefelinger.it/flaka/dependencies'
   </c:list>
-
+  <c:when test=" 'build/var/lib'.tofile.exists" >
+    <delete dir="build/var/lib" />
+  </c:when>
+  <mkdir dir="build/var/lib" />
   <c:for var="d" in=" dependencies ">
     <c:for var="r" in=" repos ">
       <c:let>
         url  = concat(r,'/',d.m2path)
-      	dest = 'build/lib/#{d.basename}'.tofile
+      	dest = 'build/var/lib/#{d.basename}'
       </c:let>
     	<c:when test=" not dest.exists ">
     	  <get src="#{url}" dest="#{dest}" verbose="on" />

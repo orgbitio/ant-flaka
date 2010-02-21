@@ -23,9 +23,9 @@ import it.haefelinger.flaka.util.TextReader;
 
 import java.util.ArrayList;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.LogLevel;
 
 /**
  * 
@@ -35,14 +35,18 @@ import org.apache.tools.ant.Project;
 public class List extends Task
 {
   protected String var;
-  protected String text;
-  // TODO: move this as general property into 'Task' ?
-  protected String comment;
   protected java.util.List list;
-
+  protected TextReader tr;
+  
+  public List()
+  {
+    this.tr = new TextReader();
+    this.tr.setSkipEmpty(true);
+  }
+  
   public void setComment(String s)
   {
-    this.comment = Static.trim3(getProject(), s,this.comment);
+    this.tr.setComment(s);
   }
 
   public void setVar(String var)
@@ -52,9 +56,12 @@ public class List extends Task
 
   public void addText(String text)
   {
-    if (this.text == null)
-      this.text = "";
-    this.text += getProject().replaceProperties(text);
+    String s = this.tr.getText();
+    if (s == null)
+      s = "";
+    s +=  text;
+    s = getProject().replaceProperties(s);
+    this.tr.setText(s);
   }
 
   protected java.util.List makelist()
@@ -74,35 +81,33 @@ public class List extends Task
   public java.util.List eval() throws BuildException
   {
     Project project;
-    TextReader tr;
     String line, v;
 
-    if (this.text == null)
-      return makelist();
-
-    /* start evaluation text */
-    project = this.getProject();
-
-    /* get text reader */
-    tr = new TextReader(this.text).setComment(this.comment);
-    tr.setSkipEmpty(true);
-
-    /* read line by line */
-    while ((line = tr.readLine()) != null)
+    if (this.tr.getText() != null)
     {
-      try
+ 
+      /* start evaluation text */
+      project = this.getProject();
+
+ 
+      /* read line by line */
+      while ((line = this.tr.readLine()) != null)
       {
-        v = Static.elresolve(project, line);
-        if (this.el)
-          v = Static.el2str(project,v);
-        else
-          v = v.trim();
-        append(v);
-      } catch (Exception e)
-      {
-        if (this.debug)
-          debug("line : error evaluating EL expression (ignored) in "
-              + Static.q(line));
+        try
+        {
+          v = Static.elresolve(project, line);
+          if (this.el)
+            v = Static.el2str(project,v);
+          else
+            v = v.trim();
+          append(v);
+        } 
+        catch (Exception e)
+        {
+          String s = "line : error evaluating EL expression (ignored) in "
+            + Static.q(line);
+          this.log(s);
+        }
       }
     }
     /* ensure that we in any case return a list */

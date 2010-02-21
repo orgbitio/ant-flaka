@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
  */
 public class TextReader 
 {
-  protected Pattern comment;
+  protected Pattern comment = makepattern(";");
   protected boolean skipempty = true;
   protected boolean continuation = true;
   protected String text;
@@ -136,7 +136,10 @@ public class TextReader
     return this;
   }
 
-  /**
+  public String getText() {
+    return this.text;
+  }
+   /**
    * A small helper function generating a regular expression pattern.
    * 
    * The pattern generated is meant to define the begin of a comment

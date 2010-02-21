@@ -1,54 +1,54 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
 
-	<c:switch value="foo" debug="true">
+	<c:switch value="foo" debug="false">
 		<matches pat="foo|bar">
 			<fail message="test 0x01 fails" />
 		</matches>
 	</c:switch>
 
-	<c:switch value="foo" debug="true">
+	<c:switch value="foo" debug="false">
 		<matches re="foo|bar" />
 		<default>
 			<fail message="test 0x02 fails" />
 		</default>
 	</c:switch>
 
-	<c:switch value="xfoox" debug="true">
+	<c:switch value="xfoox" debug="false">
 		<matches re="foo|bar" />
 		<otherwise>
 			<fail message="test 0x03 fails" />
 		</otherwise>
 	</c:switch>
 
-	<c:switch value="foobar" debug="true">
+	<c:switch value="foobar" debug="false">
 		<matches pat="*ob*" />
 		<default>
 			<fail message="test 0x04 fails" />
 		</default>
 	</c:switch>
 
-	<c:switch value="foobar" debug="true">
+	<c:switch value="foobar" debug="false">
 		<matches re="ob" />
 		<default>
 			<fail message="test 0x05 fails" />
 		</default>
 	</c:switch>
 
-	<c:switch value="foo bar" debug="true">
+	<c:switch value="foo bar" debug="false">
 		<matches pat="*bar" />
 		<default>
 			<fail message="test 0x06 fails" />
 		</default>
 	</c:switch>
 
-	<c:switch value="foo bar" debug="true">
+	<c:switch value="foo bar" debug="false">
 		<matches re="*bar">
 			<fail message="test 0x07 fails" />
 		</matches>
 	</c:switch>
 
 	<!-- useless bug legal -->
-	<c:switch value="foobar=" debug="true" />
+	<c:switch value="foobar=" debug="false" />
 
 	<c:trycatch>
 		<try>

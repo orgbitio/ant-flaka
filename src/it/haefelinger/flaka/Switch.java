@@ -321,7 +321,10 @@ public class Switch extends Task
 
     b = false;
     c = null;
-    v = Static.el2str(getProject(),this.value);
+    /* resolve EL refs in input */
+    v = Static.elresolve(getProject(),this.value);
+    
+    /* try each match case until success */
     for (int i = 0; !b && i < this.cases.size(); i++)
     {
       c = (Match) this.cases.get(i);

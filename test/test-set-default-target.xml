@@ -1,6 +1,6 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" default="this">
 
-  <c:let-default-target name="foobar" />
+  <c:set-default-target name="foobar" />
   
   <target name="this">
     <echo>THIS</echo>
@@ -10,4 +10,9 @@
     <echo>FOOBAR</echo>
   </target>
 
+  <!--
+  ;; not yet ready
+  ;; it should execute target 'foobar'. However, what it does right now is to
+  ;; execute target 'this'.
+  -->
 </project>

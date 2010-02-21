@@ -8,7 +8,7 @@
   <c:echo>
     foo
 </c:echo>
-  <c:echo comment=";" ic="." shift=" 0* ">
+  <c:echo comment=";" shift=" 0* ">
     ; ignore \
     me (still a comment here)
     Hello\

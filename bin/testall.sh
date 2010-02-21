@@ -29,6 +29,18 @@ ant=ant
 # make it fully qualified
 FLAKA_HOME=$(cd "$FLAKA_HOME" > /dev/null && pwd)
 
+
+cat <<EOF
+======================================================================
+Warning: using [1] for testing. Make sure that this file is up-to-date
+before testing. You can do this by running
+
+ ant package
+
+[1] $FLAKA_HOME/ant-flaka.jar
+======================================================================
+EOF
+
 L=$(find "$FLAKA_HOME/test" -name test-\*.xml)
 G=""
 F=""
