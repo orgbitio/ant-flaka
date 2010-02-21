@@ -56,12 +56,8 @@ public class List extends Task
 
   public void addText(String text)
   {
-    String s = this.tr.getText();
-    if (s == null)
-      s = "";
-    s +=  text;
-    s = getProject().replaceProperties(s);
-    this.tr.setText(s);
+    text = getProject().replaceProperties(text);
+    this.tr.addText(text);
   }
 
   protected java.util.List makelist()

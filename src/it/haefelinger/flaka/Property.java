@@ -37,23 +37,16 @@ import org.apache.tools.ant.Project;
  */
 public class Property extends Task
 {
-  protected String text;
-  protected String comment;
-  protected boolean debug = false;
+  protected TextReader tr = new TextReader().setSkipEmpty(true);
 
   public void setComment(String s)
   {
-    this.comment = Static.trim2(s, null);
-  }
-
-  public void setDebug(boolean b)
-  {
-    this.debug = b;
+    this.tr.setComment(s);
   }
 
   public void addText(String text)
   {
-    this.text = text;
+    this.tr.addText(text);
   }
 
   protected Pattern makeregex(String s)
@@ -79,22 +72,14 @@ public class Property extends Task
   {
     Project project;
     Pattern regex;
-    TextReader tr;
     Matcher M;
     String line, k, v;
 
     project = this.getProject();
-
-    if (this.text == null)
-      return;
-
     regex = this.getPropRegex();
 
-    tr = new TextReader(this.text).setComment(this.comment);
-    // TODO: set proper line number
-    tr.setSkipEmpty(true);
 
-    while ((line = tr.readLine()) != null)
+    while ((line = this.tr.readLine()) != null)
     {
       if (!(M = regex.matcher(line)).matches())
       {

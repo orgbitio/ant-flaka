@@ -35,26 +35,25 @@ import org.apache.tools.ant.Project;
  */
 public class MSet extends Task
 {
-  private String text = null;
-  private String comment = null;
+  protected TextReader tr = new TextReader().setSkipEmpty(true);
 
   public void setComment(String s)
   {
-    this.comment = Static.trim2(s, null);
+    this.tr.setComment(s);
   }
 
   public void addText(String text)
   {
-    this.text = text;
+    this.tr.addText(text);
   }
 
   public String toString()
   {
     StringBuilder buf = new StringBuilder();
-    if (this.text != null)
+    if (this.tr.getText() != null)
     {
       buf.append("<mset>\n");
-      buf.append(this.text);
+      buf.append(this.tr.getText());
       buf.append("\n</mset>\n");
     } else
     {
@@ -108,7 +107,6 @@ public class MSet extends Task
   {
     Project project;
     Pattern regex;
-    TextReader tr;
     Matcher M;
     String line;
     String k, v;
@@ -118,18 +116,10 @@ public class MSet extends Task
     project = this.getProject();
     type = Static.VARREF;
 
-    if (this.comment == null)
-      this.comment = ";";
-
-    if (this.text == null)
-      return;
-
+ 
     regex = getPropRegex();
 
-    tr = new TextReader(this.text).setComment(this.comment);
-    tr.setSkipEmpty(true);
-
-    while ((line = tr.readLine()) != null)
+    while ((line = this.tr.readLine()) != null)
     {
       /* eval text */
       if ((M = regex.matcher(line)).matches() == false)

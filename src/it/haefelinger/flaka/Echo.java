@@ -38,9 +38,8 @@ import org.apache.tools.ant.Project;
 public class Echo extends org.apache.tools.ant.taskdefs.Echo
 {
   protected boolean debug = true;
-  protected String comment = ";";
-  protected String shift = "";
-
+  protected TextReader tr = new TextReader();
+  
   public Echo()
   {
     super();
@@ -63,10 +62,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
    */
   public void setComment(String s)
   {
-    if (s.matches("\\s*"))
-      this.comment = null;
-    else
-      this.comment = s;
+    this.tr.setComment(s);
   }
 
   /**
@@ -85,8 +81,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
    */
   public void setShift(String s)
   {
-    /* do not trim, leave as is */
-    this.shift = s;
+    this.tr.setShift(s);
   }
 
  
@@ -99,16 +94,13 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     {
       project = getProject();
 
-      TextReader tr = new TextReader();
-      tr.setText(this.message);
-      tr.setSkipEmpty(false);
-      tr.setResolveContLines(true);
-      tr.setComment(this.comment);
-      tr.setSkipws(true);
-      tr.setShift(this.shift);
+      this.tr.setText(this.message);
+      this.tr.setSkipEmpty(false);
+      this.tr.setResolveContLines(true);
+      this.tr.setSkipws(true);
       
       // Read all text in one go instead line by line.
-      this.message = tr.read();
+      this.message = this.tr.read();
       
       /* resolve all EL references in message */
       this.message = Static.elresolve(project, this.message);

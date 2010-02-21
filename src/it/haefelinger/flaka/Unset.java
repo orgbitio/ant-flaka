@@ -30,30 +30,29 @@ import org.apache.tools.ant.Project;
  */
 public class Unset extends Task
 {
-  protected String comment;
-  protected String text = "";
+  protected TextReader tr = new TextReader();
 
+  public Unset() {
+    this.tr.setSkipEmpty(true);
+  }
   public void setComment(String comment)
   {
-    this.comment = Static.trim2(comment, this.comment);
+    this.tr.setComment(comment);
   }
 
   public void addText(String text)
   {
-    this.text = Static.trim2(text, this.text);
+    this.tr.addText(text);
   }
 
   public void execute() throws BuildException
   {
     Project project;
-    TextReader tr;
     String line;
 
     project = getProject();
-    tr = new TextReader(this.text).setComment(this.comment);
-    tr.setSkipEmpty(true);
 
-    while ((line = tr.readLine()) != null)
+    while ((line = this.tr.readLine()) != null)
     {
       line = project.replaceProperties(line);
       line = Static.elresolve(project, line);

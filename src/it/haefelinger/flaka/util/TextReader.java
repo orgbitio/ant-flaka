@@ -74,15 +74,24 @@ public class TextReader
  
   public TextReader(String text)
   {
-    this.text = text;
+    this.setText(text);
   }
   public TextReader()
   {
-    this.text = "";
+    this.setText("");
   }
   public TextReader setText(String text)
   {
-    this.text = text;
+
+    if (text == null)
+      this.text = "";
+    else
+      this.text = text;
+    return this;
+  }
+  public TextReader addText(String text)
+  {
+    this.setText(this.text + text);
     return this;
   }
   public TextReader setSkipws(boolean b)
