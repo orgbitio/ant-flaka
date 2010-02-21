@@ -24,9 +24,6 @@ package it.haefelinger.flaka;
 import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
