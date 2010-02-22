@@ -503,7 +503,7 @@ public final class EL
       tree = parser.maketree();
       if (!parser.errors.isEmpty())
       {
-        for (Exception ex : parser.errors)
+        for (@SuppressWarnings("unused") Exception ex : parser.errors)
         {
           // TODO: print on debug stream ..
           //System.err.println(ex.getMessage());
