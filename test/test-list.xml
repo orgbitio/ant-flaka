@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+ 
   <c:let>
     _var_ = 'list'
   </c:let>
@@ -9,13 +10,25 @@
     file('.')
     ;; each line is a EL expression
     3 * 5
-    ''.tofile.list
+    '.'.tofile.list
   </c:list>
 
   <c:for var="item" in=" #{_var_} ">
     <c:echo>
-      >> #{item}  | type = #{ typeof(item) }
+      #{item}  | type = #{ typeof(item) }
     </c:echo>
+    <c:let>
+      typstr = concat(typstr,typeof(item))
+      x = typeof(item)
+    </c:let>
   </c:for>
-
-</project>
+  <echo />
+  <c:echo shift="30%">=</c:echo>
+  <c:echo>
+  got |#{typstr}|
+  </c:echo>
+ 
+    <c:when test=" typstr != 'FileIntegerIterable ">  
+       <fail message="expected: FileIntegerIterable" />
+    </c:when>
+ </project>

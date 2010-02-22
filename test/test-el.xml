@@ -1,4 +1,12 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+  <property name="foobar" value="" />
+  <fail unless="foobar" />
+  <c:when test=" not has.property.foobar " >
+    <fail />
+  </c:when>
+  <c:when test=" not has.task.fail " >
+    <fail />
+  </c:when>
   <c:echo>
     The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
   </c:echo>
