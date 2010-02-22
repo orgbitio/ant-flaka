@@ -23,35 +23,34 @@
     <version>1.2.8</version>
   </dependency>
 
-  <mkdir dir="tmp" />
-
-  <c:scndeps var="dlist">
+  <!--
+      Scan depenencies into variable 'dependencies'. The structure is
+      dependencies._ALL_ for all dependencies, regardless of scope
+      dependencies.`scope` contains dependencies in this scope.
+  -->
+  <c:scndeps var=" dependencies ">
     <include name="test-scndeps.xml" />
   </c:scndeps>
 
-  <c:for var="d" in=" dependencies ">
-    <c:let>
-      x = d.scope
-    </c:let>
-    <c:echo>#{x}</c:echo>
+  <c:echo shift="59=">=</c:echo>
+  <c:for var="list" in=" dependencies ">
+    <c:echo>>> #{list}</c:echo>
   </c:for>
+  <c:echo shift="59=">=</c:echo>
 
-
+  <c:echo shift="59%">%</c:echo>
   <c:echo>
     ;; we got 
-    #{ dlist }
+    we got #{ size(dependencies._ALL_) } dependencies by this scan.
   </c:echo>
-  <c:let>
-    ;; like any other variable ..
-    dependencies = \
-    append(dependencies,dlist)
-  </c:let>
+  <c:echo shift="59%">%</c:echo>
+  
+  <c:when test=" size(dependencies._ALL_) != 2 ">
+    <fail message="expected 2 dependencies, got #{ size(dependencies._ALL_) }" />
+  </c:when>
 
-  <c:for var="d" in=" dependencies ">
-    <c:echo>#{d}</c:echo>
-  </c:for>
   <!-- write dependencies in format alias  -->
-  <c:for var="d" in=" dependencies ">
+  <c:for var="d" in=" dependencies._ALL_ ">
     <c:when test=" not empty d.alias ">
       <c:let>
         x = d.scope
@@ -61,16 +60,17 @@
       </c:echo>
     </c:when>
   </c:for>
+
+
   <!-- write dependencies in format MI (maven 1) -->
-  <c:for var="d" in=" dependencies ">
+  <c:for var="d" in=" dependencies._ALL_ ">
     <c:echo>[2] #{d.m1path}</c:echo>
   </c:for>
   <!-- write dependencies in format M2 (maven 2) -->
-  <c:for var="d" in=" dependencies ">
+  <c:for var="d" in=" dependencies._ALL_ ">
     <c:echo>[3] |#{d.m2path}|</c:echo>
   </c:for>
-  <c:echo>There are #{size(dependencies)} ..</c:echo>
-  <c:for var="d" in=" dependencies ">
+  <c:for var="d" in=" dependencies._ALL_ ">
     <c:echo>
       [4] | #{d.location.name} | #{d.file} | #{d.scope} | 
     </c:echo>
@@ -83,15 +83,27 @@
     <delete dir="build/var/lib" />
   </c:when>
   <mkdir dir="build/var/lib" />
-  <c:for var="d" in=" dependencies ">
+
+  <c:for var="d" in=" dependencies['_ALL_'] ">
     <c:for var="r" in=" repos ">
       <c:let>
-        url  = concat(r,'/',d.m2path)
+        url  = concat(r,d.m2path)
       	dest = 'build/var/lib/#{d.basename}'
       </c:let>
-    	<c:when test=" not dest.exists ">
-    	  <get src="#{url}" dest="#{dest}" verbose="on" />
-    	</c:when>
+      <c:echo>
+        >> #{url}
+      </c:echo>
+      <c:choose>
+        <c:when test=" not dest.tofile.exists ">
+          <get src="#{url}" dest="#{dest}" verbose="on" />
+        </c:when>
+        <c:otherwise>
+          <c:echo>
+            ;; should not happen as we remove test/build/var ..
+            #{dest} already existing, fetching #{url} ignored. 
+          </c:echo>
+        </c:otherwise>
+      </c:choose>
     </c:for>
   </c:for>
 </project>

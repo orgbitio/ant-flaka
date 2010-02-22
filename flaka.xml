@@ -50,9 +50,6 @@
     <javac source="1.5" debug="true" />
   </presetdef>
   
-  <c:scndeps var="dependencies">
-    <include name="build.xml" />
-  </c:scndeps>
   
   <c:install-property-handler />
 
@@ -67,15 +64,20 @@
     ;;'http://download.haefelinger.it/flaka/dependencies'
   </c:list>
 
-  <c:for var="d" in=" dependencies ">
+  <mkdir dir="${lib.dir}" />
+
+  <c:scndeps var=" dependencies ">
+    <include name="build.xml" />
+  </c:scndeps>
+
+  
+  <c:for var="d" in=" dependencies.allscopes ">
     <c:for var="r" in=" depots ">
       <c:let>
-        url  =  concat(r,d.m2path)
-        file = '${lib.dir}/#{d.basename}'.tofile
+        dest = '${lib.dir}/#{d.basename}'
       </c:let>
-      <c:when test=" not(file.exists)" >
-        <mkdir dir="${lib.dir}" />
-        <get src="#{url}" dest="#{file}" verbose="off" ignoreerrors="true"/>
+      <c:when test=" not(dest.tofile.exists)" >
+        <get src="#{concat(r,d.m2path)}" dest="#{dest}" verbose="off" ignoreerrors="true"/>
       </c:when>
     </c:for>
   </c:for>

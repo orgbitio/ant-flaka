@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.apache.tools.ant.Project;
 import org.w3c.dom.Document;
@@ -37,13 +37,14 @@ import org.w3c.dom.NodeList;
 public class Scanner
 {
   public Project project;
-  public List list;
+  public Map map = new HashMap();
+  public Map seen = new HashMap();
   public File file;
   public int cntr;
   
-  public Scanner(Project project,List list) {
+  public Scanner(Project project,Map map) {
     super();
-    reset(project,list);
+    reset(project,map);
   }
   
   public Scanner(Project proj)
@@ -51,10 +52,10 @@ public class Scanner
     this(proj,null);
   }
 
-  public Scanner reset(Project proj,List list)
+  public Scanner reset(Project proj,Map map)
   {
     this.project = proj;
-    this.list = list;
+    this.map = map;
     this.cntr = 0;
     this.file = null;
     return this;
@@ -81,31 +82,58 @@ public class Scanner
     return s;
   }
 
-  protected void annotate(File file) 
-  {
-    Iterator iter;
-    
-    if (this.list != null) {
-      iter = iterator();
-      while(iter.hasNext()) {
-        Dependency d = (Dependency)iter.next();
-        d.setLocation(file);
-      }
+//  protected void annotate(File file) 
+//  {
+//    Iterator iter;
+//    
+//    if (this.list != null) {
+//      iter = iterator();
+//      while(iter.hasNext()) {
+//        Dependency d = (Dependency)iter.next();
+//        d.setLocation(file);
+//      }
+//    }
+//  }
+//  
+//  protected Iterator iterator() {
+//    return getList().iterator();
+//  }
+  
+//  protected List getList() {
+//    if (this.list == null) 
+//      this.list = new ArrayList();
+//    return this.list;
+//  }
+  
+  protected void add(String scope,Dependency d) {
+    List v = (List)this.map.get(scope);
+    if (v == null) {
+      this.map.put(scope,new ArrayList());
+      v = (List)this.map.get(scope);
     }
+    // TODO: dependency already added?
+    // iterate over each element and create m2path. If equal with my
+    // m2path, ignore, else add.
+    v.add(d);
   }
   
-  protected Iterator iterator() {
-    return getList().iterator();
-  }
-  
-  protected List getList() {
-    if (this.list == null) 
-      this.list = new ArrayList();
-    return this.list;
-  }
-  protected void addtolist(Dependency d) {
+  protected void add(String scope[],Dependency d) {
+    String m2path;
+    m2path = d.getM2path();
+    if (this.seen.containsKey(m2path)) {
+      // Dependency already seen, do not add it again.
+      // TODO: warning message
+      return;
+    }
+    // Record dependency.
+    this.seen.put(m2path,d);
     this.cntr += 1;
-    getList().add(d.setLocation(this.file));
+    d.setLocation(this.file);
+    
+    // Add dependency is special scope variable.
+    add("_ALL_",d);
+    for(int i=0;i<scope.length;++i)
+      add(scope[i], d);
   }
   /**
    * @param file not null
@@ -257,8 +285,15 @@ public class Scanner
           dep.setScope(value);
         }
       }
+      
+      
+      String scope[];
+      scope = dep.getScope();
+      if (scope == null) {
+        scope = new String[]{ "compile" };
+      }
       /* add dependencies in arrival order !! */
-      addtolist(dep);
+      add(scope,dep);
     }
   }
 

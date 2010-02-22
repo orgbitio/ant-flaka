@@ -26,9 +26,8 @@ import it.haefelinger.flaka.util.MatchingTask;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
@@ -42,7 +41,7 @@ public class ScanDeps extends MatchingTask
 {
   protected String var;
   protected String dir = "''.tofile";
-  protected List list;
+  protected Map map;
 
   // protected Scanner scanner;
 
@@ -64,8 +63,8 @@ public class ScanDeps extends MatchingTask
     
     project = this.getProject();
     file = Static.toFile(project, fname);
-    this.list = new ArrayList();
-    scanner = new Scanner(project,this.list);
+    this.map = new HashMap();
+    scanner = new Scanner(project,this.map);
     scanner.scan(file);
   }
 
@@ -93,6 +92,6 @@ public class ScanDeps extends MatchingTask
         scan(args[i]);
       }
     }
-    Static.assign(project, this.var, this.list, Static.VARREF);
+    Static.assign(project, this.var, this.map, Static.VARREF);
   }
 }

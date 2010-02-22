@@ -141,7 +141,7 @@ public class HttpUploadTask extends Task
     if (this.debug)
     {
       /* enable debug output */
-      HttpUpload.debug(true);
+      //HttpUpload.debug(true);
     }
 
     if (this.filesets == null)
