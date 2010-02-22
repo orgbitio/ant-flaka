@@ -33,10 +33,11 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class MSet extends Task
+public class Let extends Task
 {
-  protected TextReader tr = new TextReader().setSkipEmpty(true);
+  protected TextReader tr = new TextReader();
 
+ 
   public void setComment(String s)
   {
     this.tr.setComment(s);
@@ -44,6 +45,7 @@ public class MSet extends Task
 
   public void addText(String text)
   {
+    this.tr.setProject(getProject());
     this.tr.addText(text);
   }
 
@@ -130,15 +132,10 @@ public class MSet extends Task
       try
       {
         type = howto(M.group(2));
-        k = project.replaceProperties(M.group(1));
-        k = Static.elresolve(project, k);
-        // TODO: if we assign a property in 'set-if-not-defined' mode, then
-        // we do not need to evaluate the right side if that property exists
-        // already (cause it wont be changed anyway).
+        k = M.group(1);
         if (type == Static.PROPTY && project.getProperty(k) != null)
           continue;
-        v = project.replaceProperties(M.group(3));
-        v = Static.elresolve(project, v);
+        v = M.group(3);
         o = Static.el2obj(project, v);
         Static.assign(project, k, o, type);
 
