@@ -13,7 +13,9 @@
   </c:list>
 
   <c:for var="item" in=" #{_var_} ">
-    <c:echo>#{item}</c:echo>
+    <c:echo>
+      >> #{item}  | type = #{ typeof(item) }
+    </c:echo>
   </c:for>
 
 </project>

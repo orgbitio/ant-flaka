@@ -34,7 +34,7 @@ import org.apache.tools.ant.Project;
 public class List extends Task
 {
   protected String var;
-  protected java.util.List list;
+  protected java.util.List list = new ArrayList();
   protected TextReader tr = new TextReader();
  
  
@@ -54,43 +54,33 @@ public class List extends Task
     this.tr.addText(text);
   }
 
-  protected java.util.List makelist()
+ 
+  protected void append(Object obj)
   {
-    if (this.list == null)
-      this.list = new ArrayList();
-    return this.list;
-  }
-
-  protected java.util.List append(String s)
-  {
-    if (s != null)
-      makelist().add(s);
-    return this.list;
+    this.list.add(obj);
   }
 
   public java.util.List eval() throws BuildException
   {
     Project project;
-    String line, v;
+    String line;
+    Object obj;
 
     if (this.tr.getText() != null)
     {
- 
       /* start evaluation text */
       project = this.getProject();
 
- 
       /* read line by line */
       while ((line = this.tr.readLine()) != null)
       {
         try
         {
-          v = Static.elresolve(project, line);
           if (this.el)
-            v = Static.el2str(project,v);
+            obj = Static.el2obj(project,line);
           else
-            v = v.trim();
-          append(v);
+            obj = line.trim();
+          append(obj);
         } 
         catch (Exception e)
         {
@@ -101,7 +91,7 @@ public class List extends Task
       }
     }
     /* ensure that we in any case return a list */
-    return makelist();
+    return this.list;
   }
 
   public void execute() throws BuildException

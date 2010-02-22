@@ -212,30 +212,33 @@ public class Functions
   static public String typeof(Object object)
   {
     if (object == null)
-      return "null";
+      return "Null";
 
     if (object instanceof String)
-      return "string";
+      return "String";
 
     if (object instanceof File)
-      return "file";
+      return "File";
 
     if (object.getClass().isArray())
-      return "array";
+      return "Array";
 
     if (object instanceof Iterable)
-      return "list";
+      return "Iterable";
 
     if (Integer.class.isAssignableFrom(object.getClass()))
-      return "integer";
+      return "Integer";
+  
+    if (Long.class.isAssignableFrom(object.getClass()))
+      return "Integer";
 
     if (Double.class.isAssignableFrom(object.getClass()))
-      return "float";
+      return "Float";
 
     if (Boolean.class.isAssignableFrom(object.getClass()))
-      return "boolean";
+      return "Boolean";
 
-    return "object";
+    return "Object";
   }
 
 }

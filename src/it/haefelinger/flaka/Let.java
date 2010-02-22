@@ -54,12 +54,12 @@ public class Let extends Task
     StringBuilder buf = new StringBuilder();
     if (this.tr.getText() != null)
     {
-      buf.append("<mset>\n");
+      buf.append("<let>\n");
       buf.append(this.tr.getText());
-      buf.append("\n</mset>\n");
+      buf.append("\n</let>\n");
     } else
     {
-      buf.append("<mset/>\n");
+      buf.append("<let/>\n");
     }
     return buf.toString();
   }
