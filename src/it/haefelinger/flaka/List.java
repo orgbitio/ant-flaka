@@ -35,14 +35,9 @@ public class List extends Task
 {
   protected String var;
   protected java.util.List list;
-  protected TextReader tr;
-  
-  public List()
-  {
-    this.tr = new TextReader();
-    this.tr.setSkipEmpty(true);
-  }
-  
+  protected TextReader tr = new TextReader();
+ 
+ 
   public void setComment(String s)
   {
     this.tr.setComment(s);
@@ -55,7 +50,7 @@ public class List extends Task
 
   public void addText(String text)
   {
-    text = getProject().replaceProperties(text);
+    this.tr.setProject(getProject());
     this.tr.addText(text);
   }
 

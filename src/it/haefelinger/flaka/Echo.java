@@ -21,11 +21,9 @@
  */
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
 
 /**
  * 
@@ -35,11 +33,15 @@ import org.apache.tools.ant.Project;
 public class Echo extends org.apache.tools.ant.taskdefs.Echo
 {
   protected boolean debug = true;
-  protected TextReader tr = new TextReader();
+  protected TextReader tr;
   
   public Echo()
   {
     super();
+    this.tr = new TextReader();
+    this.tr.setSkipEmpty(false);
+    this.tr.setResolveContLines(true);
+    this.tr.setSkipws(true);
   }
 
   public void setDebug(boolean b)
@@ -85,27 +87,18 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   
   public void execute() throws BuildException
   {
-    Project project;
-
     if (this.message != null && !this.message.matches("\\s*"))
     {
-      project = getProject();
-
+      this.tr.setProject(getProject());
       this.tr.setText(this.message);
-      this.tr.setSkipEmpty(false);
-      this.tr.setResolveContLines(true);
-      this.tr.setSkipws(true);
-      
       // Read all text in one go instead line by line.
       this.message = this.tr.read();
-      
-      /* resolve all EL references in message */
-      this.message = Static.elresolve(project, this.message);
-
     }
-
-    /* let my parent handle this */
-    super.execute();
+    if (this.message != null)
+    {
+      /* let my parent handle this */
+      super.execute();
+    }
   }
 
 }

@@ -37,7 +37,8 @@ import org.apache.tools.ant.Project;
  */
 public class Property extends Task
 {
-  protected TextReader tr = new TextReader().setSkipEmpty(true);
+  protected TextReader tr = new TextReader();
+
 
   public void setComment(String s)
   {
@@ -46,6 +47,7 @@ public class Property extends Task
 
   public void addText(String text)
   {
+    this.tr.setProject(getProject());
     this.tr.addText(text);
   }
 

@@ -32,9 +32,6 @@ public class Unset extends Task
 {
   protected TextReader tr = new TextReader();
 
-  public Unset() {
-    this.tr.setSkipEmpty(true);
-  }
   public void setComment(String comment)
   {
     this.tr.setComment(comment);
@@ -42,6 +39,7 @@ public class Unset extends Task
 
   public void addText(String text)
   {
+    this.tr.setProject(getProject());
     this.tr.addText(text);
   }
 

@@ -42,6 +42,8 @@ public class Scanner
   public File file;
   public int cntr;
   
+ 
+  
   public Scanner(Project project,Map map) {
     super();
     reset(project,map);
@@ -58,6 +60,8 @@ public class Scanner
     this.map = map;
     this.cntr = 0;
     this.file = null;
+    this.map.put("scope",new HashMap());
+    this.map.put("each",new ArrayList());
     return this;
   }
 
@@ -105,11 +109,17 @@ public class Scanner
 //    return this.list;
 //  }
   
+  protected Map getScopeMap() {
+    Map map = (Map)this.map.get("scope");
+    return map;
+  }
+  
   protected void add(String scope,Dependency d) {
-    List v = (List)this.map.get(scope);
+    Map m = getScopeMap();
+    List v = (List)m.get(scope);
     if (v == null) {
-      this.map.put(scope,new ArrayList());
-      v = (List)this.map.get(scope);
+      m.put(scope,new ArrayList());
+      v = (List)m.get(scope);
     }
     // TODO: dependency already added?
     // iterate over each element and create m2path. If equal with my
@@ -131,7 +141,7 @@ public class Scanner
     d.setLocation(this.file);
     
     // Add dependency is special scope variable.
-    add("_ALL_",d);
+    ((ArrayList)this.map.get("each")).add(d);
     for(int i=0;i<scope.length;++i)
       add(scope[i], d);
   }

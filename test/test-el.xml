@@ -1,28 +1,32 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
-
   <c:echo>
+    The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
+  </c:echo>
+   <c:echo>
     The #{ 'good' } and the #{ 'ugly'.doesnotexist } is a well\
     known movie.
   </c:echo>
   <c:echo>
     The great \\#{escape}. Or: #{'#'}escape.
   </c:echo>
-  <c:echo>#{'} #{'abc'} 3*5=#{3*5}</c:echo>
+  <c:echo>;;#{'} #{'abc'} 3*5=#{3*5}</c:echo>
   <c:echo>
     The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
   </c:echo>
-  <c:echo>#{'} #{'abc''} 3*5=#{3*5}</c:echo>
+  <c:echo>;;#{'} #{'abc''} 3*5=#{3*5}</c:echo>
   <c:echo>4*6=#{4*6}</c:echo>
   <c:echo>#{'abc'}</c:echo>
-  <c:echo>#{'}</c:echo>
-  <c:echo>#{'} #{'abc'}</c:echo>
+  <c:echo>
+    ;; should fail
+    ;; #{'}
+  </c:echo>
+  <c:echo>;;#{'} #{'abc'}</c:echo>
   <c:echo>#{</c:echo>
   <c:echo>$${}</c:echo>
-  <c:echo>$${</c:echo>
-  <c:echo>$${ </c:echo>
-  <c:echo>a$${ b</c:echo>
-  <c:echo>a$${</c:echo>
-  <c:echo>a$${b</c:echo>
+  <c:echo>;;$${</c:echo>
+  <c:echo>;;a$${ b</c:echo>
+  <c:echo>;;a$${</c:echo>
+  <c:echo>;;a$${b</c:echo>
 
   <c:echo>
     #{3 * 5}
@@ -31,7 +35,7 @@
   <c:echo>
     ${ ' }
 	</c:echo>
-  <c:echo>a$${</c:echo>
+  <c:echo>;;a$${</c:echo>
 
   <c:echo>
     ${ ' }

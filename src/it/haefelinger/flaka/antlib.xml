@@ -35,7 +35,7 @@
   <taskdef name="initssl" classname="it.haefelinger.flaka.util.InitSSL" />
   <taskdef name="logo" classname="it.haefelinger.flaka.Logo" />
   <taskdef name="make-dir" classname="it.haefelinger.flaka.Mkdir" />
-  <taskdef name="let" classname="it.haefelinger.flaka.MSet" />
+  <taskdef name="let" classname="it.haefelinger.flaka.Let" />
   <taskdef name="properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="inline-properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="property-by-regex" classname="it.haefelinger.flaka.Select" />

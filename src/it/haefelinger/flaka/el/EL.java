@@ -506,7 +506,7 @@ public final class EL
         for (Exception ex : parser.errors)
         {
           // TODO: print on debug stream ..
-          System.err.println(ex.getMessage());
+          //System.err.println(ex.getMessage());
         }
       }
       return tree;
@@ -662,10 +662,11 @@ public final class EL
       obj = ve.getValue(this.context);
     } catch (TreeBuilderException tbe)
     {
-      System.err.println(tbe.getMessage());
+      // TODO: error handling
+      //System.err.println(tbe.getMessage());
     } catch (ELException ele)
     {
-      System.err.println(ele.getMessage());
+      //System.err.println(ele.getMessage());
     }
     return obj;
   }
@@ -718,11 +719,11 @@ public final class EL
       Iterator I = L.iterator();
       while (I.hasNext())
       {
-        System.err.println("=>" + I.next());
+        //System.err.println("=>" + I.next());
       }
     } catch (Exception e)
     {
-      System.err.println("error: " + e);
+      //System.err.println("error: " + e);
     }
   }
 

@@ -24,6 +24,8 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tools.ant.Project;
+
 /**
  * A class to read and massage text.
  * 
@@ -71,6 +73,8 @@ public class TextReader
   protected boolean skipws = false;
   protected String shift;
   protected BufferedReader bufreader;
+  protected Project project;
+  protected boolean resolve = false;
  
   public TextReader(String text)
   {
@@ -79,6 +83,10 @@ public class TextReader
   public TextReader()
   {
     this.setText("");
+  }
+  public TextReader setProject(Project project) {
+    this.project = project;
+    return this;
   }
   public TextReader setText(String text)
   {
@@ -89,10 +97,9 @@ public class TextReader
       this.text = text;
     return this;
   }
-  public TextReader addText(String text)
+  public void addText(String text)
   {
     this.setText(this.text + text);
-    return this;
   }
   public TextReader setSkipws(boolean b)
   {
@@ -321,7 +328,7 @@ public class TextReader
       // if resolve continuation lines is on, merge continuation lines 
       if (this.continuation)
         this.text = TextReader.resolvecontlines(this.text);
-      
+             
       /* initialize buffered reader */
       this.bufreader = TextReader.tobufreader(this.text);
     }
@@ -329,13 +336,23 @@ public class TextReader
       while ( (line = this.bufreader.readLine())!=null && this.ignore(line)) {
         // read another line
       }
+      if (line != null)
+      {
+        /* resolve all Ant properties ${ } */
+        line = this.project.replaceProperties(line);
+      
+        /* resolve all EL references #{ ..} */
+        line = Static.elresolve(this.project,line);
+      
+        if (line != null && this.shift != null)
+          line = this.shift + line;
+      }
     }
     catch(IOException e)
     {
       line = null;
     }
-    if (line != null && this.shift != null)
-      line = this.shift + line;
+    
     return line;
   }
 
