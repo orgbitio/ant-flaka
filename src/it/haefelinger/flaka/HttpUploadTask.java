@@ -18,6 +18,7 @@
 
 package it.haefelinger.flaka;
 
+import it.haefelinger.flaka.util.HttpUpload;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;

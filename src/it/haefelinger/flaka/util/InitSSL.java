@@ -16,9 +16,9 @@
  * and limitations under the License.
  */
 
-package it.haefelinger.flaka;
+package it.haefelinger.flaka.util;
 
-import it.haefelinger.flaka.util.Static;
+import it.haefelinger.flaka.Task;
 
 import java.io.File;
 import java.io.IOException;

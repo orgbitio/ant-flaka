@@ -32,7 +32,7 @@
  * the License.
  * 
  */
-package it.haefelinger.flaka;
+package it.haefelinger.flaka.type;
 
 import it.haefelinger.flaka.util.Static;
 

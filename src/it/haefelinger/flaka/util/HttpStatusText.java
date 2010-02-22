@@ -16,7 +16,7 @@
  * and limitations under the License.
  */
 
-package it.haefelinger.flaka;
+package it.haefelinger.flaka.util;
 
 /**
  * 

@@ -6,7 +6,7 @@
 ]>
 <antlib xmlns:c="ant:current">
   <typedef name="dependency-selector" classname="it.haefelinger.flaka.dep.Select" />
-  <typedef name="filterset" classname="it.haefelinger.flaka.FilterSet" />
+  <typedef name="filterset" classname="it.haefelinger.flaka.type.FilterSet" />
   <typedef name="istext-selector" classname="it.haefelinger.flaka.IsText" />
   <typedef name="identity-globmapper" classname="it.haefelinger.flaka.GlobMap" />
 
@@ -32,7 +32,7 @@
   <taskdef name="export-task" classname="it.haefelinger.flaka.Export" />
   <taskdef name="find" classname="it.haefelinger.flaka.Find" />
   <taskdef name="for" classname="it.haefelinger.flaka.For" />
-  <taskdef name="initssl" classname="it.haefelinger.flaka.InitSSL" />
+  <taskdef name="initssl" classname="it.haefelinger.flaka.util.InitSSL" />
   <taskdef name="logo" classname="it.haefelinger.flaka.Logo" />
   <taskdef name="make-dir" classname="it.haefelinger.flaka.Mkdir" />
   <taskdef name="let" classname="it.haefelinger.flaka.MSet" />

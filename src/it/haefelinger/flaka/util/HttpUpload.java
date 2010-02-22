@@ -16,7 +16,7 @@
  * and limitations under the License.
  */
 
-package it.haefelinger.flaka;
+package it.haefelinger.flaka.util;
 
 import java.io.File;
 import java.util.Properties;
