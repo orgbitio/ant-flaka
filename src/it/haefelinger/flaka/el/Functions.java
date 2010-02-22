@@ -160,11 +160,21 @@ public class Functions
 
   static public Object concat(Object... argv)
   {
+    Object obj;
+    String str;
     StringBuilder buf = new StringBuilder();
     for (int i = 0, n = argv.length; i < n; ++i)
     {
-      Object obj = argv[i];
-      buf.append(obj instanceof String ? (String) obj : obj.toString());
+      obj = argv[i];
+      if (obj == null)
+        str = null;
+      else if (obj instanceof String)
+        str = (String)obj;
+      else
+        str = obj.toString();
+      if (str == null)
+        str = "";
+      buf.append(str);
     }
     return buf.toString();
   }

@@ -49,13 +49,10 @@ public class Unset extends Task
     String line;
 
     project = getProject();
-
     while ((line = this.tr.readLine()) != null)
     {
-      line = project.replaceProperties(line);
-      line = Static.elresolve(project, line);
       line = line.trim();
-      Static.unset(project, line);
+      Static.unset(project,line);
     }
 
   }
