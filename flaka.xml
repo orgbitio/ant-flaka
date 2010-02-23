@@ -1,6 +1,64 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="flaka">
-  <c:let>
-    lib.dir := 'build/lib'
+<project xmlns:c="antlib:it.haefelinger.flaka" name="package">
+	 <description>
+	    ========================================================================
+	    ===     This is the build script building Flaka using Flaka          ===
+	    ========================================================================
+
+	 	  To use this build file, you need to have ant-flaka.jar in Ant's class-
+	 	  path.
+	 	
+	    Use option -p to see a list of targets. By  default, Flaka gets compiled
+	    and packaged as
+
+	          ${dist.dir}/ant-flaka-${version}${patchv}.jar   
+
+	    In addition, file
+
+	         ${basedir}/ant-flaka.jar 
+
+	    gets also created. Both files should be the same. The latter is intended 
+	    when working on Flaka itself. Having a version-less jar  file  simplifies 
+	    some configuration files, especially when using Eclipse.
+
+	    Use target `package-all' to generate all distribution packages and pick
+	    them from folder ${build.dir}.
+
+	    You can at any time remove folder 
+
+	      ${build.dir}.
+
+	    manually in order to start building from scratch.
+
+	    Run 
+
+	      ant -p
+
+	    for a list of targets.
+	     
+	    Please make sure to have red the build instructions in file
+
+	         ${basedir}/README.txt
+
+	     Good Luck.
+	     ==========
+	  </description>
+	
+  <c:install-property-handler />
+	<c:let>
+ 		
+	  depot.url   := 'http://download.haefelinger.it/flaka/dependencies'
+		      
+		version     := '1.01'
+		patchv      := ''
+
+		src.dir     := '${basedir}/src' 
+	  test.dir    := '${basedir}/test'
+		build.dir   := '${basedir}/build' 
+	  dist.dir    := '${build.dir}/dist' 
+	  lib.dir     := '${build.dir}/lib'
+	  obj.dir     := '${build.dir}/classes'
+		javadoc.dir := '${build.dir}/javadoc'
+
   </c:let>
 
 
@@ -51,117 +109,296 @@
   </presetdef>
   
   
-  <c:install-property-handler />
-
-  <c:echo>
-    #{dlist}
-  </c:echo>
-  
   <c:list var="depots">
     ;; Depot in M2 structure.
     ;; Just contains dependencies required to build flaka.
     'http://repo1.maven.org/maven2'
-    ;;'http://download.haefelinger.it/flaka/dependencies'
+    'http://download.haefelinger.it/flaka/dependencies'
   </c:list>
 
   <mkdir dir="${lib.dir}" />
 
   <c:scndeps var=" dependencies ">
+  	<decorate>
+  		;; artefacts shall go here 
+  		dest = '${lib.dir}'
+  	</decorate>
     <include name="build.xml" />
   </c:scndeps>
 
-  
-  <c:for var="d" in=" dependencies.allscopes ">
+  <c:echo>
+    #{dependencies}
+  </c:echo>
+
+  <c:for var="d" in=" dependencies.each ">
+    <c:echo>
+      downloading dependencies ..
+    </c:echo>
     <c:for var="r" in=" depots ">
-      <c:let>
-        dest = '${lib.dir}/#{d.basename}'
-      </c:let>
-      <c:when test=" not(dest.tofile.exists)" >
-        <get src="#{concat(r,d.m2path)}" dest="#{dest}" verbose="off" ignoreerrors="true"/>
+      <c:when test=" not(d.file.exists)" >
+        <get src="#{concat(r,d.m2path)}" dest="#{d.file}" verbose="off" ignoreerrors="true"/>
       </c:when>
     </c:for>
   </c:for>
 
   <!-- Report missing dependencies and abort if one is missing -->
-  <c:echo>
-    ====================================
-    checking for missing dependencies ..
-    ====================================
-  </c:echo>
-  <c:for var="d" in=" dependencies ">
-    <c:let>
-      file = '${lib.dir}/#{d.basename}'.tofile
-    </c:let>
-    <c:when test=" not(file.exists) ">
-      <c:let>
-        missing = append(missing,d)
-      </c:let>
+  <c:for var="d" in=" dependencies.each ">
+    <c:when test=" not(d.file.exists) ">
+    	<fail message="dependency missing: #{d.file}" /> 
     </c:when>
   </c:for>
   
-  <c:echo>
-    #missing: #{size(missing)} 
-  </c:echo>
-
-  <c:when test=" not(empty missing) ">
+  <target name="init">
     <c:echo>
-      >> Not all dependencies are fetched. &lt;&lt;
-      
-      The following dependencies are missing:
-    </c:echo>
-    <c:for var="d" in=" missing ">
-      <c:echo>#{d.basename}</c:echo>
-    </c:for>
-    <c:echo>>> panic, unable to continue. &lt;&lt;</c:echo>
-    <fail />
-  </c:when>
+    
+    depot.url   := ${depot.url}
+          
+    version     := ${version}
+    patchv      := 
 
-  <c:let>
-    deps-compile = null
-  </c:let>
+    src.dir     := ${src.dir}
+    test.dir    := ${test.dir}
+    build.dir   := ${build.dir} 
+    dist.dir    := ${dist.dir} 
+    lib.dir     := ${lib.dir} 
+    obj.dir     := ${obj.dir}
+    javadoc.dir := ${javadoc.dir}
 
-  <c:for var=" d " in=" dependencies">
-    <c:echo>
-      #{d.scope}
-    </c:echo>
-    <c:switch value=" d.scope " >
-      <matches glob="*compile*">
-        <c:let>
-          deps-compile = append(deps-compile,d)
-        </c:let>
-      </matches>
-    </c:switch>
-  </c:for>
+	  </c:echo>
+	 </target>
+	
+	
+	 <target name="clean" >
+	    <sequential>
+	      <delete dir="${obj.dir}" />
+	    </sequential>
+	  </target>
+	  
+	  <target name="clean-dist" >
+	    <sequential>
+	      <delete dir="${build.dir}" />
+	    </sequential>
+	  </target>
 
-  
-  <macrodef name="package">
-    <sequential>
-    </sequential>
-  </macrodef>
-  
-  <presetdef name="javadoc">
-    <javadoc
-        packagenames    = "it.haefelinger.flaka.*"
-        sourcepath      = "${src.dir}"
-        classpathref    = "javac.classpath"
-        >
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
-      <link href="http://www.jdom.org/docs/apidocs" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://javadoc.haefelingerit.net/org.apache.ant/1.7.1" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.cruisecontrol/2.8.2" />
-      <link href="http://javadoc.haefelingerit.net/net.sourceforge.juel/2.1" />
-      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
-    </javadoc>
-  </presetdef>
+	  <target name="compile" depends="clean, init">
+	    <sequential>
+	      <!-- Todo: use M2 names -->
+	      <mkdir dir="${obj.dir}"/>
+	      <javac srcdir="src" destdir="${obj.dir}">
+	        <classpath>
+	          <fileset dir="${lib.dir}">
+	            <include name="**/*.jar"/>
+	          </fileset>
+	        </classpath>
+	      </javac>
+	    </sequential>
+	  </target>
 
-  <target name="copy-resources">
-    <c:copy-and-replace src="${basedir}/res" dst="${obj.dir}" />
-  </target>
+	  <macrodef name="test-init">
+	    <sequential>
+	      <mkdir dir="${build.dir}/test-classes" />
+	      <javac srcdir="test" destdir="${build.dir}/test-classes"> 
+	        <include name="**/*Test.java" />
+	        <classpath>
+	          <pathelement path="${obj.dir}"/>
+	          <fileset dir="${lib.dir}">
+	            <include name="**/*.jar"/>
+	          </fileset>
+	        </classpath>
+	      </javac>
+	    </sequential>
+	  </macrodef>
 
-  <target name="apropos">
-    <c:apropos />
-  </target>
+	  <macrodef name="test-exec">
+	    <sequential>
+	      <mkdir dir="${build.dir}/test" />
+	      <junit>
+	        <classpath>
+	          <pathelement path="${obj.dir}"/>
+	          <pathelement path="${build.dir}/test-classes"/>
+	          <fileset dir="${lib.dir}">
+	            <include name="**/*.jar"/>
+	          </fileset>
+	        </classpath>
+	        <formatter type="brief" usefile="false"/>
+	        <formatter type="xml"/>
+	        <batchtest todir="${build.dir}/test">
+	          <fileset dir="${build.dir}/test-classes">
+	            <include name="**/*Test.class" />
+	          </fileset>
+	        </batchtest>
+	        <jvmarg value="-ea"/>   
+	      </junit>
+	    </sequential>
+	  </macrodef>
+
+	  <target name="test" depends="compile" >
+	    <test-init />
+	    <test-exec />
+	  </target>
+
+	  <macrodef name="zip-merge">
+	    <attribute name="libfile" />
+	    <element name="zip-element" implicit="true"/>
+	    <sequential>
+	      <zip destfile="@{libfile}" update="true">
+	        <zip-element/>
+	      </zip>
+	    </sequential>
+	  </macrodef>
+
+	  <macrodef name="inline-dependencies">
+	    <attribute name="file" default="ant-flaka.jar" />
+	    <sequential>
+	      <zip-merge libfile="@{file}">
+	        <zipgroupfileset dir="${lib.dir}">
+	          <patternset>
+	            <includesfile name="${lib.dir}/__inline__.txt"/> 
+	          </patternset>
+	        </zipgroupfileset>
+	      </zip-merge>
+	    </sequential>
+	  </macrodef>
+
+
+	  <macrodef name="package">
+	    <attribute name="distdir"  default="${dist.dir}" />
+	    <attribute name="distfile" default="${dist.dir}/ant-flaka-${version}${patchv}.jar" />
+	    <attribute name="objdir"   default="${obj.dir}" />
+	    <sequential>
+	      <mkdir dir="@{distdir}" />
+	      <jar jarfile="@{distfile}">
+	        <fileset dir="@{objdir}">
+	          <include name="**/*.class" />
+	          <include name="**/antlib.xml" />
+	        </fileset>
+	        <fileset dir="src">
+	          <include name="**/antlib.xml" />
+	        </fileset>
+	      </jar>
+	      <inline-dependencies 
+	          file="@{distfile}"
+	          />
+	      <copy 
+	          tofile="ant-flaka.jar" 
+	          verbose="true" 
+	          overwrite="true" 
+	          file="@{distfile}"  
+	          />
+	    </sequential>
+	  </macrodef>
+
+	  <target name="package" depends="compile">
+	    <sequential>
+	      <package />
+	    </sequential>
+	  </target>
+
+
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	  <!--                       J A V A D O C                         -->
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+	  <presetdef name="javadoc">
+	    <javadoc
+	        packagenames    = "it.haefelinger.flaka.*"
+	        sourcepath      = "${src.dir}"
+	        >
+	      <classpath>
+	        <fileset dir="${lib.dir}">
+	          <include name="**/*.jar"/>
+	        </fileset>
+	      </classpath> 
+	      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
+	      <link href="http://www.jdom.org/docs/apidocs" />
+	      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+	      <link href="http://javadoc.haefelinger.it/org.apache.ant/1.7.1" />
+	      <link href="http://javadoc.haefelinger.it/net.sourceforge.cruisecontrol/2.8.2" />
+	      <link href="http://javadoc.haefelinger.it/net.sourceforge.juel/2.1" />
+	      <link href="http://logging.apache.org/log4j/1.2/apidocs" />
+	      <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
+	    </javadoc>
+	  </presetdef>
+
+
+	  <macrodef name="javadoc-exec" >
+	    <sequential>
+	      <mkdir dir="${javadoc.dir}"/>
+	      <javadoc destdir="${javadoc.dir}" >
+	        <fileset dir="${src.dir}" defaultexcludes="yes"/>
+	      </javadoc>      
+	    </sequential>
+	  </macrodef>
+
+	  <macrodef name="package-javadoc-exec" >
+	    <sequential>
+	      <!-- create dist folder directory -->
+	      <mkdir dir="${dist.dir}"/>
+	      <zip zipfile="${dist.dir}/flaka-javadoc-${version}.zip">
+	        <zipfileset dir="${javadoc.dir}"
+	                    prefix="it.haefelinger.flaka/"
+	                    >
+	          <include name="**/*" />
+	        </zipfileset>
+	      </zip>
+	    </sequential>
+	  </macrodef>
+
+	  
+	  <target name="javadoc" depends="init">
+	    <javadoc-exec />
+	  </target>
+	  
+	  <target name="package-javadoc" depends="javadoc">
+	    <package-javadoc-exec />
+	  </target>
+
+
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	  <!--                    P A C K A G E - D I S T                  -->
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+	  <macrodef name="package-dist-exec" >
+	    <attribute name="prefix" default="flaka-${version}${patchv}/" />
+	    <sequential>
+	      <!-- create dist folder directory -->
+	      <mkdir dir="${dist.dir}"/>
+	      <zip zipfile="${dist.dir}/flaka-${version}${patchv}.zip">
+	        <zipfileset dir="." prefix="@{prefix}">
+	          <exclude name="build/" />
+	          <exclude name=".project" />
+	          <exclude name=".settings/" />
+	          <exclude name=".classpath" />
+	          <exclude name=".svn/" />
+	          <exclude name=".git/" />
+	          <exclude name="CVS" />
+	          <exclude name="**/removeme/" />
+	          <exclude name="tryme.xml" />
+	          <exclude name="**/*tryme*" />
+	          <exclude name="tmp/" />
+	          <exclude name="var/" />
+	          <exclude name="test/**/*.jar" />
+	          <exclude name="test/build/" />
+	        </zipfileset>
+	      </zip>
+	    </sequential>
+	  </macrodef>
+
+
+	  
+	  <target name="package-dist" depends="package">
+	    <package-dist-exec />
+	  </target>
+
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	  <!--                    P A C K A G E - A L L                    -->
+	  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+	  <target name="package-all" 
+	          depends="
+	                   package,
+	                   package-javadoc,
+	                   package-dist
+	                   " />
 
 </project>
