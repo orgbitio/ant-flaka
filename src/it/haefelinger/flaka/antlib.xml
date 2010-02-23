@@ -28,7 +28,6 @@
   <taskdef name="cvsstat" classname="it.haefelinger.flaka.CvsStat" />
   <taskdef name="dotclasspath-task" classname="it.haefelinger.flaka.DotClassPath" />
   <taskdef name="echo" classname="it.haefelinger.flaka.Echo" />
-  <taskdef name="export" classname="it.haefelinger.flaka.Export" />
   <taskdef name="export-task" classname="it.haefelinger.flaka.Export" />
   <taskdef name="find" classname="it.haefelinger.flaka.Find" />
   <taskdef name="for" classname="it.haefelinger.flaka.For" />
@@ -539,11 +538,7 @@
         <c:test-init />
       </presetdef>
 
-      <!--macro `test-junit'-->
-      <presetdef name="test-junit">
-        <c:test-junit />
-      </presetdef>
-
+ 
       <!--macro `test-post'-->
       <presetdef name="test-post">
         <c:test-post />
@@ -1548,28 +1543,7 @@
     </sequential>
   </macrodef>
 
-  <presetdef name="test-junit">
-    <c:test-junit>
-      <init>
-        <c:unset>test.failed</c:unset>
-        <delete dir="${test.xml.dir}"/>
-        <c:make-dir dir="${test.xml.dir}"/>
-      </init>
-      <exec>
-        <junit>
-          <classpath>
-            <path refid="@{classpath}"/>
-          </classpath>
-          <formatter type="brief" usefile="false"/>
-          <formatter type="xml"/>
-          <batchtest todir="${test.xml.dir}">
-            <fileset refid="@{fileset}"/>
-          </batchtest>
-          <jvmarg value="-ea"/>   
-        </junit>
-      </exec>
-    </c:test-junit>
-  </presetdef>
+ 
 
 
   <!--==========================================================-->

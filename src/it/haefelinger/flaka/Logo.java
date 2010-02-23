@@ -19,6 +19,7 @@
 package it.haefelinger.flaka;
 
 import it.haefelinger.flaka.util.Static;
+import it.haefelinger.flaka.util.TextReader;
 
 import org.apache.tools.ant.BuildException;
 
@@ -32,10 +33,11 @@ public class Logo extends Task
   protected String text = "";
   protected String chr = ":";
   protected int width = 80;
+  protected TextReader tr = new TextReader();
 
-  public void setText(String s)
+  public void addText(String s)
   {
-    this.text = Static.trim2(s, this.text);
+    this.tr.addText(s);
   }
 
   public void setChr(String s)
@@ -50,7 +52,23 @@ public class Logo extends Task
 
   public void execute() throws BuildException
   {
-    System.out.print(Static.logo(this.text, this.width));
+    this.tr.setComment(";");
+    this.tr.setSkipws(true);
+    this.tr.setResolveContLines(true);
+    this.tr.setProject(getProject());
+    this.tr.setSkipEmpty(false);
+    String line = this.tr.readLine();
+    System.out.println(Static.mkchrseq(this.chr,this.width));
+    int w = this.chr.length();
+    while(line != null)
+    {
+      System.out.print(this.chr);
+      System.out.print(Static.center(line,this.width - 2 * w," "));
+      System.out.print(this.chr);
+      System.out.println();
+      line = this.tr.readLine();
+    }
+    System.out.println(Static.mkchrseq(this.chr,this.width));
     System.out.flush();
   }
 }

@@ -567,7 +567,7 @@ final public class Static
     return s;
   }
 
-  final public static String mkchrseq(char c, int n)
+  final public static String mkchrseq(String c, int n)
   {
     String s = "";
     /* terrible inefficient */
@@ -576,7 +576,7 @@ final public class Static
     return s;
   }
 
-  final private static String center(String S, int width, char chr)
+  final public static String center(String S, int width, String chr)
   {
     int w;
     String s = S;
@@ -602,13 +602,13 @@ final public class Static
 
     h = (msg == null ? "Hello, Flaka" : msg );
 
-    s += mkchrseq(':', width);
+    s += mkchrseq(":", width);
     s += '\n';
     s += "::";
-    s += center(h, width - 4, ' ');
+    s += center(h, width - 4, " ");
     s += "::";
     s += '\n';
-    s += mkchrseq(':', width);
+    s += mkchrseq(":", width);
     s += '\n';
     return s;
   }

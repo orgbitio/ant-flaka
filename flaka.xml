@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="package">
+<project xmlns:c="antlib:it.haefelinger.flaka" name="Flaka" default="compile">
 	 <description>
 	    ========================================================================
 	    ===     This is the build script building Flaka using Flaka          ===
@@ -44,7 +44,12 @@
 	  </description>
 	
   <c:install-property-handler />
-	<c:logo text="Hello\ns"/>
+	<c:logo>
+		Hello, #{ project.name} 
+		This is 
+		#{ property['ant.file'].tofile.name }
+		reporting.
+	</c:logo>
 	<c:let>
  		
 	  depot.url   := 'http://download.haefelinger.it/flaka/dependencies'
