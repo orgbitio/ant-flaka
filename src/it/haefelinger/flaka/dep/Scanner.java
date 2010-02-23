@@ -62,6 +62,7 @@ public class Scanner
     this.file = null;
     this.map.put("scope",new HashMap());
     this.map.put("each",new ArrayList());
+    this.map.put("alias",new HashMap());
     return this;
   }
 
@@ -70,10 +71,10 @@ public class Scanner
     if (Character.isDigit(c))
       return c;
     if (Character.isLetter(c))
-      return Character.toUpperCase(c);
+      return c;
     if (c == '_')
       return c;
-    return '_';
+    return '-';
   }
 
   static private String name2alias(String v)
@@ -86,34 +87,14 @@ public class Scanner
     return s;
   }
 
-//  protected void annotate(File file) 
-//  {
-//    Iterator iter;
-//    
-//    if (this.list != null) {
-//      iter = iterator();
-//      while(iter.hasNext()) {
-//        Dependency d = (Dependency)iter.next();
-//        d.setLocation(file);
-//      }
-//    }
-//  }
-//  
-//  protected Iterator iterator() {
-//    return getList().iterator();
-//  }
-  
-//  protected List getList() {
-//    if (this.list == null) 
-//      this.list = new ArrayList();
-//    return this.list;
-//  }
-  
   protected Map getScopeMap() {
-    Map map = (Map)this.map.get("scope");
+      Map map = (Map)this.map.get("scope");
     return map;
   }
-  
+  protected Map getAliasMap() {
+    Map map = (Map)this.map.get("alias");
+  return map;
+}
   protected void add(String scope,Dependency d) {
     Map m = getScopeMap();
     List v = (List)m.get(scope);
@@ -144,6 +125,14 @@ public class Scanner
     ((ArrayList)this.map.get("each")).add(d);
     for(int i=0;i<scope.length;++i)
       add(scope[i], d);
+    
+    // do we have a alias? If so, then we add it to special property
+    // alias.
+    String alias = d.getAlias();
+    if (alias != null && !alias.matches("\\s*")) {
+      alias = alias.trim();
+      getAliasMap().put(alias,d);
+    }
   }
   /**
    * @param file not null
@@ -199,6 +188,8 @@ public class Scanner
        * dependencies with property variables based on "alias".
        */
       alias = Static.nodeattribute(node, "alias", null);
+      
+      // If there is a type, then use it other it will be 'jar'.
       type = Static.nodeattribute(node, "type", "jar");
 
       /* set alias to be "<name>.<type>" */
@@ -223,10 +214,19 @@ public class Scanner
       value = Static.nodeattribute(node, "version", null);
       if (value != null)
         dep.setVersion(value);
+      value = Static.nodeattribute(node, "rev", null);
+      if (value != null)
+        dep.setVersion(value);
       value = Static.nodeattribute(node, "groupid", null);
       if (value != null)
         dep.setGroupId(value);
+      value = Static.nodeattribute(node, "group", null);
+      if (value != null)
+        dep.setGroupId(value);
       value = Static.nodeattribute(node, "artifactid", null);
+      if (value != null)
+        dep.setArtifactId(value);
+      value = Static.nodeattribute(node, "name", null);
       if (value != null)
         dep.setArtifactId(value);
       value = Static.nodeattribute(node, "type", null);

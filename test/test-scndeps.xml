@@ -5,23 +5,26 @@
 	
   <macrodef name="dependency">
     <attribute name="alias" default="" />
-    <element name="groupId" />
+
+  	<attribute name="group" default="" />
+    <attribute name="name" default="" />
+    <attribute name="rev" default="" />
+
+  	<element name="groupId" />
     <element name="artifactId" />
     <element name="version" />
     <sequential />
   </macrodef>
 
+	<!-- A classical Maven dependency (except scope) -->
   <c:dependency scope="test">
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
     <version>3.8.1</version>
   </c:dependency>
 
-  <dependency alias="log4j">
-    <groupId>log4j</groupId>
-    <artifactId>log4j</artifactId>
-    <version>1.2.8</version>
-  </dependency>
+	<!-- A unscoped dependency -->
+  <dependency alias="log4j" group="log4j" name="log4j" rev="1.2.8" />
 
   <!--
       Scan depenencies into variable 'dependencies'. The structure is

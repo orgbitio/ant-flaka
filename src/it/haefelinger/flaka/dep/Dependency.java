@@ -18,8 +18,9 @@
 
 package it.haefelinger.flaka.dep;
 
+import it.haefelinger.flaka.util.Static;
+
 import java.io.File;
-import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
@@ -95,35 +96,7 @@ import org.apache.tools.ant.Project;
 //
 public class Dependency
 {
-  final static public int UDM_REGULAR = 0;
-  final static public int UDM_SNAPSHOT = 1;
-  final static public int UDM_SNAPSHOT_STRICT = 2;
-  // status codes
-  // This dependency is in it's initial state, no artefact is associated.
-  public static final short UNKOWN = 0;
-  // This dependency needs to be resolved against a Baseline, no artefact
-  // associated.
-  public static final short UNRESOLVED = 1;
-  // This dependency has been retrieved from a remote location; artefact
-  // is associated
-  public static final short RETRIEVED_REMOTE = 2;
-  // The dep was found in the file cache
-  public static final short RETRIEVED_CACHE = 3;
-  // The dependency exists locally and is up-to-date
-  public static final short ISCURRENT = 4;
-  // The dependency could not be found either on the network or
-  // in the file cache or file directory
-  public static final short NOTFOUND = 5;
-  // The dependency exists but cannot be
-  // downloaded from the given URL
-  public static final short IOERROR_REMOTE = 6;
-  // The dependency exists in a cache but cannot be
-  // copied over
-  public static final short IOERROR_CACHE = 7;
-  public static final short ILLEGAL_STATE = 8;
 
-  /* The status of this dependency regarding retrieval */
-  protected short stat = UNKOWN;
   /* The logical name of this dependency (if any) */
   protected String alias = null;
   /* The revision/version */
@@ -146,12 +119,9 @@ public class Dependency
   protected File location = null;
   /* The alternative location from where to get the artifact */
   protected String alt;
-  /* The url used for remote retrieval */
-  protected URL url;
-  /* The update mode */
-  public byte mode = UDM_REGULAR;
-  /* Error message */
-  public String errmsg = null;
+
+
+ 
   /* This is the task which created this dependency */
   public Project proj;
 
@@ -165,7 +135,6 @@ public class Dependency
   {
     Dependency d = new Dependency(this.proj);
     d.alias = this.alias;
-    d.stat = this.stat;
     d.rev = this.rev;
     d.type = this.type;
     d.group = this.group;
@@ -176,22 +145,10 @@ public class Dependency
     d.file = this.file;
     d.location = this.location;
     d.alt = this.alt;
-    d.url = this.url;
-    d.mode = this.mode;
-    d.errmsg = this.errmsg;
     return d;
   }
 
-  public void setStatus(short x)
-  {
-    this.stat = x;
-  }
-
-  public short getStatus()
-  {
-    return this.stat;
-  }
-
+ 
   public String getAlias()
   {
     return this.alias;
@@ -199,30 +156,10 @@ public class Dependency
 
   public void setAlias(String S)
   {
-    String s = S;
-    if (s == null)
-      return;
-    s = s.trim();
-    if (s.length() <= 0)
-      return;
-    /* we don't normalize here, we take the alias as is */
-    this.alias = s;
-    this.stat = UNRESOLVED;
+    this.alias = Static.trim2(S,null);
   }
 
-  /**
-   * @return alt
-   */
-  public URL getURL()
-  {
-    return this.url;
-  }
-
-  public void setURL(URL url)
-  {
-    this.url = url;
-  }
-
+  
   /**
    * @return alt
    */
@@ -239,6 +176,19 @@ public class Dependency
     return this.rev;
   }
 
+  // Ivy names
+  public String getRev()
+  {
+    return this.rev;
+  }
+  public String getGroup()
+  {
+    return this.group;
+  }
+  public String getName()
+  {
+    return this.name;
+  }
   /**
    * @param string
    */
@@ -690,8 +640,7 @@ public class Dependency
       }
     }
 
-    /* This dependency is resolved, set proper status now */
-    this.setStatus(UNKOWN);
+
     return c;
   }
 

@@ -45,7 +45,7 @@ import org.apache.tools.ant.Project;
 public class ScanDeps extends MatchingTask
 {
   static protected Pattern P = Pattern.compile("^\\s*(\\w+)\\s*=\\s*(.*)");
-  protected String var;
+  protected String var = "dependencies";
   protected String dir = "''.tofile";
   protected Map map;
   protected TextReader dec;
