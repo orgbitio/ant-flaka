@@ -60,7 +60,10 @@
 		javadoc.dir := '${build.dir}/javadoc'
 
   </c:let>
-
+  <c:list var=" depots ">
+    'http://repo1.maven.org'
+  	${depot.url}
+  </c:list>
 
   <c:dependencies>
     <c:dependency scope="compile">
@@ -118,22 +121,19 @@
 
   <mkdir dir="${lib.dir}" />
 
-  <c:scndeps var=" dependencies ">
+  <c:scandeps var=" dependencies ">
   	<decorate>
   		;; artefacts shall go here 
   		dest = '${lib.dir}'
   	</decorate>
-    <include name="build.xml" />
-  </c:scndeps>
+    <include name="flaka.xml" />
+  </c:scandeps>
 
   <c:echo>
     #{dependencies}
   </c:echo>
 
   <c:for var="d" in=" dependencies.each ">
-    <c:echo>
-      downloading dependencies ..
-    </c:echo>
     <c:for var="r" in=" depots ">
       <c:when test=" not(d.file.exists)" >
         <get src="#{concat(r,d.m2path)}" dest="#{d.file}" verbose="off" ignoreerrors="true"/>
@@ -150,9 +150,7 @@
   
   <target name="init">
     <c:echo>
-    
-    depot.url   := ${depot.url}
-          
+ 
     version     := ${version}
     patchv      := 
 
@@ -237,26 +235,15 @@
 	    <test-exec />
 	  </target>
 
-	  <macrodef name="zip-merge">
-	    <attribute name="libfile" />
-	    <element name="zip-element" implicit="true"/>
-	    <sequential>
-	      <zip destfile="@{libfile}" update="true">
-	        <zip-element/>
-	      </zip>
-	    </sequential>
-	  </macrodef>
-
+	
 	  <macrodef name="inline-dependencies">
 	    <attribute name="file" default="ant-flaka.jar" />
 	    <sequential>
-	      <zip-merge libfile="@{file}">
-	        <zipgroupfileset dir="${lib.dir}">
-	          <patternset>
-	            <includesfile name="${lib.dir}/__inline__.txt"/> 
-	          </patternset>
-	        </zipgroupfileset>
-	      </zip-merge>
+	    	<c:for var="d" in="dependencies.scope.inline" >
+	    		<zip destfile="@{file}" update="true">
+	    		  <zipfileset src="#{ d.file }" />
+	        </zip>
+	    	</c:for>
 	    </sequential>
 	  </macrodef>
 
