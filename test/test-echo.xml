@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+  <c:echo shift="80%" />
   <c:echo />
   <echo>foobar
 </echo>
@@ -64,4 +65,5 @@
   <c:let>
     f = ''.tofile
   </c:let>
+
 </project>

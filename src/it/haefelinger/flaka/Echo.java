@@ -87,18 +87,18 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   
   public void execute() throws BuildException
   {
-    if (this.message != null && !this.message.matches("\\s*"))
+    if (this.message != null)
     {
       this.tr.setProject(getProject());
       this.tr.setText(this.message);
       // Read all text in one go instead line by line.
       this.message = this.tr.read();
     }
-    if (this.message != null)
-    {
-      /* let my parent handle this */
-      super.execute();
-    }
+    if (this.message == null)
+      this.message = this.tr.getShift();
+    
+    /* let my parent handle this */
+    super.execute();
   }
 
 }

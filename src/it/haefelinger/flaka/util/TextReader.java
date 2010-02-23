@@ -129,6 +129,10 @@ public class TextReader
     }
     return this;
   }
+  public String getShift() {
+    return this.shift == null ? "" : this.shift;
+  }
+  
   public TextReader setComment(String comment)
   {
     this.comment = makepattern(Static.trim2(comment,null));
