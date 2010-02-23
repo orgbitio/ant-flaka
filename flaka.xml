@@ -44,6 +44,7 @@
 	  </description>
 	
   <c:install-property-handler />
+	<c:logo text="Hello\ns"/>
 	<c:let>
  		
 	  depot.url   := 'http://download.haefelinger.it/flaka/dependencies'

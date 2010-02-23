@@ -600,18 +600,14 @@ final public class Static
     String s = "";
     String h;
 
-    h = "use `ant -p' to get a list of useful targets";
+    h = (msg == null ? "Hello, Flaka" : msg );
 
     s += mkchrseq(':', width);
     s += '\n';
     s += "::";
-    s += center(msg, width - 4, ' ');
-    s += "::";
-    s += '\n';
-    s += "::";
     s += center(h, width - 4, ' ');
     s += "::";
-    s += "\n";
+    s += '\n';
     s += mkchrseq(':', width);
     s += '\n';
     return s;
