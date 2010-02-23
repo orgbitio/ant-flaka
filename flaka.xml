@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="Flaka" default="compile">
+<project xmlns:c="antlib:it.haefelinger.flaka" name="Flaka" default="package">
 	 <description>
 	    ========================================================================
 	    ===     This is the build script building Flaka using Flaka          ===
