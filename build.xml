@@ -62,7 +62,7 @@
 
   <property
       name="version"
-      value="1.01"
+      value="1.01.01_RC01"
       />
   <!-- patch version, increase for fixes. Initially empty. When using, -->
   <!-- use something like '.4712' being 4712 the patch level used. -->  
