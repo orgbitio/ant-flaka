@@ -1008,7 +1008,7 @@ final public class Static
    * @return true in case key could be removed from Hashtable denoted * by
    *         attribute <code>att</code>.
    */
-  final static public boolean htabremove(org.apache.tools.ant.PropertyHelper obj, String att, String key)
+  final static public boolean htabremove(Object obj, String att, String key)
   {
     boolean b = false;
     if (obj != null)
@@ -1800,22 +1800,11 @@ final public class Static
   static final public Project unset(Project project, String... properties)
   {
     Object obj;
-    org.apache.tools.ant.PropertyHelper ph;
-   
     obj = project.getReference("ant.PropertyHelper");
-    ph = (org.apache.tools.ant.PropertyHelper)obj;
-    
-    /* ID #1, loop over all property handlers when removing
-     * a property. 
-     */
-    while (ph != null)
+    for (String name : properties)
     {
-      for (String name : properties)
-      {
-        Static.htabremove(ph, "properties", name);
-        Static.htabremove(ph, "userProperties", name);
-      }
-      ph = ph.getNext();
+      Static.htabremove(obj, "properties", name);
+      Static.htabremove(obj, "userProperties", name);
     }
     return project;
   }
