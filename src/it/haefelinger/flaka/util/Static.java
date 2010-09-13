@@ -1797,14 +1797,26 @@ final public class Static
     return f;
   }
 
+  
   static final public Project unset(Project project, String... properties)
   {
     Object obj;
+    org.apache.tools.ant.PropertyHelper ph;
+   
     obj = project.getReference("ant.PropertyHelper");
-    for (String name : properties)
+    ph = (org.apache.tools.ant.PropertyHelper)obj;
+    
+    /* ID #1, loop over all property handlers when removing
+     * a property. 
+     */
+    while (ph != null)
     {
-      Static.htabremove(obj, "properties", name);
-      Static.htabremove(obj, "userProperties", name);
+      for (String name : properties)
+      {
+        Static.htabremove(ph, "properties", name);
+        Static.htabremove(ph, "userProperties", name);
+      }
+      ph = ph.getNext();
     }
     return project;
   }
