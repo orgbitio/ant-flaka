@@ -15,6 +15,7 @@
   <!--=============================================================-->
 
   <taskdef name="install-reference-handler" classname="it.haefelinger.flaka.PropertyHelper" /><!--  deprecated --> 
+  <!--  TODO: fix manual -->
   <taskdef name="install-property-handler" classname="it.haefelinger.flaka.PropertyHelper" /> 
   <taskdef name="while" classname="it.haefelinger.flaka.While" />
   <taskdef name="rescue" classname="it.haefelinger.flaka.Rescue" />
