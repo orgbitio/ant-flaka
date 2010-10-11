@@ -47,7 +47,7 @@
   <taskdef name="scndeps" classname="it.haefelinger.flaka.ScanDeps" />
   <taskdef name="scandeps" classname="it.haefelinger.flaka.ScanDeps" />
   <taskdef name="set-default-target" classname="it.haefelinger.flaka.SetDefault" />
-  <taskdef name="switch"   classname="it.haefelinger.flaka.Switch02" />
+  <taskdef name="switch" classname="it.haefelinger.flaka.Switch" />
   <taskdef name="taskdotclasspath" classname="it.haefelinger.flaka.DotClassPath" />
   <taskdef name="throw" classname="it.haefelinger.flaka.Throw" />
   <taskdef name="try-exec" classname="it.haefelinger.flaka.Exec" />

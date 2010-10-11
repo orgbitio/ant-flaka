@@ -18,7 +18,6 @@
 
 package it.haefelinger.flaka.el;
 
-import it.haefelinger.flaka.Switch.MatcherBean;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
