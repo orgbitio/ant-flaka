@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+  <target name="test-case">
   <c:choose>
   </c:choose>
 
@@ -25,5 +26,5 @@
   <fail if="p2" />
   <fail unless="p3" />
   <fail if="p4" />
-
+  </target>
 </project>

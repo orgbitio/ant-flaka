@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:echo shift="80%" />
   <c:echo />
   <echo>foobar
@@ -66,4 +67,5 @@
     f = ''.tofile
   </c:let>
 
+</target>
 </project>

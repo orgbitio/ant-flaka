@@ -1,7 +1,8 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 	<presetdef name="when">
 		<c:when debug="true" />
-	</presetdef>
+  </presetdef>
 	<property name="bar" value="true" />
 
 	<when test=" property.foo ">
@@ -31,5 +32,5 @@
 	<when test="not f">
 		<fail message=" f evaluates to false??" />
 	</when>
-
+</target>
 </project>

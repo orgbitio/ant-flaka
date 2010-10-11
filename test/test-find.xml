@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 
   <c:property-handler/>
 
@@ -10,4 +11,5 @@
   </c:echo>
   <c:find dir=" basefolder " />
  
+</target>
 </project>

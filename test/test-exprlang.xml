@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 	<fail if="x" />
 	<c:unless test=" empty property.x">
 		<fail message="[1] empty property.x" />
@@ -70,4 +71,5 @@
 
   
 
+</target>
 </project>

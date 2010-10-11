@@ -1,6 +1,6 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
-
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+<target name="test-case">
   <!-- Initial test to check whether set/unset works properly. Both tasks are -->
   <!-- used to determine whether trycatch/throw works as expected.            -->
   <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
@@ -64,4 +64,5 @@
       <fail-if-defined property="after-throw" />
     </finally>
   </c:trycatch>
+</target>
 </project>

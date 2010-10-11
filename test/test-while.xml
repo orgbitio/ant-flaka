@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" xmlns:foo="foobar">
+<target name="test-case">
 
   <c:let>
     i = 0
@@ -14,4 +15,5 @@
   </c:let>
   </c:while>
 
+</target>
 </project>

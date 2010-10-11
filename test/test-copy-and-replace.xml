@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <property name="var.dir" value="${basedir}/../build/var" />
   <mkdir dir="${var.dir}" />
   <property name="folder" value="${var.dir}/removeme" />
@@ -12,4 +13,5 @@
     <fail message="folder ${folder} not created." />
   </c:unless>
   <!-- TODO: check that files are equal -->
+</target>
 </project>

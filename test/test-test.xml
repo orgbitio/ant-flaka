@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 	<property name="Z" value="zzz" />
 	<property name="comment" value=";" />
 	<c:let comment="${comment}">
@@ -97,4 +98,5 @@
 		<fail message="[7b] but b must evaluate to false" />
 	</c:unless>
 
+</target>
 </project>

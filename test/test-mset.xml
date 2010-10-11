@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:let>
     s := '3 * 5'
     ;; defines r as 15
@@ -55,4 +56,5 @@
     </c:echo>
   </c:for>
 
+</target>
 </project>

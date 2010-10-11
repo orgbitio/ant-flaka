@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 
   <c:for />
   <c:for var="" />
@@ -99,4 +100,5 @@
   <fail message="X5 *not* defined" unless="X5" />
   <fail message="X6 *not* defined" unless="X6" />
 
+</target>
 </project>

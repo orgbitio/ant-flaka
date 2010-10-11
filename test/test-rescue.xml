@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 
   <c:rescue>
     <vars>
@@ -56,6 +57,6 @@
   <c:fail test="not has.var.v1" />
   <c:fail test="property.p1 != 'hello'" />
   <c:fail test="var.v1 != 15"/>
- 
+</target> 
 
 </project>

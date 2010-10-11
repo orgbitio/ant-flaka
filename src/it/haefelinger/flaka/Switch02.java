@@ -82,12 +82,17 @@ public class Switch02 extends Task
   static protected final class RE extends Case
   {
     public String regexstr = null;
+    public boolean literally = true;
 
     public void setExpr(String value)
     {
       this.regexstr = Static.trim3(getProject(), value, this.regexstr);
     }
 
+    public void setLiterally(boolean b)
+    {
+      this.literally = b;
+    }
     /**
      * Try this value against this clause.
      */
@@ -103,8 +108,12 @@ public class Switch02 extends Task
           P = Pattern.compile(this.regexstr, this.flags);
         } catch (Exception e)
         {
-          // TODO: review
-          throw new BuildException(e);
+          if (this.literally) {
+            Static.warning(this.getProject(),"illegal regex '"+this.regexstr+"'. Taking expr literally..");
+            P = Pattern.compile(Pattern.quote(this.regexstr),this.flags);
+          } else {
+            throw new BuildException(e);
+          }
         }
         r = find(P, value);
       }
@@ -237,7 +246,7 @@ public class Switch02 extends Task
       return r;
     }
 
-    public boolean tryvalue(String value)
+    public boolean tryvalue(@SuppressWarnings("unused") String value)
     {
       return false;
     }

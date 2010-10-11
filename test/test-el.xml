@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <property name="foobar" value="" />
   <fail unless="foobar" />
   <c:when test=" not has.property.foobar " >
@@ -60,4 +61,5 @@
     #{ "'" }
     #{}
 	</c:echo>
+</target>
 </project>

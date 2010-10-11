@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <mkdir dir="tmp" />
   <echo message="hello world" file="tmp/greeting.txt" />
   <c:cat src="tmp/greeting.txt" />
@@ -11,5 +12,5 @@
     <catch type="*" match="*">
     </catch>
   </c:trycatch>
-  
+</target>
 </project>

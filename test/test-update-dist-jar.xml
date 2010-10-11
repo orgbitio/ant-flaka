@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:find dir="${basedir}">
     <include name="lib/*.jar" />
   </c:find>
@@ -16,4 +17,5 @@
   </c:update-dist-jar>
 
   <c:dependencies />
+</target>
 </project>

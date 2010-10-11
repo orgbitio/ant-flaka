@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="PROJECT NAME">
+<target name="test-case">
   <description>
     Test (E)expression (L)angugage
   </description>
@@ -45,4 +46,5 @@
   <assert-false cond=" true == false " />
 
 
+</target>
 </project>

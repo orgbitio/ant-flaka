@@ -1,4 +1,4 @@
-<project name="ant-flaka" default="package">
+<project name="ant-flaka" default="package" xmlns:au="antlib:org.apache.ant.antunit">
   <description>
     ========================================================================
     === This is the build script building the Flaka project from scratch ===
@@ -220,7 +220,7 @@
     </sequential>
   </target>
 
-  <target name="compile" depends="clean, init">
+  <target name="compile" depends="init">
     <sequential>
       <!-- Todo: use M2 names -->
       <mkdir dir="${obj.dir}"/>
@@ -269,6 +269,22 @@
         </batchtest>
         <jvmarg value="-ea"/>   
       </junit>
+      <!-- Add ant-flaka.jar to classpath -->
+      <taskdef uri="antlib:it.haefelinger.flaka"
+               resource="it/haefelinger/flaka/antlib.xml"
+               classpath="${basedir}/ant-flaka.jar"/>
+      <!-- Add ant-antunit.jar to classpath -->
+      <taskdef uri="antlib:org.apache.ant.antunit"
+               resource="org/apache/ant/antunit/antlib.xml"
+               classpath="${lib.dir}/ant-antunit-1.1.jar" />
+      <au:antunit>
+        <fileset dir="test">
+          <include name="test-*.xml" />
+          <exclude name="test-scndeps.xml" />
+          <exclude name="test-set-default-target.xml" />
+        </fileset>
+        <au:plainlistener/>
+      </au:antunit>
     </sequential>
   </macrodef>
 
@@ -440,6 +456,7 @@
                    package-javadoc,
                    package-dist
                    " />
+
 
 
 </project>

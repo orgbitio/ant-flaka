@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:let>
     foo = 'foo'
   </c:let>
@@ -15,4 +16,5 @@
     <c:fail message="unexpected value for property foobar: #{property.foobar}" />
   </c:when>
 
+</target>
 </project>

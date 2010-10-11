@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:echo>
     #{"a'c'} -- illegal :recover from here =>"}
     #{"abc"} -- abc
@@ -13,4 +14,5 @@
     #{'\\ab\\'} -- \ab\   (todo: ab\\ should stop continuation line!!)
   </c:echo>
 
+</target>
 </project>

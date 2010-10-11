@@ -5,9 +5,9 @@
 	<classpathentry kind="lib" path="build/lib/ant-launcher-1.7.1.jar"/>
 	<classpathentry kind="lib" path="build/lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/lib/jdom-1.0.jar"/>
-	<classpathentry kind="lib" path="build/lib/juel-2.1.1-rc4.jar" sourcepath="/Users/geronimo/juel-2.1.1-rc4/src/main/java"/>
 	<classpathentry kind="lib" path="build/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="build/test/obj" path="test/java"/>
+	<classpathentry kind="lib" path="build/lib/juel-2.2.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

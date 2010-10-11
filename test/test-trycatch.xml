@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 
 	<macrodef name="fail-if-undefined">
 		<attribute name="property" />
@@ -188,4 +189,5 @@
 	<fail-if-undefined property="caught-panic" />
 
 
+</target>
 </project>

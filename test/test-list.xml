@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
  
   <c:let>
     _var_ = 'list'
@@ -31,4 +32,5 @@
     <c:when test=" typstr != 'FileIntegerIterable ">  
        <fail message="expected: FileIntegerIterable" />
     </c:when>
+</target>
  </project>

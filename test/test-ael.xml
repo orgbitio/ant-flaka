@@ -3,128 +3,131 @@
     Test (E)expression (L)angugage
   </description>
   
-  <property name="name" value="PROPERTY name" />
-  <c:let>
-    name =  'REFERENCE name'
-  </c:let>
-
   <target name="name" description="TARGET name" />
+  
   <macrodef name="name1">
     <sequential>
       <echo>MACRO name</echo>
     </sequential>
   </macrodef>
   
-  <c:let>
-    foo.bar = 'some string (reference)'
-  </c:let>
-  <property name="foo.bar" value="some string (property)'" />
   
-  <taskdef name="name" classname="it.haefelinger.flaka.Echo" />
-  
-  <property name="ant" value="###ANT###" />
-  <property name="el"  value="###EL####" />
+  <target name="test-case">
+    <property name="name" value="PROPERTY name" />
+    <c:let>
+      name =  'REFERENCE name'
+    </c:let>
+    
+    <c:let>
+      foo.bar = 'some string (reference)'
+    </c:let>
+    <property name="foo.bar" value="some string (property)'" />
+    <!-- TODO: make this work ..
+         <taskdef name="name" classname="it.haefelinger.flaka.Echo" />
+    -->
+    <property name="ant" value="###ANT###" />
+    <property name="el"  value="###EL####" />
+    
+    <c:let>
+      antfile =  '${ant.file}'.tofile 
+    </c:let>
+    <c:echo debug="true">
+      #files? : #{size(antfile.parent.list)}
+      
+      parent : #{antfile.parent}
+      
+      ;	#{antfile mkdir}
+      ;	#{antfile delete}
+    </c:echo>
+    <c:echo debug="true" comment=";">
+      file = #{antfile}
+      exists : #{antfile.exists}
+      isfile : #{antfile.isfile}
+      isdir  : #{antfile.isdir}
+      isread : #{antfile.isread}
+      iswrite: #{antfile.iswrite}
+      ishidden:#{antfile.ishidden}
+      size   : #{antfile.size}
+      length : #{antfile.length}
+      touri  : #{antfile.touri}
+      tourl  : #{antfile.tourl}
+      mtime  : #{antfile.mtime}
+      list   : #{antfile.parent.list[1].ishidden}
+      tostr  : #{antfile.tostr}
+      toabs  : #{antfile.toabs}
+      parent : #{antfile.parent}
+      
+      ;	#{antfile mkdir}
+      ;	#{antfile delete}
+      
+      
+      == Files/Folders ==
+      #{'ab'.tofile.parent}
+      #{'${ant.file}'.tofile}
+      
+      ;;#{isfile(expr) and exists(expr) and not isdir(expr) and canread(expr) and canwrite(expr)}
+      #{file('${ant.file}').parent}
+      ;;#{project.tofile('${ant.file}')
+      #{x.parent}
+      ;;#{isfile('${ant.file}')}
+    </c:echo>
+    
+    <c:echo debug="true">
+      # reference only
+      name                   => #{name}
+      # *only* methods!!
+      project.name           => #{project.name}
+      project['name']        => #{project['name']}
+      
+      # property
+      property.name          => #{property.name} 
+      property['name']       => #{property['name']} 
+      # reference
+      reference.name         => #{reference.name}
+      var.name               => #{var.name}
+      # target
+      target.name            => #{target.name}
+      # taskdef
+      taskdef.name           => #{taskdef.name} 
+      # macrodef
+      macrodef.name          => #{macrodef.name1} 
+      # either taskdef or macrodef
+      task.name              => #{task.name}   
+      
+      # expenensive ..
+      project.properties.ant => #{project.properties.ant}
+      # better this way ..
+      property.ant            => #{property.ant}
+      
+      # some math ..
+      value of 1+(37277 * 4777) = #{1+(37277 * 4777)}
+      
+      # Handling of 'dotted' names 
+      # 
+      # queries getBar() on foo - not what we want
+      reference.foo.bar       => #{reference.foo.bar}
+      # NO: there is no 'foo' reference ..
+      reference[foo.bar]      => #{reference[foo.bar]}
+      # GOOD
+      reference['foo.bar']    => #{reference['foo.bar']}
+      # NO
+      foo.bar                 => #{foo.bar}
+      # NO (just evaluates to enclosed string)
+      'foo.bar'               => #{'foo.bar'}
+      
+      name    => #{empty project.name ? '(null)' : project.name}
+      basedir => #{project.baseDir.parent}
+      descr   => #{project.description}
+      
+      == Math ==
+      #{pi} #{e}
+      #{pow(2,4) * sqrt(16)}
+      # other math stuff: sin,cos,tan, 
+      # exp, log  (e^x logn)
+      # abs
+      # max,min
 
-  <c:let>
-    antfile =  '${ant.file}'.tofile 
-  </c:let>
-  <c:echo debug="true">
-    #files? : #{size(antfile.parent.list)}
- 
-  	parent : #{antfile.parent}
-	    
-	    ;	#{antfile mkdir}
-	    ;	#{antfile delete}
-	</c:echo>
-  <c:echo debug="true" comment=";">
-    file = #{antfile}
-    exists : #{antfile.exists}
-    isfile : #{antfile.isfile}
-    isdir  : #{antfile.isdir}
-    isread : #{antfile.isread}
-    iswrite: #{antfile.iswrite}
-    ishidden:#{antfile.ishidden}
-    size   : #{antfile.size}
-    length : #{antfile.length}
-    touri  : #{antfile.touri}
-    tourl  : #{antfile.tourl}
-    mtime  : #{antfile.mtime}
-    list   : #{antfile.parent.list[1].ishidden}
-    tostr  : #{antfile.tostr}
-    toabs  : #{antfile.toabs}
-    parent : #{antfile.parent}
+    </c:echo>
     
-    ;	#{antfile mkdir}
-    ;	#{antfile delete}
-
-    
-    == Files/Folders ==
-    #{'ab'.tofile.parent}
-    #{'${ant.file}'.tofile}
-
-    ;;#{isfile(expr) and exists(expr) and not isdir(expr) and canread(expr) and canwrite(expr)}
-    #{file('${ant.file}').parent}
-    ;;#{project.tofile('${ant.file}')
-    #{x.parent}
-    ;;#{isfile('${ant.file}')}
-  </c:echo>
-  
-  <c:echo debug="true">
-    # reference only
-    name                   => #{name}
-    # *only* methods!!
-    project.name           => #{project.name}
-    project['name']        => #{project['name']}
-    
-    # property
-    property.name          => #{property.name} 
-    property['name']       => #{property['name']} 
-    # reference
-    reference.name         => #{reference.name}
-    var.name               => #{var.name}
-    # target
-    target.name            => #{target.name}
-    # taskdef
-    taskdef.name           => #{taskdef.name} 
-    # macrodef
-    macrodef.name          => #{macrodef.name1} 
-    # either taskdef or macrodef
-    task.name              => #{task.name}   
-    
-    # expenensive ..
-    project.properties.ant => #{project.properties.ant}
-    # better this way ..
-    property.ant            => #{property.ant}
-    
-    # some math ..
-    value of 1+(37277 * 4777) = #{1+(37277 * 4777)}
-    
-    # Handling of 'dotted' names 
-    # 
-    # queries getBar() on foo - not what we want
-    reference.foo.bar       => #{reference.foo.bar}
-    # NO: there is no 'foo' reference ..
-    reference[foo.bar]      => #{reference[foo.bar]}
-    # GOOD
-    reference['foo.bar']    => #{reference['foo.bar']}
-    # NO
-    foo.bar                 => #{foo.bar}
-    # NO (just evaluates to enclosed string)
-    'foo.bar'               => #{'foo.bar'}
-    
-    name    => #{empty project.name ? '(null)' : project.name}
-    basedir => #{project.baseDir.parent}
-    descr   => #{project.description}
-    
-    == Math ==
-    #{pi} #{e}
-    #{pow(2,4) * sqrt(16)}
-    # other math stuff: sin,cos,tan, 
-    # exp, log  (e^x logn)
-    # abs
-    # max,min
-
-  </c:echo>
-  
-  
+  </target>
 </project>

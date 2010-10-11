@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
   <c:let>
     ;; this task is not yet ready
     ready = false
@@ -56,4 +57,5 @@
     </c:echo>
   </c:when>
 
+</target>
 </project>

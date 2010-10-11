@@ -1,4 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
 
   <c:xmlmerge
       dst = "-"
@@ -6,4 +7,5 @@
       pattern = "*.xml"
       />
 
+</target>
 </project>
