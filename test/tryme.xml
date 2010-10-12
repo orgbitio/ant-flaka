@@ -1,68 +1,21 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
-
-
-	<macrodef name="greeting">
-		<sequential>
-			<c:echo>
-        Hello, World!
-      </c:echo>
-		</sequential>
-	</macrodef>
-
-	<c:let>
-		apropos = 'antlib:it.haefelinger.flaka:apropos'
-		let     = 'antlib:it.haefelinger.flaka:let'
-	</c:let>
+	 
+	 <fail if="pass" />
+	    <c:let>
+	      foo = 'foo'
+	    </c:let>
+	    <c:switch value=" #{foo} " debug="true">
+	      <glob expr="f*">
+	        <property name="pass" value="true" />
+	      </glob>
+	      <otherwise>
+	        <fail />
+	      </otherwise>
+	    </c:switch>
+	    <fail unless="pass" />
+	    <c:unset>
+	      pass
+	    </c:unset>
+	    <fail if="pass" />
 	
-	<c:fail test="not task[apropos]" />
-	<c:fail test="not has.task[apropos]" />
-	<c:fail test="taskdef[apropos]" />
-	<c:fail test="has.taskdef[apropos]" />
-	<c:fail test="not macrodef[apropos]" />
-	<c:fail test="not has.macrodef[apropos]" />
-
-  <c:fail test="not task[let]" />
-  <c:fail test="not has.task[let]" />
-  <c:fail test="not taskdef[let]" />
-  <c:fail test="not has.taskdef[let]" />
-  <c:fail test="macrodef[let]" />
-  <c:fail test="has.macrodef[let]" />
-	
-
-	<c:echo>
-    tasks     : #{ size(task) }
-    taskdefs  : #{ size(taskdef) }
-    macrodefs : #{ size(macrodef)}  
-  </c:echo>
-
-	<c:choose>
-		<c:when test="task['greeting']">
-			<c:run-macro name="greeting" />
-		</c:when>
-		<otherwise>
-			<c:echo>
-      Task greeting does not exist .."
-      </c:echo>
-		</otherwise>
-	</c:choose>
-
-	<c:let>
-    i = 0
-  </c:let>
-	<c:for var="x" in="task">
-		<c:switch value="x">
-			<c:matches glob="antlib:net*:apro*" debug="false">
-				<c:let>i = i + 1</c:let>
-				<c:echo>
-				  #{i}: #{x} => #{task[x]}
-				 </c:echo>
-			</c:matches>
-		</c:switch>
-	</c:for>
-
-	<c:fail test="task['apropos']" />
-	<c:fail test="has.task['apropos']" />
-	<c:fail test="not task['antlib:it.haefelinger.flaka:apropos'] " />
-	<c:run-local-macro name="apropos" />
-
-</project>
+	</project>
