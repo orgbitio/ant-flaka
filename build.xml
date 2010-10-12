@@ -127,16 +127,6 @@
           />
       <fetchjar 
           group="org/apache/ant" 
-          name="ant-launcher" 
-          version="1.7.1" 
-          />
-      <fetchjar 
-          group="org/apache/ant" 
-          name="ant" 
-          version="1.7.1" 
-          />
-<fetchjar 
-          group="org/apache/ant" 
           name="ant-antunit" 
           version="1.1" 
           />
@@ -147,7 +137,6 @@
           version="2.2.1" 
           type="inline"
           />
-      
     </sequential>
   </macrodef>
 
@@ -157,11 +146,12 @@
     <attribute name="name" />
     <attribute name="version" />
     <attribute name="type" default=""/>
+    <attribute name="dest" default="${lib.dir}/@{name}-@{version}.jar" />
     <sequential>
       <echo>fetching @{name} ..</echo>
       <mkdir dir="${lib.dir}" />
       <get src="${depot.url}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
-           dest="${lib.dir}/@{name}-@{version}.jar" 
+           dest="@{dest}" 
            verbose="On"/>
       <!-- Now it gets really cumbersome with standard Ant -->
       <!-- All I want to say is that if type='inline', then I want to append some text -->
@@ -474,6 +464,24 @@
                    package-dist
                    " />
 
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                   E C L I P S E                             -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-
+  <target name="eclipse" depends="init">
+    <mkdir dir="${build.dir}/eclipse" />
+    <!-- Eclipse only -->
+    <fetchjar 
+        group="org/apache/ant" 
+        name="ant" 
+        version="1.7.1" 
+        dest="build/eclipse/ant.jar"
+        />
+    <fetchjar 
+        group="org/apache/ant" 
+        name="ant-launcher" 
+        version="1.7.1" 
+        dest="build/eclipse/ant-launcher.jar"
+        />
+  </target>
 </project>

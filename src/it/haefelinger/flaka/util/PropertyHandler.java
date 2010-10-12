@@ -8,21 +8,23 @@ import org.apache.tools.ant.PropertyHelper;
 
 public class PropertyHandler extends org.apache.tools.ant.PropertyHelper
 {
-  public PropertyHandler(org.apache.tools.ant.PropertyHelper handler)
+  public Project project;
+  
+  public PropertyHandler(Project project,org.apache.tools.ant.PropertyHelper handler)
   {
     super();
     setNext(handler);
-    setProject(handler.getProject());
+    setProject(project);
   }
 
   public void setProject(Project p)
   {
-    this.getNext().setProject(p);
+    this.project = p;
   }
 
   public Project getProject()
   {
-    return getNext().getProject();
+    return this.project;
   }
 
   protected void debug(String msg)

@@ -48,7 +48,7 @@ public class PropertyHelper extends Task
     current = org.apache.tools.ant.PropertyHelper.getPropertyHelper(project);
     
     /* create new property helper */
-    ph = new PropertyHandler(current);
+    ph = new PropertyHandler(this.getProject(),current);
     /* install my property handler */
     project.getReferences().put(ANT_HELPER_REFID, ph);
   }

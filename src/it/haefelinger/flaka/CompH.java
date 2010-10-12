@@ -471,7 +471,7 @@ public class CompH extends ComponentHelper
     }
   }
 
-  Project getProject()
+  public Project getProject()
   {
     return (Project) getattr(project);
   }

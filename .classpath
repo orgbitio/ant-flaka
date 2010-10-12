@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="build/lib/ant-1.7.1.jar" sourcepath="/Users/geronimo/apache-ant-1.7.1/src/main"/>
-	<classpathentry kind="lib" path="build/lib/ant-launcher-1.7.1.jar"/>
 	<classpathentry kind="lib" path="build/lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/lib/jdom-1.0.jar"/>
 	<classpathentry kind="lib" path="build/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="build/test/obj" path="test/java"/>
 	<classpathentry kind="lib" path="build/lib/juel-2.2.1.jar"/>
+	<classpathentry kind="lib" path="build/eclipse/ant.jar"/>
+	<classpathentry kind="lib" path="build/eclipse/ant-launcher.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
