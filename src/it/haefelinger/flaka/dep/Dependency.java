@@ -293,8 +293,8 @@ public class Dependency
   }
 
   /**
-   * @param x
-   *          this dependency has been declared in loc <code>x</code>.
+   * @param location
+   *          this dependency has been declared in loc <code>location</code>.
    */
   public Dependency setLocation(File location)
   {

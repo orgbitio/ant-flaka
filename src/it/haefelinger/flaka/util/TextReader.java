@@ -239,7 +239,7 @@ public class TextReader
    * multiple lines.
    * 
    * @param text
-   * @return
+   * @return not null
    */
   final static public String stripws(String text)
   {
@@ -290,7 +290,7 @@ public class TextReader
    * A helper function to resolve continuation lines.
    * 
    * @param text
-   * @return
+   * @return not null
    */
   final public static String resolvecontlines(String text)
   {
@@ -315,9 +315,6 @@ public class TextReader
    * Read the next line. Ignores comment lines and empty lines if desired.
    * 
    * @see java.io.BufferedReader#readLine()
-   */
-  /**
-   * @return
    */
   public String readLine()
   {
