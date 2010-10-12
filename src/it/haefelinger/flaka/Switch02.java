@@ -75,7 +75,8 @@ public class Switch02 extends Task
 
   public void setValue(String value)
   {
-    this.value = Static.trim3(getProject(), value, this.value);
+    /* provide empty string if value would resolve to null after trimming */
+    this.value = Static.trim3(getProject(), value, "");
   }
 
   /** Case class */
@@ -93,6 +94,7 @@ public class Switch02 extends Task
     {
       this.literally = b;
     }
+
     /**
      * Try this value against this clause.
      */
@@ -108,10 +110,13 @@ public class Switch02 extends Task
           P = Pattern.compile(this.regexstr, this.flags);
         } catch (Exception e)
         {
-          if (this.literally) {
-            Static.warning(this.getProject(),"illegal regex '"+this.regexstr+"'. Taking expr literally..");
-            P = Pattern.compile(Pattern.quote(this.regexstr),this.flags);
-          } else {
+          if (this.literally)
+          {
+            Static.warning(this.getProject(), "illegal regex '" + this.regexstr
+                + "'. Taking expr literally..");
+            P = Pattern.compile(Pattern.quote(this.regexstr), this.flags);
+          } else
+          {
             throw new BuildException(e);
           }
         }
@@ -266,15 +271,17 @@ public class Switch02 extends Task
     {
       this.eq = Static.trim3(getProject(), value, "");
     }
+
     public void setLt(String value)
     {
       this.lt = Static.trim3(getProject(), value, "");
     }
+
     public void setGt(String value)
     {
       this.gt = Static.trim3(getProject(), value, "");
     }
-    
+
     /**
      * Try this value against this clause.
      */
@@ -284,38 +291,43 @@ public class Switch02 extends Task
 
       if (this.eq == null && this.lt == null && this.gt == null)
         return this.not ? true : false;
-      
+
       r = false;
+
       if (!r && this.eq != null)
       {
-        if( (this.flags & Pattern.CASE_INSENSITIVE) != 0) {
+        if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
+        {
           r = this.eq.compareToIgnoreCase(value) == 0;
-        }
-        else {
+        } else
+        {
           r = this.eq.compareTo(value) == 0;
         }
       }
       if (!r && this.lt != null)
       {
-        if( (this.flags & Pattern.CASE_INSENSITIVE) != 0) {
+        if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
+        {
           r = value.compareToIgnoreCase(this.lt) < 0;
-        }
-        else {
+        } else
+        {
           r = value.compareTo(this.lt) < 0;
         }
       }
       if (!r && this.gt != null)
       {
-        if( (this.flags & Pattern.CASE_INSENSITIVE) != 0) {
+        if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
+        {
           r = value.compareToIgnoreCase(this.gt) > 0;
-        }
-        else {
+        } else
+        {
           r = value.compareTo(this.gt) > 0;
         }
       }
       return this.not ? !r : r;
     }
   }
+
   /** Case class */
   static protected final class Match extends Case
   {
@@ -332,7 +344,7 @@ public class Switch02 extends Task
     {
       setGlob(value);
     }
-    
+
     public void setGlob(String value)
     {
       this.regexstr = Static.trim3(getProject(), value, this.regexstr);
@@ -349,7 +361,7 @@ public class Switch02 extends Task
       r = M.find();
       if (r && this.var != null)
       {
-        Static.assign(getProject(), this.var,new MatcherBean(M,0), Static.VARREF);
+        Static.assign(getProject(), this.var, new MatcherBean(M, 0), Static.VARREF);
       }
       if (this.debug)
       {
@@ -427,7 +439,7 @@ public class Switch02 extends Task
     this.cases.add(res);
     return res;
   }
-  
+
   /**
    * @param res
    * @throws BuildException
