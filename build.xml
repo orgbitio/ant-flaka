@@ -7,7 +7,7 @@
     Use option -p to see a list of targets. By  default, Flaka gets compiled
     and packaged as
 
-          ${dist.dir}/ant-flaka-${version}${patchv}.jar   
+          ${dist.dir}/ant-flaka-${version}.jar   
 
     In addition, file
 
@@ -63,12 +63,6 @@
   <property
       name="version"
       value="1.02.00_RC01"
-      />
-  <!-- patch version, increase for fixes. Initially empty. When using, -->
-  <!-- use something like '.4712' being 4712 the patch level used. -->  
-  <property
-      name="patchv"
-      value=""
       />
   <property 
       name="src.dir" 
@@ -141,13 +135,19 @@
           name="ant" 
           version="1.7.1" 
           />
+<fetchjar 
+          group="org/apache/ant" 
+          name="ant-antunit" 
+          version="1.1" 
+          />
       <!-- JUEL has not been uploaded into a Maven 2 repository yet -->
       <fetchjar 
           group="juel-impl" 
           name="juel" 
-          version="2.1.1-rc4" 
+          version="2.2.1" 
           type="inline"
           />
+      
     </sequential>
   </macrodef>
 
@@ -304,7 +304,7 @@
   </macrodef>
 
   <macrodef name="inline-dependencies">
-    <attribute name="file" default="ant-flaka.jar" />
+    <attribute name="file" />
     <sequential>
       <zip-merge libfile="@{file}">
         <zipgroupfileset dir="${lib.dir}">
@@ -318,12 +318,17 @@
 
 
   <macrodef name="package">
+    <attribute name="name"     default="ant-flaka" />
     <attribute name="distdir"  default="${dist.dir}" />
-    <attribute name="distfile" default="${dist.dir}/ant-flaka-${version}${patchv}.jar" />
+    <attribute name="basename" default="@{name}-${version}" />
+    <attribute name="barename" default="@{name}-bare-${version}" />
     <attribute name="objdir"   default="${obj.dir}" />
     <sequential>
       <mkdir dir="@{distdir}" />
-      <jar jarfile="@{distfile}">
+      <delete dir="@{distdir}">
+        <include name="**" />
+      </delete>
+      <jar jarfile="@{distdir}/@{basename}.jar">
         <fileset dir="@{objdir}">
           <include name="**/*.class" />
           <include name="**/antlib.xml" />
@@ -332,14 +337,26 @@
           <include name="**/antlib.xml" />
         </fileset>
       </jar>
-      <inline-dependencies 
-          file="@{distfile}"
-          />
+      <!-- Provide also a stripped version, i.e. not having any dependencies -->
+      <!-- inlined. Just in case of conflicts or if better libs are avail- -->
+      <!-- able. -->
       <copy 
-          tofile="ant-flaka.jar" 
+          tofile="@{distdir}/@{barename}.jar" 
           verbose="true" 
           overwrite="true" 
-          file="@{distfile}"  
+          file="@{distdir}/@{basename}.jar"  
+          />
+      <!-- Inline (non-system) dependencies -->
+      <inline-dependencies 
+          file="@{distdir}/@{basename}.jar"
+          />
+      <!-- Provide a non-versioned copy for simplified usage (for example -->
+      <!-- when using Eclipse ..) -->
+      <copy 
+          tofile="@{name}.jar" 
+          verbose="true" 
+          overwrite="true" 
+          file="@{distdir}/@{basename}.jar"  
           />
     </sequential>
   </macrodef>

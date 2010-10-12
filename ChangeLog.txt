@@ -1,2 +1,12 @@
 1.01.01
 #1 remove properties from all property handlers.
+
+1.02.00
+* updated to JUEL 2.2.1 (was 2.1.1-rc4)
+* using ant-antunit (1.1) to run Ant based unit tests
+* refactoring ant unit tests (test/test-*.xml) 
+* <switch /> redesigned to have elements re, glob, cmp and matches
+(legacy, deprecated)
+* fixed bug in <switch/matches[glob]/> to avoid partial matches.
+* new distributable "ant-flaka-bare-${version}.jar" introduced - does
+not contain any inlined dependencies (as ant-flaka-${version}.jar) does.
