@@ -432,11 +432,11 @@
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
   <macrodef name="package-dist-exec" >
-    <attribute name="prefix" default="flaka-${version}${patchv}/" />
+    <attribute name="prefix" default="flaka-${version}/" />
     <sequential>
       <!-- create dist folder directory -->
       <mkdir dir="${dist.dir}"/>
-      <zip zipfile="${dist.dir}/flaka-${version}${patchv}.zip">
+      <zip zipfile="${dist.dir}/flaka-${version}.zip">
         <zipfileset dir="." prefix="@{prefix}">
           <exclude name="build/" />
           <exclude name=".project" />
