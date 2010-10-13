@@ -137,19 +137,6 @@
           version="2.2.1" 
           type="inline"
           />
-      <!-- Required when using Eclipse | Javadoc -->
-    <fetchjar 
-        group="org/apache/ant" 
-        name="ant" 
-        version="1.7.1" 
-        dest="${lib.dir}/ant.jar"
-        />
-    <fetchjar 
-        group="org/apache/ant" 
-        name="ant-launcher" 
-        version="1.7.1" 
-        dest="${lib.dir}/ant-launcher.jar"
-        />
     </sequential>
   </macrodef>
 
@@ -230,11 +217,7 @@
       <javac srcdir="src" destdir="${obj.dir}">
         <classpath>
           <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
-            <exclude name="ant.jar" />
-            <exclude name="ant-antunit*.jar" />
-            <exclude name="ant-launcher.jar" />
-            <exclude name="junit-*.jar" />
+            <include name="**/*.jar"/>
           </fileset>
         </classpath>
       </javac>
@@ -249,10 +232,7 @@
         <classpath>
           <pathelement path="${obj.dir}"/>
           <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
-            <exclude name="ant.jar" />
-            <exclude name="ant-antunit*.jar" />
-            <exclude name="ant-launcher.jar" />
+            <include name="**/*.jar"/>
           </fileset>
         </classpath>
       </javac>
@@ -484,4 +464,24 @@
                    package-dist
                    " />
 
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                   E C L I P S E                             -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <target name="eclipse" depends="init">
+    <mkdir dir="${build.dir}/eclipse" />
+    <!-- Eclipse only -->
+    <fetchjar 
+        group="org/apache/ant" 
+        name="ant" 
+        version="1.7.1" 
+        dest="build/eclipse/ant.jar"
+        />
+    <fetchjar 
+        group="org/apache/ant" 
+        name="ant-launcher" 
+        version="1.7.1" 
+        dest="build/eclipse/ant-launcher.jar"
+        />
+  </target>
 </project>

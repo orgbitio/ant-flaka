@@ -146,7 +146,6 @@ public class TryCatch extends Task
   final static public String REFERENCE = "trycatch.object";
   protected List trylist = new ArrayList();
   protected List catchlist = new ArrayList();
-  protected List elselist = new ArrayList();
   protected List finallylist = new ArrayList();
   protected String property = null;
   protected String reference = REFERENCE;
@@ -231,11 +230,6 @@ public class TryCatch extends Task
   public void addTry(Sequential seq)
   {
     this.trylist.add(seq);
-  }
-  
-  public void addElse(Sequential seq)
-  {
-    this.elselist.add(seq);
   }
 
   /**
@@ -329,22 +323,6 @@ public class TryCatch extends Task
         }
       }
     }
-    else
-    {
-      it = this.elselist.iterator();
-      while (it.hasNext())
-      {
-        S = (Sequential) it.next();
-        try
-        {
-          S.perform();
-        } catch (Throwable e)
-        {
-          thrown = e;
-          break;
-        }
-      }
-    }
 
     it = this.finallylist.iterator();
     while (it.hasNext())
@@ -355,8 +333,6 @@ public class TryCatch extends Task
         S.perform();
       } catch (Throwable e)
       {
-        // TODO: document, that any exception thrown in finally overrides
-        // any previous exception thrown!!
         thrown = e;
         break;
       }

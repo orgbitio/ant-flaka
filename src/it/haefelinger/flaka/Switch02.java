@@ -42,28 +42,10 @@ public class Switch02 extends Task
   protected Sequential defaultcase;
   protected String var;
   protected int flags;
-  protected boolean find = false;
-  protected boolean not = false;
-  protected boolean literally = false;
 
   public void setVar(String s)
   {
     this.var = Static.trim3(getProject(), s, this.var);
-  }
-
-  public void setFind(boolean b)
-  {
-    this.find = b;
-  }
-
-  public void setNot(boolean b)
-  {
-    this.not = b;
-  }
-
-  public void setLiterally(boolean b)
-  {
-    this.literally = b;
   }
 
   public void setIgnoreCase(boolean b)
@@ -101,10 +83,16 @@ public class Switch02 extends Task
   static protected final class RE extends Case
   {
     public String regexstr = null;
+    public boolean literally = true;
 
     public void setExpr(String value)
     {
       this.regexstr = Static.trim3(getProject(), value, this.regexstr);
+    }
+
+    public void setLiterally(boolean b)
+    {
+      this.literally = b;
     }
 
     /**
@@ -113,14 +101,28 @@ public class Switch02 extends Task
     public boolean tryvalue(String value)
     {
       Pattern P = null;
-      boolean b = false;
+      boolean r = false;
 
       if (this.regexstr != null)
       {
-        P = this.reCompile(this.regexstr);
-        b = this.find ? this.find(P, value) : this.matches(P, value);
+        try
+        {
+          P = Pattern.compile(this.regexstr, this.flags);
+        } catch (Exception e)
+        {
+          if (this.literally)
+          {
+            Static.warning(this.getProject(), "illegal regex '" + this.regexstr
+                + "'. Taking expr literally..");
+            P = Pattern.compile(Pattern.quote(this.regexstr), this.flags);
+          } else
+          {
+            throw new BuildException(e);
+          }
+        }
+        r = find(P, value);
       }
-      return b;
+      return this.not ? !r : r;
     }
   }
 
@@ -144,10 +146,11 @@ public class Switch02 extends Task
 
       if (this.regexstr != null)
       {
-        P = this.globCompile(this.regexstr);
-        r = this.find ? this.find(P, value) : this.matches(P, value);
+        String glob = Static.patternAsRegex(this.regexstr);
+        P = Pattern.compile(glob, this.flags);
+        r = matches(P, value);
       }
-      return r;
+      return this.not ? !r : r;
     }
   }
 
@@ -169,8 +172,6 @@ public class Switch02 extends Task
     public String var;
     public int flags;
     public boolean not = false;
-    public boolean find = false;
-    public boolean literally = true;
 
     public void setDebug(boolean debug)
     {
@@ -212,16 +213,6 @@ public class Switch02 extends Task
       this.not = b;
     }
 
-    public void setLiterally(boolean b)
-    {
-      this.literally = b;
-    }
-
-    public void setFind(boolean b)
-    {
-      this.find = b;
-    }
-
     protected boolean matches(Pattern regex, String value)
     {
       boolean r;
@@ -236,7 +227,7 @@ public class Switch02 extends Task
       if (this.debug)
       {
         String pattern = M.pattern().pattern();
-        System.err.println("applying regex `" + pattern + "' on `" + value + "' gives " + r);
+        System.err.println("matching regex/pat |" + pattern + "| against |" + value + "| => " + r);
       }
       return r;
     }
@@ -260,63 +251,9 @@ public class Switch02 extends Task
       return r;
     }
 
-    /**
-     * @param regexstr
-     *          not null
-     * @return
-     */
-    public Pattern globCompile(String regexstr)
-    {
-      Pattern P = null;
-      String glob;
-
-      if (this.literally)
-        glob = Pattern.quote(regexstr);
-      else
-        glob = Static.patternAsRegex(regexstr);
-      P = Pattern.compile(glob, this.flags);
-      return P;
-    }
-
-    /**
-     * @param regexstr
-     *          not null
-     * @return
-     */
-    public Pattern reCompile(String regexstr)
-    {
-      Pattern P = null;
-
-      try
-      {
-        P = Pattern.compile(regexstr, this.flags);
-      }
-      catch (Exception e)
-      {
-        if (this.literally)
-        {
-          String msg;
-          msg = String.format("illegal regex `%s' - taking regex literally.", regexstr);
-          Static.warning(this.getProject(), msg);
-          P = Pattern.compile(Pattern.quote(regexstr), this.flags);
-        }
-        else
-        {
-          throw new BuildException(e);
-        }
-      }
-      return P;
-    }
-
-    protected boolean tryvalue(@SuppressWarnings("unused") String value)
+    public boolean tryvalue(@SuppressWarnings("unused") String value)
     {
       return false;
-    }
-
-    public boolean eval(String value)
-    {
-      boolean r = this.tryvalue(value);
-      return this.not ? !r : r;
     }
   }
 
@@ -353,7 +290,7 @@ public class Switch02 extends Task
       boolean r;
 
       if (this.eq == null && this.lt == null && this.gt == null)
-        return false;
+        return this.not ? true : false;
 
       r = false;
 
@@ -362,8 +299,7 @@ public class Switch02 extends Task
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
           r = this.eq.compareToIgnoreCase(value) == 0;
-        }
-        else
+        } else
         {
           r = this.eq.compareTo(value) == 0;
         }
@@ -373,8 +309,7 @@ public class Switch02 extends Task
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
           r = value.compareToIgnoreCase(this.lt) < 0;
-        }
-        else
+        } else
         {
           r = value.compareTo(this.lt) < 0;
         }
@@ -384,13 +319,12 @@ public class Switch02 extends Task
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
           r = value.compareToIgnoreCase(this.gt) > 0;
-        }
-        else
+        } else
         {
           r = value.compareTo(this.gt) > 0;
         }
       }
-      return r;
+      return this.not ? !r : r;
     }
   }
 
@@ -417,23 +351,51 @@ public class Switch02 extends Task
       this.ispattern = true;
     }
 
+    protected boolean match(Pattern regex, String value)
+    {
+      boolean r;
+      Matcher M;
+
+      /* match it */
+      M = regex.matcher(value);
+      r = M.find();
+      if (r && this.var != null)
+      {
+        Static.assign(getProject(), this.var, new MatcherBean(M, 0), Static.VARREF);
+      }
+      if (this.debug)
+      {
+        String pattern = M.pattern().pattern();
+        System.err.println("matching regex/pat |" + pattern + "| against |" + value + "| => " + r);
+      }
+      return r;
+    }
+
     /**
      * Try this value against this clause.
      */
     public boolean tryvalue(String value)
     {
       Pattern P = null;
-      boolean r = false;
 
-      if (this.regexstr != null)
+      if (this.regexstr == null)
+        return false;
+
+      if (!this.ispattern)
       {
-        if (this.ispattern)
-          P = this.globCompile(this.regexstr);
-        else
-          P = this.reCompile(this.regexstr);
-        r = this.find ? this.find(P, value) : this.matches(P, value);
+        try
+        {
+          P = Pattern.compile(this.regexstr, this.flags);
+        } catch (Exception e)
+        {
+          P = Pattern.compile(Pattern.quote(this.regexstr), this.flags);
+        }
+      } else
+      {
+        String glob = Static.patternAsRegex(this.regexstr);
+        P = Pattern.compile(glob, this.flags);
       }
-      return r;
+      return match(P, value);
     }
   }
 
@@ -443,9 +405,6 @@ public class Switch02 extends Task
     res.var = this.var;
     res.flags = this.flags;
     res.debug = this.debug;
-    res.not = this.not;
-    res.find = this.find;
-    res.literally = this.literally;
     this.cases.add(res);
     return res;
   }
@@ -456,9 +415,6 @@ public class Switch02 extends Task
     res.var = this.var;
     res.flags = this.flags;
     res.debug = this.debug;
-    res.not = this.not;
-    res.find = this.find;
-    res.literally = this.literally;
     this.cases.add(res);
     return res;
   }
@@ -469,9 +425,6 @@ public class Switch02 extends Task
     res.var = this.var;
     res.flags = this.flags;
     res.debug = this.debug;
-    res.not = this.not;
-    res.find = this.find;
-    res.literally = this.literally;
     this.cases.add(res);
     return res;
   }
@@ -483,9 +436,6 @@ public class Switch02 extends Task
     res.var = this.var;
     res.flags = this.flags;
     res.debug = this.debug;
-    res.not = this.not;
-    res.find = this.find;
-    res.literally = this.literally;
     this.cases.add(res);
     return res;
   }
@@ -536,15 +486,13 @@ public class Switch02 extends Task
     b = false;
     c = null;
     /* resolve EL refs in input */
-    // necessary? already done when setting value
-    // v = Static.elresolve(getProject(), this.value);
-    v = this.value;
+    v = Static.elresolve(getProject(), this.value);
 
     /* try each match case until success */
     for (int i = 0; !b && i < this.cases.size(); i++)
     {
       c = (Case) this.cases.get(i);
-      b = c.eval(v);
+      b = c.tryvalue(v);
     }
     s = b ? c : this.defaultcase;
     if (s != null)
