@@ -62,7 +62,7 @@
 
   <property
       name="version"
-      value="1.02.00_RC01"
+      value="1.02.00_RC02"
       />
   <property 
       name="src.dir" 
