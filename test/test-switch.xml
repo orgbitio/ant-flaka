@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="test-switch" default="test-switch-re">
+<project xmlns:c="antlib:it.haefelinger.flaka" name="test-switch" default="test-switch-glob">
 	<macrodef name="expect">
 		<attribute name="cand" />
 		<attribute name="this" />
@@ -157,7 +157,7 @@
 	</target>
 
 	<target name="test-switch-glob">
-		<c:switch value="foo" debug="false">
+		<c:switch value="foo" debug="true">
 			<glob expr="foo|bar">
 				<fail />
 			</glob>
@@ -396,4 +396,21 @@
 		<fail if="gt_detected" />
 	</target>
 
+ <target name="test-switch-pathological" >
+ 	<c:switch />
+ 	<c:switch value="x">
+ 		<re />
+ 		<otherwise><fail/></otherwise>   
+ 	</c:switch>
+ 	<c:switch value="x">
+ 	      <glob />
+ 	      <otherwise><fail/></otherwise>    
+ 	  </c:switch>
+ 	<c:switch value="x">
+ 	    <cmp />
+      <otherwise><fail/></otherwise>		
+ 	</c:switch>
+ 	
+ </target>
+	
 </project>

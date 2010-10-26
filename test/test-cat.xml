@@ -1,5 +1,6 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
 <target name="test-case">
+	<delete dir="tmp" />
   <mkdir dir="tmp" />
   <echo message="hello world" file="tmp/greeting.txt" />
   <c:cat src="tmp/greeting.txt" />

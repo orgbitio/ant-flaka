@@ -1,21 +1,50 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
-	 
-	 <fail if="pass" />
-	    <c:let>
-	      foo = 'foo'
-	    </c:let>
-	    <c:switch value=" #{foo} " debug="true">
-	      <glob expr="f*">
-	        <property name="pass" value="true" />
-	      </glob>
-	      <otherwise>
-	        <fail />
-	      </otherwise>
-	    </c:switch>
-	    <fail unless="pass" />
-	    <c:unset>
-	      pass
-	    </c:unset>
-	    <fail if="pass" />
+
+	 <c:install-reference-handler />
+    <c:install-property-handler />
+
+  <c:echo>
+        |#{ format('%S %1$4s','s') }|
+  </c:echo>
+ 
+
+    <property name="servernames" value=",server1,server2, server3," />
+    <c:let>
+      Q = replace('${servernames}','\s*,\s*',' ')
+    </c:let>
+    
+    <c:for var="host" in="L">
+      <echo>
+        ======= Cleanup vor Transfer =======
+        Servername =>#{host}
+        Targetdir  =>//#{host}/deploy
+        ======= Cleanup vor Transfer =======
+      </echo>
+      </c:for>
 	
+    <c:let>
+      a = 'a'
+      b := 'b'
+    </c:let>
+    <c:for var="host" in="list(a,property.b,b,c)">
+      <c:echo>
+        host = #{host}
+      </c:echo>
+      </c:for>
+    <c:echo>
+              Q = |#{Q}|
+        trim(Q) = |#{ trim(Q) }|
+       ltrim(Q) = |#{ ltrim(Q) }|
+       rtrim(Q) = |#{ rtrim(Q) }|
+      </c:echo>
+      
+  <!--  TODO:  a problem in #{ } causes the whole echo to terminate!!-->    
+     <c:for var="file" in="''.tofile.list">
+      <c:echo>
+        file = |#{ format('%S',file) }|
+        xxx
+      </c:echo>
+    </c:for>
+      
+      
 	</project>

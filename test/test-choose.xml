@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
   <target name="test-case">
   <c:choose>
   </c:choose>

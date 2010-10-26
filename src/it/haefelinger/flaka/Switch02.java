@@ -39,7 +39,7 @@ public class Switch02 extends Task
 {
   protected String value;
   protected List cases = new ArrayList();
-  protected Sequential defaultcase;
+  protected List defaultcase = new ArrayList();
   protected String var;
   protected int flags;
   protected boolean find = false;
@@ -65,7 +65,8 @@ public class Switch02 extends Task
   {
     this.literally = b;
   }
-
+  
+  
   public void setIgnoreCase(boolean b)
   {
     this.flags = Static.bitset(this.flags, Pattern.CASE_INSENSITIVE, b);
@@ -113,7 +114,7 @@ public class Switch02 extends Task
     public boolean tryvalue(String value)
     {
       Pattern P = null;
-      boolean b = false;
+      boolean b = true;
 
       if (this.regexstr != null)
       {
@@ -140,7 +141,7 @@ public class Switch02 extends Task
     public boolean tryvalue(String value)
     {
       Pattern P = null;
-      boolean r = false;
+      boolean r = true;
 
       if (this.regexstr != null)
       {
@@ -170,7 +171,7 @@ public class Switch02 extends Task
     public int flags;
     public boolean not = false;
     public boolean find = false;
-    public boolean literally = true;
+    public boolean literally = false;
 
     public void setDebug(boolean debug)
     {
@@ -236,7 +237,7 @@ public class Switch02 extends Task
       if (this.debug)
       {
         String pattern = M.pattern().pattern();
-        System.err.println("applying regex `" + pattern + "' on `" + value + "' gives " + r);
+        System.err.println("matching regex `" + pattern + "' on `" + value + "' gives " + r);
       }
       return r;
     }
@@ -255,7 +256,7 @@ public class Switch02 extends Task
       if (this.debug)
       {
         String pattern = M.pattern().pattern();
-        System.err.println("matching regex/pat |" + pattern + "| against |" + value + "| => " + r);
+        System.err.println("finding regex `" + pattern + "' on `" + value + "' gives " + r);
       }
       return r;
     }
@@ -308,10 +309,7 @@ public class Switch02 extends Task
       return P;
     }
 
-    protected boolean tryvalue(@SuppressWarnings("unused") String value)
-    {
-      return false;
-    }
+    abstract protected boolean tryvalue(String value);
 
     public boolean eval(String value)
     {
@@ -350,14 +348,9 @@ public class Switch02 extends Task
      */
     public boolean tryvalue(String value)
     {
-      boolean r;
+      boolean r = true;
 
-      if (this.eq == null && this.lt == null && this.gt == null)
-        return false;
-
-      r = false;
-
-      if (!r && this.eq != null)
+      if (r && this.eq != null)
       {
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
@@ -368,7 +361,7 @@ public class Switch02 extends Task
           r = this.eq.compareTo(value) == 0;
         }
       }
-      if (!r && this.lt != null)
+      if (r && this.lt != null)
       {
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
@@ -379,7 +372,7 @@ public class Switch02 extends Task
           r = value.compareTo(this.lt) < 0;
         }
       }
-      if (!r && this.gt != null)
+      if (r && this.gt != null)
       {
         if ((this.flags & Pattern.CASE_INSENSITIVE) != 0)
         {
@@ -496,7 +489,7 @@ public class Switch02 extends Task
    */
   public void addDefault(Sequential res) throws BuildException
   {
-    this.defaultcase = res;
+    this.defaultcase.add(res);
   }
 
   /**
@@ -545,10 +538,15 @@ public class Switch02 extends Task
     {
       c = (Case) this.cases.get(i);
       b = c.eval(v);
+      if (b) c.perform();
     }
-    s = b ? c : this.defaultcase;
-    if (s != null)
-      s.perform();
-  }
+    // handle <otherwise />
+    if (b == false && this.defaultcase.isEmpty() == false) {
+        for(int i=0;i<this.defaultcase.size();i++) {
+          s = (Sequential)this.defaultcase.get(i);
+          s.perform();
+        }
+      }
+    }
 
 }

@@ -1,80 +1,109 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
-<target name="test-case">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-for-gilbert">
+	<target name="test-for-gilbert">
+		<c:install-reference-handler />
+		<c:install-property-handler />
 
-  <c:for />
-  <c:for var="" />
-  <c:for in="" />
-  <c:for var="x" />
-  <c:for var="x" in="" />
-  <c:for var="x" in="5" />
-  <c:for var="x" in="'a'" />
-  <c:for var="x" in="null" />
-  <c:for var="x" in="true" />
-  <c:for var="x" in="y" />
-  <c:for var="x" in="list(a, b, c)" />
-  
-  
-  <c:let>
+		<property name="servernames" value="server1,server2" />
+
+		<c:for var="host" in="a,b">
+			<echo>
+				======= Cleanup vor Transfer =======
+			  Servername =>#{host}
+			  Targetdir  =>//#{host}/deploy
+			  ======= Cleanup vor Transfer =======
+			</echo>
+		  </c:for>
+	</target>
+	<target name="test-for-with-csv">
+		<c:for var="x" in="a,b">
+			<fail />
+			<c:echo>
+				x = #{x}
+			</c:echo>
+			<c:let>
+				y := x
+			</c:let>
+		</c:for>
+		<fail unless="y" />
+		<echo>y=${y}</echo>
+	</target>
+
+	<target name="test-case">
+
+		<c:for />
+		<c:for var="" />
+		<c:for in="" />
+		<c:for var="x" />
+		<c:for var="x" in="" />
+		<c:for var="x" in="5" />
+		<c:for var="x" in="'a'" />
+		<c:for var="x" in="null" />
+		<c:for var="x" in="true" />
+		<c:for var="x" in="y" />
+		<c:for var="x" in="list(a, b, c)" />
+
+
+		<c:let>
     x = null
   </c:let>
-  <c:fail test="has.var.x" />
-  <c:for var="x" />
-  <c:for var="x" in="'foobar'" >
-    <c:fail test="not has.var.x" />
-    <c:let>
+		<c:fail test="has.var.x" />
+		<c:for var="x" />
+		<c:for var="x" in="'foobar'">
+			<c:fail test="not has.var.x" />
+			<c:let>
       ;; set property px
       px := x
     </c:let>
-  </c:for>  
-  <!--  test that px is set and that x is not set -->
-  <c:fail test="has.var.x" />
-  <fail unless="px" />	
-  
-  <!--  same again, this time we check that x is restored -->
-  <c:let>
+		</c:for>
+		<!--  test that px is set and that x is not set -->
+		<c:fail test="has.var.x" />
+		<fail unless="px" />
+
+		<!--  same again, this time we check that x is restored -->
+		<c:let>
     x = 'foo'
   </c:let>
-  <c:fail test="not has.var.x and x != 'foo'" />
-  <c:for var="x" in="'foobar'" >
-    <c:fail test="not has.var.x and x != 'foobar'" />
-  </c:for>
-  <c:fail test="not has.var.x and x != 'foo'" />
-  
-    
-  <c:for var="i" in=" ''.tofile.list ">
-    <c:echo>#{i} => #{i.mtime}</c:echo>
-  </c:for>
+		<c:fail test="not has.var.x and x != 'foo'" />
+		<c:for var="x" in="'foobar'">
+			<c:fail test="not has.var.x and x != 'foobar'" />
+		</c:for>
+		<c:fail test="not has.var.x and x != 'foo'" />
 
-  <!--
+
+		<c:for var="i" in=" ''.tofile.list ">
+			<c:echo>#{i} => #{i.mtime}</c:echo>
+		</c:for>
+
+		<!--
     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   -->
-  <!--
+		<!--
     This loop should not be iterated more than 3 times.
   -->
-  <!--
+		<!--
     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   -->
-  <c:for var="i" in=" list(1,2,3,4,5) ">
-    <c:echo>i = #{i} (break test)</c:echo>
-    <c:let>
+		<c:for var="i" in=" list(1,2,3,4,5) ">
+			<c:echo>i = #{i} (break test)</c:echo>
+			<c:let>
       X#{i} := #{i} 
     </c:let>
-    <c:when test=" i gt 2">
-      <c:break />
-    </c:when>
-  </c:for>
+			<c:when test=" i gt 2">
+				<c:break />
+			</c:when>
+		</c:for>
 
-  <c:fail test="has.var.i" message="i must not be defined here" />
-  <c:echo>i=> |#{i}|</c:echo>
+		<c:fail test="has.var.i" message="i must not be defined here" />
+		<c:echo>i=> |#{i}|</c:echo>
 
-  <fail message="X1 not defined" unless="X1" />
-  <fail message="X2 not defined" unless="X2" />
-  <fail message="X3 not defined" unless="X3" />
-  <fail message="X4 *is* defined" if="X4" />
-  <fail message="X5 *is* defined" if="X5" />
-  <fail message="X6 *is* defined" if="X6" />
+		<fail message="X1 not defined" unless="X1" />
+		<fail message="X2 not defined" unless="X2" />
+		<fail message="X3 not defined" unless="X3" />
+		<fail message="X4 *is* defined" if="X4" />
+		<fail message="X5 *is* defined" if="X5" />
+		<fail message="X6 *is* defined" if="X6" />
 
-  <c:unset>
+		<c:unset>
     X1 
     X2 
     X3 
@@ -83,22 +112,22 @@
     X6
   </c:unset>
 
-  <c:for var="i" in=" list(1,2,3,4,5,6) ">
-      <c:when test=" i lt 4">
-        <c:continue />
-      </c:when>
-      <c:echo>i = #{i} (continue test)</c:echo>
-      <c:let>
+		<c:for var="i" in=" list(1,2,3,4,5,6) ">
+			<c:when test=" i lt 4">
+				<c:continue />
+			</c:when>
+			<c:echo>i = #{i} (continue test)</c:echo>
+			<c:let>
         X#{i} := #{i}
       </c:let>
-  </c:for>
+		</c:for>
 
-  <fail message="X1 *is* defined"  if="X1" />
-  <fail message="X2 *is* defined"  if="X2" />
-  <fail message="X3 *is* defined"  if="X3" />
-  <fail message="X4 *not* defined" unless="X4" />
-  <fail message="X5 *not* defined" unless="X5" />
-  <fail message="X6 *not* defined" unless="X6" />
+		<fail message="X1 *is* defined" if="X1" />
+		<fail message="X2 *is* defined" if="X2" />
+		<fail message="X3 *is* defined" if="X3" />
+		<fail message="X4 *not* defined" unless="X4" />
+		<fail message="X5 *not* defined" unless="X5" />
+		<fail message="X6 *not* defined" unless="X6" />
 
-</target>
+	</target>
 </project>

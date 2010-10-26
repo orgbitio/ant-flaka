@@ -62,7 +62,7 @@
 
   <property
       name="version"
-      value="1.02.00_RC01"
+      value="1.02.00_RC02"
       />
   <property 
       name="src.dir" 
@@ -260,14 +260,21 @@
   </macrodef>
 
   <macrodef name="test-exec">
+    <attribute name="name"     default="ant-flaka" />
+    <attribute name="basename" default="@{name}-${version}" />
     <sequential>
       <mkdir dir="${build.dir}/test" />
       <junit>
         <classpath>
-          <pathelement path="${obj.dir}"/>
           <pathelement path="${build.dir}/test-classes"/>
+          <fileset dir="${dist.dir}">
+            <include name="@{basename}.jar" />
+          </fileset>
           <fileset dir="${lib.dir}">
-            <include name="**/*.jar"/>
+            <include name="*.jar"/>
+            <exclude name="ant.jar" />
+            <exclude name="ant-launcher.jar" />
+            <exclude name="ant-antunit*.jar" />
           </fileset>
         </classpath>
         <formatter type="brief" usefile="false"/>
@@ -282,7 +289,7 @@
       <!-- Add ant-flaka.jar to classpath -->
       <taskdef uri="antlib:it.haefelinger.flaka"
                resource="it/haefelinger/flaka/antlib.xml"
-               classpath="${basedir}/ant-flaka.jar"/>
+               classpath="${dist.dir}/@{basename}.jar"/>
       <!-- Add ant-antunit.jar to classpath -->
       <taskdef uri="antlib:org.apache.ant.antunit"
                resource="org/apache/ant/antunit/antlib.xml"
@@ -298,7 +305,7 @@
     </sequential>
   </macrodef>
 
-  <target name="test" depends="compile" >
+  <target name="test" depends="package" >
     <test-init />
     <test-exec />
   </target>

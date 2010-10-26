@@ -572,6 +572,14 @@ public final class EL
 
     funcdefv("list", Functions.class, "list", Object[].class);
     funcdefv("append", Functions.class, "append", Object[].class);
+    
+    funcdefv("split", Functions.class, "split", Object[].class);
+    funcdef("split_ws", Functions.class, "split_ws", Object.class);
+    funcdefv("replace", Functions.class, "replace", Object[].class);
+    funcdef("trim", Functions.class, "trim", Object.class);
+    funcdef("ltrim", Functions.class, "ltrim", Object.class);
+    funcdef("rtrim", Functions.class, "rtrim", Object.class);
+    funcdef1v("format", Functions.class, "format", String.class);
 
     // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
     // funcdef("car", Functions.class, "car", List.class);
@@ -638,7 +646,19 @@ public final class EL
       Static.error(this.project, "no such method:" + nsm);
     }
   }
-
+  
+  void funcdef1v(String name, Class clazz, String func, Class arg)
+  {
+    try
+    {
+      Method method;
+      method = clazz.getMethod(func, new Class[] { arg, Object[].class } );
+      this.context.setFunction("", name, method);
+    } catch (NoSuchMethodException nsm)
+    {
+      Static.error(this.project, "no such method:" + nsm);
+    }
+  }
   /**
    * Evaluate <code>expr</code> according to EL rules.
    * 

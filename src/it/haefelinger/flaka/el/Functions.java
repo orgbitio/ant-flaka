@@ -218,7 +218,80 @@ public class Functions
       list.add(args[i]);
     return list;
   }
+  
+  static public List split_ws(Object s) {
+    return split(s,"\\s+");
+  }
+  
+  
+  static public List split(Object... args)
+  {
+    String regex;
+    List list = new ArrayList();
+    
+    if (args.length<1)
+      return list;
+    
+    if (args.length>1)
+      regex = args[1].toString();
+    else
+      regex = "\\s*,\\*s";
+    
+    String[] arr;
+    String s = args[0].toString();
+    arr = s.split(regex);
+    // TODO:
+    // Let EL iterate on Arrays|[] as well. Up to 1.2, arrays
+    // are handled as singularities.
+    for(int i=0;i<arr.length;++i)
+      list.add(arr[i]);
+    return list;
+  }
+  
+  static public String replace(Object... args)
+  {
+    String r,src,regex,subst;
+    
+    if (args.length<1)
+      return null;
+    
+    if (args.length<2)
+      return args[1].toString();
+    
+    src = args[0].toString();
+    regex = args[1].toString();
+    subst = " ";
 
+    if (args.length>2)
+      subst = args[2].toString();
+
+    if (src == null || regex == null || subst == null)
+      return null;
+    try {
+      r = src.replaceAll(regex,subst);
+    }
+    catch(Exception e) {
+      r = null;
+    }
+    return r;
+  }
+  static public String trim(Object s) {
+    return replace(s,"^\\s*|\\s*$","");
+  }
+  static public String ltrim(Object s) {
+    return replace(s,"^\\s*","");
+  }
+  static public String rtrim(Object s) {
+    return replace(s,"\\s*$","");
+  }
+  
+  static public String format(String format,Object... args)
+  {
+    String r;
+    r = String.format(format, args);
+    return r;
+  }
+ 
   static public String typeof(Object object)
   {
     if (object == null)

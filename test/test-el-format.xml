@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-format-basic">
+
+  <macrodef name="expect">
+    <attribute name="have" />
+    <attribute name="expected" />
+    <sequential>
+    <c:switch value="@{have}">
+      <cmp eq="@{expected}" />
+      <otherwise>
+        <fail message="expected @{expected}, got @{have} .."/>
+      </otherwise>
+    </c:switch>
+  </sequential>
+  </macrodef>
+  
+  <target name="test-el-format-basic">
+    <c:let>
+      p0 := format()
+      p1 := format('foo')
+      p2 := format('%S','foo')
+      p3 := format('%s%s','foo','bar')
+      p4 := format('%s',true)
+      p5 := format('%s',4711)
+      p6 := format('%s',list('a',2))
+    </c:let>
+    <fail if="p0" />
+    <fail unless="p1" />
+    <fail unless="p2" />
+    <fail unless="p3" />
+    <fail unless="p4" />
+    <fail unless="p5" />
+    <fail unless="p6" />
+  
+    <expect have="${p1}" expected="foo" />
+    <expect have="${p2}" expected="FOO" />
+    <expect have="${p3}" expected="foobar" />
+    <expect have="${p4}" expected="true" />
+    <expect have="${p5}" expected="4711" />
+    <expect have="${p6}" expected="[a, 2]" />
+    
+    
+  </target>
+  
+</project>
