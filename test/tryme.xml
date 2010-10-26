@@ -3,9 +3,10 @@
 	 <c:install-reference-handler />
     <c:install-property-handler />
 
-  <c:echo>
-        |#{ format('%S %1$4s','s') }|
-  </c:echo>
+    <c:let>
+      p0 = join(':','a')
+      p1 = join(':',list('a','b'))
+    </c:let>
  
 
     <property name="servernames" value=",server1,server2, server3," />

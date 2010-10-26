@@ -116,7 +116,8 @@ public class Functions
         if (r != null)
           return r;
       }
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
       r = null;
     }
@@ -130,7 +131,8 @@ public class Functions
         if (r != null)
           return r;
       }
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
       r = null;
     }
@@ -145,7 +147,8 @@ public class Functions
         if (r != null)
           return r;
       }
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
       r = null;
     }
@@ -169,7 +172,7 @@ public class Functions
       if (obj == null)
         str = null;
       else if (obj instanceof String)
-        str = (String)obj;
+        str = (String) obj;
       else
         str = obj.toString();
       if (str == null)
@@ -201,7 +204,8 @@ public class Functions
         {
           L.add(I.next());
         }
-      } else
+      }
+      else
       {
         /* null is like the empty list */
         if (obj != null)
@@ -218,80 +222,129 @@ public class Functions
       list.add(args[i]);
     return list;
   }
-  
-  static public List split_ws(Object s) {
-    return split(s,"\\s+");
+
+  static public List split_ws(Object s)
+  {
+    return split(s, "\\s+");
   }
-  
-  
+
   static public List split(Object... args)
   {
     String regex;
     List list = new ArrayList();
-    
-    if (args.length<1)
+
+    if (args.length < 1)
       return list;
-    
-    if (args.length>1)
+
+    if (args.length > 1)
       regex = args[1].toString();
     else
       regex = "\\s*,\\*s";
-    
+
     String[] arr;
     String s = args[0].toString();
     arr = s.split(regex);
     // TODO:
     // Let EL iterate on Arrays|[] as well. Up to 1.2, arrays
     // are handled as singularities.
-    for(int i=0;i<arr.length;++i)
+    for (int i = 0; i < arr.length; ++i)
       list.add(arr[i]);
     return list;
   }
-  
+
   static public String replace(Object... args)
   {
-    String r,src,regex,subst;
-    
-    if (args.length<1)
+    String r, src, regex, subst;
+
+    if (args.length < 1)
       return null;
-    
-    if (args.length<2)
-      return args[1].toString();
-    
+
+    if (args.length < 2)
+      return args[0].toString();
+
     src = args[0].toString();
     regex = args[1].toString();
-    subst = " ";
+    subst = "";
 
-    if (args.length>2)
+    if (args.length > 2)
       subst = args[2].toString();
 
     if (src == null || regex == null || subst == null)
       return null;
-    try {
-      r = src.replaceAll(regex,subst);
+    try
+    {
+      r = src.replaceAll(regex, subst);
     }
-    catch(Exception e) {
+    catch (Exception e)
+    {
       r = null;
     }
     return r;
   }
-  static public String trim(Object s) {
-    return replace(s,"^\\s*|\\s*$","");
+
+  static public String trim(Object s)
+  {
+    return replace(s, "^\\s*|\\s*$", "");
   }
-  static public String ltrim(Object s) {
-    return replace(s,"^\\s*","");
+
+  static public String ltrim(Object s)
+  {
+    return replace(s, "^\\s*", "");
   }
-  static public String rtrim(Object s) {
-    return replace(s,"\\s*$","");
+
+  static public String rtrim(Object s)
+  {
+    return replace(s, "\\s*$", "");
   }
-  
-  static public String format(String format,Object... args)
+
+  static public String format(String f, Object... args)
   {
     String r;
-    r = String.format(format, args);
+    r = String.format(f, args);
     return r;
   }
- 
+
+  static public String join(String f, Object... args)
+  {
+    String r;
+    switch (args.length)
+    {
+      case 0:
+        r = "";
+        break;
+      case 1:
+      {
+        Object arg0 = args[0];
+        if (arg0 instanceof Iterable)
+        {
+          Iterator i = ((Iterable) arg0).iterator();
+          r = "";
+          if (i.hasNext())
+          {
+            r = i.next().toString();
+          }
+          while (i.hasNext())
+          {
+            r = r + f + i.next();
+          }
+        }
+        else
+        {
+          r = arg0.toString();
+        }
+        break;
+      }
+      default:
+        // if there are more than one vararg, treat them as list.
+        r = args[0].toString();
+        for (int i = 1; i < args.length; ++i)
+        {
+          r = r + f + args[i].toString();
+        }
+    }
+    return r;
+  }
+
   static public String typeof(Object object)
   {
     if (object == null)
@@ -311,7 +364,7 @@ public class Functions
 
     if (Integer.class.isAssignableFrom(object.getClass()))
       return "Integer";
-  
+
     if (Long.class.isAssignableFrom(object.getClass()))
       return "Integer";
 

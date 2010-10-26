@@ -1,32 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" default="test-for-gilbert">
-	<target name="test-for-gilbert">
-		<c:install-reference-handler />
-		<c:install-property-handler />
-
-		<property name="servernames" value="server1,server2" />
-
-		<c:for var="host" in="a,b">
-			<echo>
-				======= Cleanup vor Transfer =======
-			  Servername =>#{host}
-			  Targetdir  =>//#{host}/deploy
-			  ======= Cleanup vor Transfer =======
-			</echo>
-		  </c:for>
-	</target>
-	<target name="test-for-with-csv">
-		<c:for var="x" in="a,b">
-			<fail />
-			<c:echo>
-				x = #{x}
-			</c:echo>
-			<c:let>
-				y := x
-			</c:let>
-		</c:for>
-		<fail unless="y" />
-		<echo>y=${y}</echo>
-	</target>
+	
 
 	<target name="test-case">
 
