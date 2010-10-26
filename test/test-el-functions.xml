@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-join-basic">
+
+  <macrodef name="init">
+    <sequential>
+      <c:unset>
+        p0
+        p1
+        p2
+        p3
+        p4
+        p5
+        p6
+     </c:unset>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="expect">
+    <attribute name="have" />
+    <attribute name="expected" />
+    <sequential>
+      <c:switch value="@{have}">
+        <cmp eq="@{expected}" />
+        <otherwise>
+          <fail message="expected @{expected}, got @{have} .." />
+        </otherwise>
+      </c:switch>
+    </sequential>
+  </macrodef>
+
+  <target name="test-el-format-basic">
+    <init />
+    <c:let>
+      p0 := format()
+      p1 := format('foo')
+      p2 := format('%S','foo')
+      p3 := format('%s%s','foo','bar')
+      p4 := format('%s',true)
+      p5 := format('%s',4711)
+      p6 := format('%s',list('a',2))
+    </c:let>
+    <fail if="p0" />
+    <expect have="${p1}" expected="foo" />
+    <expect have="${p2}" expected="FOO" />
+    <expect have="${p3}" expected="foobar" />
+    <expect have="${p4}" expected="true" />
+    <expect have="${p5}" expected="4711" />
+    <expect have="${p6}" expected="[a, 2]" />
+  </target>
+  
+   <target name="test-el-replace-basic">
+    <init />
+    <c:let>
+      p0 := replace()
+      p1 := replace('a, b')
+      p2 := replace('a, b',',')
+      p3 := replace('a, b','\s*,\s*')
+      p4 := replace('a, b','\s*,\s*',':')
+    </c:let>
+    <fail if="p0" />
+    <expect have="${p1}" expected="a, b" />
+    <expect have="${p2}" expected="a b" />
+    <expect have="${p3}" expected="ab" />
+    <expect have="${p4}" expected="a:b" />
+  </target>
+  
+  <target name="test-el-split-basic">
+    <init />
+    <c:let>
+      p0 := format('%s',  split()                     )
+      p1 := format('%s',  split('a,b')                )
+      p2 := format('%s',  split('a,b',',')            )
+      p3 := format('%s',  split('a ,b','\s*,\s*')     )
+      p4 := format('%s',  split('a,b','\s*,\s*',':')  )
+      p5 := format('%s',  split('a,b',':' )           )
+    </c:let>
+    <!--
+    About the notation:
+    [a, b] means that there is a list with two elements ('a' and 'b') while
+    [a,b] denotes a list with one element ('a,b').
+     -->
+    <expect have="${p0}" expected="[]" />
+    <expect have="${p1}" expected="[a,b]" />
+    <expect have="${p2}" expected="[a, b]" />
+    <expect have="${p3}" expected="[a, b]" />
+    <expect have="${p4}" expected="[a, b]" />
+    <expect have="${p5}" expected="[a,b]" />
+  </target>
+  
+  <target name="test-el-join-basic">
+    <init />
+    <c:let>
+      p0 := join()
+      p1 := join(':')
+      p2 := join(':','a')
+      p3 := join(':',list('a'))
+      p4 := join(':',list('a','b'))
+      p5 := join(':',true)
+    </c:let>
+    <fail if="p0" /> 
+    <expect have="${p1}" expected="" />
+    <expect have="${p2}" expected="a" />
+    <expect have="${p3}" expected="a" />
+    <expect have="${p4}" expected="a:b" />
+    <expect have="${p5}" expected="true" />
+  </target>
+  
+</project>
