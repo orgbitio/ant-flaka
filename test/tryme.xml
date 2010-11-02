@@ -1,51 +1,14 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
-
-	 <c:install-reference-handler />
-    <c:install-property-handler />
-
-    <c:let>
-      p0 = join(':','a')
-      p1 = join(':',list('a','b'))
-    </c:let>
- 
-
-    <property name="servernames" value=",server1,server2, server3," />
-    <c:let>
-      Q = replace('${servernames}','\s*,\s*',' ')
-    </c:let>
-    
-    <c:for var="host" in="L">
-      <echo>
-        ======= Cleanup vor Transfer =======
-        Servername =>#{host}
-        Targetdir  =>//#{host}/deploy
-        ======= Cleanup vor Transfer =======
-      </echo>
-      </c:for>
-	
-    <c:let>
-      a = 'a'
-      b := 'b'
-    </c:let>
-    <c:for var="host" in="list(a,property.b,b,c)">
-      <c:echo>
-        host = #{host}
-      </c:echo>
-      </c:for>
-    <c:echo>
-              Q = |#{Q}|
-        trim(Q) = |#{ trim(Q) }|
-       ltrim(Q) = |#{ ltrim(Q) }|
-       rtrim(Q) = |#{ rtrim(Q) }|
-      </c:echo>
-      
-  <!--  TODO:  a problem in #{ } causes the whole echo to terminate!!-->    
-     <c:for var="file" in="''.tofile.list">
-      <c:echo>
-        file = |#{ format('%S',file) }|
-        xxx
-      </c:echo>
-    </c:for>
-      
-      
-	</project>
+<project xmlns:c="antlib:it.haefelinger.flaka" name="xx">
+  <c:echo>
+  #{ project.name }
+  #{ file(project) }
+  #{ file('.').absolutePath }
+  #{ file(project.basedir).absolutePath }
+  ${basedir}
+  
+  </c:echo>
+  <c:echo>
+  ;; report last modification time (as Date object)
+  Modified at #{ format('%1$tA, %1$tD', file(project).mtime) }
+</c:echo>
+</project>

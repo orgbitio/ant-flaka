@@ -53,15 +53,18 @@
     <c:let>
       p0 := replace()
       p1 := replace('a, b')
-      p2 := replace('a, b',',')
-      p3 := replace('a, b','\s*,\s*')
-      p4 := replace('a, b','\s*,\s*',':')
+      p2 := replace('a, b',' ')
+      p3 := replace('a, b','')
+      p4 := replace('a, b',':','\s*,\s*')
+    	p5 := replace(true,'false','true')
     </c:let>
     <fail if="p0" />
     <expect have="${p1}" expected="a, b" />
     <expect have="${p2}" expected="a b" />
     <expect have="${p3}" expected="ab" />
     <expect have="${p4}" expected="a:b" />
+    <expect have="${p5}" expected="false" />
+   	
   </target>
   
   <target name="test-el-split-basic">

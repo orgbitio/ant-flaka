@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.tools.ant.Project;
+
 public class Functions
 {
   /**
@@ -79,6 +81,12 @@ public class Functions
     if (obj == null)
       return null;
 
+    if (obj instanceof Project) {
+      Project p = (Project)obj;
+      File basedir = p.getBaseDir();
+      return basedir;
+    }
+    
     if (obj instanceof File)
       return (File) obj;
 
@@ -263,11 +271,11 @@ public class Functions
       return args[0].toString();
 
     src = args[0].toString();
-    regex = args[1].toString();
-    subst = "";
+    subst = args[1].toString();
+    regex = "\\s*,\\s*";
 
     if (args.length > 2)
-      subst = args[2].toString();
+      regex = args[2].toString();
 
     if (src == null || regex == null || subst == null)
       return null;
@@ -348,33 +356,33 @@ public class Functions
   static public String typeof(Object object)
   {
     if (object == null)
-      return "Null";
+      return "null";
 
     if (object instanceof String)
-      return "String";
+      return "string";
 
     if (object instanceof File)
-      return "File";
+      return "file";
 
     if (object.getClass().isArray())
-      return "Array";
+      return "array";
 
     if (object instanceof Iterable)
-      return "Iterable";
+      return "list";
 
     if (Integer.class.isAssignableFrom(object.getClass()))
-      return "Integer";
+      return "int";
 
     if (Long.class.isAssignableFrom(object.getClass()))
-      return "Integer";
+      return "int";
 
     if (Double.class.isAssignableFrom(object.getClass()))
-      return "Float";
+      return "float";
 
     if (Boolean.class.isAssignableFrom(object.getClass()))
-      return "Boolean";
+      return "bool";
 
-    return "Object";
+    return "bbject";
   }
 
 }

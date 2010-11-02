@@ -1,37 +1,37 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="PROJECT NAME">
-  <description>
+<project xmlns:c="antlib:it.haefelinger.flaka" name="PROJECT NAME" default="test-case">
+	<description>
     Test (E)expression (L)angugage
   </description>
-  
-  <target name="name" description="TARGET name" />
-  
-  <macrodef name="name1">
-    <sequential>
-      <echo>MACRO name</echo>
-    </sequential>
-  </macrodef>
-  
-  
-  <target name="test-case">
-    <property name="name" value="PROPERTY name" />
-    <c:let>
+
+	<target name="name" description="TARGET name" />
+
+	<macrodef name="name1">
+		<sequential>
+			<echo>MACRO name</echo>
+		</sequential>
+	</macrodef>
+
+
+	<target name="test-case">
+		<property name="name" value="PROPERTY name" />
+		<c:let>
       name =  'REFERENCE name'
     </c:let>
-    
-    <c:let>
+
+		<c:let>
       foo.bar = 'some string (reference)'
     </c:let>
-    <property name="foo.bar" value="some string (property)'" />
-    <!-- TODO: make this work ..
+		<property name="foo.bar" value="some string (property)'" />
+		<!-- TODO: make this work ..
          <taskdef name="name" classname="it.haefelinger.flaka.Echo" />
     -->
-    <property name="ant" value="###ANT###" />
-    <property name="el"  value="###EL####" />
-    
-    <c:let>
+		<property name="ant" value="###ANT###" />
+		<property name="el" value="###EL####" />
+
+		<c:let>
       antfile =  '${ant.file}'.tofile 
     </c:let>
-    <c:echo debug="true">
+		<c:echo debug="true">
       #files? : #{size(antfile.parent.list)}
       
       parent : #{antfile.parent}
@@ -39,7 +39,7 @@
       ;	#{antfile mkdir}
       ;	#{antfile delete}
     </c:echo>
-    <c:echo debug="true" comment=";">
+		<c:echo debug="true" comment=";">
       file = #{antfile}
       exists : #{antfile.exists}
       isfile : #{antfile.isfile}
@@ -71,8 +71,8 @@
       #{x.parent}
       ;;#{isfile('${ant.file}')}
     </c:echo>
-    
-    <c:echo debug="true">
+
+		<c:echo debug="true">
       # reference only
       name                   => #{name}
       # *only* methods!!
@@ -126,8 +126,11 @@
       # exp, log  (e^x logn)
       # abs
       # max,min
-
     </c:echo>
-    
-  </target>
+		<c:for var="x" in="target">
+			<c:echo>
+    	#{ format("|%s| %s",x,typeof(x)) }
+  	</c:echo>
+		</c:for>
+	</target>
 </project>

@@ -97,6 +97,18 @@ public class StringELResolver extends ELResolver
         context.setPropertyResolved(true);
         return r;
       }
+      if (k.equals("ltrim"))
+      {
+        r = ((String) base).replaceFirst("^\\s*","");
+        context.setPropertyResolved(true);
+        return r;
+      }
+      if (k.equals("rtrim"))
+      {
+        r = ((String) base).replaceFirst("\\s*$","");
+        context.setPropertyResolved(true);
+        return r;
+      }
       if (k.equals("tofile"))
       {
         r = Static.toFile(this.project, (String) base);
