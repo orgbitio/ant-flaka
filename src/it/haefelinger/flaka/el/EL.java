@@ -565,7 +565,7 @@ public final class EL
     funcdef("file", Functions.class, "file", Object.class);
     funcdef("size", Functions.class, "size", Object.class);
     funcdef("sizeof", Functions.class, "size", Object.class);
-    funcdef("null", Functions.class, "isnil", Object.class);
+    funcdef("nullp", Functions.class, "isnil", Object.class);
 
     // string functions
     funcdefv("concat", Functions.class, "concat", Object[].class);

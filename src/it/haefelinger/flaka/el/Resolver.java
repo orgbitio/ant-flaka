@@ -73,6 +73,7 @@ public class Resolver extends ELResolver
     cr.add(new ListELResolver(false));
     cr.add(new MapELResolver(false));
     cr.add(new ResourceBundleELResolver());
+    cr.add(new ELProjectResolver());
     cr.add(new BeanELResolver(false));
     return cr;
   }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-join-basic">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-string-literals">
 
-  <macrodef name="init">
-    <sequential>
-      <c:unset>
+	<macrodef name="init">
+		<sequential>
+			<c:unset>
         p0
         p1
         p2
@@ -11,26 +11,32 @@
         p4
         p5
         p6
+				p7
+				p8
+				p9
+				pa
+				pb
+				pc
      </c:unset>
-    </sequential>
-  </macrodef>
-  
-  <macrodef name="expect">
-    <attribute name="have" />
-    <attribute name="expected" />
-    <sequential>
-      <c:switch value="@{have}">
-        <cmp eq="@{expected}" />
-        <otherwise>
-          <fail message="expected @{expected}, got @{have} .." />
-        </otherwise>
-      </c:switch>
-    </sequential>
-  </macrodef>
+		</sequential>
+	</macrodef>
 
-  <target name="test-el-format-basic">
-    <init />
-    <c:let>
+	<macrodef name="expect">
+		<attribute name="have" />
+		<attribute name="expected" />
+		<sequential>
+			<c:switch value="@{have}">
+				<cmp eq="@{expected}" />
+				<otherwise>
+					<fail message="expected @{expected}, got @{have} .." />
+				</otherwise>
+			</c:switch>
+		</sequential>
+	</macrodef>
+
+	<target name="test-el-format-basic">
+		<init />
+		<c:let>
       p0 := format()
       p1 := format('foo')
       p2 := format('%S','foo')
@@ -38,19 +44,21 @@
       p4 := format('%s',true)
       p5 := format('%s',4711)
       p6 := format('%s',list('a',2))
+			p7 := format('%s',null)
     </c:let>
-    <fail if="p0" />
-    <expect have="${p1}" expected="foo" />
-    <expect have="${p2}" expected="FOO" />
-    <expect have="${p3}" expected="foobar" />
-    <expect have="${p4}" expected="true" />
-    <expect have="${p5}" expected="4711" />
-    <expect have="${p6}" expected="[a, 2]" />
-  </target>
-  
-   <target name="test-el-replace-basic">
-    <init />
-    <c:let>
+		<fail if="p0" />
+		<expect have="${p1}" expected="foo" />
+		<expect have="${p2}" expected="FOO" />
+		<expect have="${p3}" expected="foobar" />
+		<expect have="${p4}" expected="true" />
+		<expect have="${p5}" expected="4711" />
+		<expect have="${p6}" expected="[a, 2]" />
+		<expect have="${p7}" expected="null" />
+	</target>
+
+	<target name="test-el-replace-basic">
+		<init />
+		<c:let>
       p0 := replace()
       p1 := replace('a, b')
       p2 := replace('a, b',' ')
@@ -58,18 +66,18 @@
       p4 := replace('a, b',':','\s*,\s*')
     	p5 := replace(true,'false','true')
     </c:let>
-    <fail if="p0" />
-    <expect have="${p1}" expected="a, b" />
-    <expect have="${p2}" expected="a b" />
-    <expect have="${p3}" expected="ab" />
-    <expect have="${p4}" expected="a:b" />
-    <expect have="${p5}" expected="false" />
-   	
-  </target>
-  
-  <target name="test-el-split-basic">
-    <init />
-    <c:let>
+		<fail if="p0" />
+		<expect have="${p1}" expected="a, b" />
+		<expect have="${p2}" expected="a b" />
+		<expect have="${p3}" expected="ab" />
+		<expect have="${p4}" expected="a:b" />
+		<expect have="${p5}" expected="false" />
+
+	</target>
+
+	<target name="test-el-split-basic">
+		<init />
+		<c:let>
       p0 := format('%s',  split()                     )
       p1 := format('%s',  split('a,b')                )
       p2 := format('%s',  split('a,b',',')            )
@@ -77,22 +85,22 @@
       p4 := format('%s',  split('a,b','\s*,\s*',':')  )
       p5 := format('%s',  split('a,b',':' )           )
     </c:let>
-    <!--
+		<!--
     About the notation:
     [a, b] means that there is a list with two elements ('a' and 'b') while
     [a,b] denotes a list with one element ('a,b').
      -->
-    <expect have="${p0}" expected="[]" />
-    <expect have="${p1}" expected="[a,b]" />
-    <expect have="${p2}" expected="[a, b]" />
-    <expect have="${p3}" expected="[a, b]" />
-    <expect have="${p4}" expected="[a, b]" />
-    <expect have="${p5}" expected="[a,b]" />
-  </target>
-  
-  <target name="test-el-join-basic">
-    <init />
-    <c:let>
+		<expect have="${p0}" expected="[]" />
+		<expect have="${p1}" expected="[a,b]" />
+		<expect have="${p2}" expected="[a, b]" />
+		<expect have="${p3}" expected="[a, b]" />
+		<expect have="${p4}" expected="[a, b]" />
+		<expect have="${p5}" expected="[a,b]" />
+	</target>
+
+	<target name="test-el-join-basic">
+		<init />
+		<c:let>
       p0 := join()
       p1 := join(':')
       p2 := join(':','a')
@@ -100,12 +108,114 @@
       p4 := join(':',list('a','b'))
       p5 := join(':',true)
     </c:let>
-    <fail if="p0" /> 
-    <expect have="${p1}" expected="" />
-    <expect have="${p2}" expected="a" />
-    <expect have="${p3}" expected="a" />
-    <expect have="${p4}" expected="a:b" />
-    <expect have="${p5}" expected="true" />
-  </target>
-  
+		<fail if="p0" />
+		<expect have="${p1}" expected="" />
+		<expect have="${p2}" expected="a" />
+		<expect have="${p3}" expected="a" />
+		<expect have="${p4}" expected="a:b" />
+		<expect have="${p5}" expected="true" />
+	</target>
+
+	<target name="test-el-typeof-basic">
+		<init />
+		<c:let>
+	      p0 := typeof()
+	      p1 := typeof(null)
+	    	p2 := typeof('')
+	    	p3 := typeof(true)
+	    	p4 := typeof(3)
+	    	p5 := typeof(pi)
+	    	p6 := typeof(project)
+	    	p7 := typeof(file(project))
+	    	p8 := typeof(list())
+	    	p9 := typeof(file(project).mtime)
+	    </c:let>
+		<fail if="p0" />
+		<expect have="${p1}" expected="null" />
+		<expect have="${p2}" expected="string" />
+		<expect have="${p3}" expected="boolean" />
+		<expect have="${p4}" expected="integer" />
+		<expect have="${p5}" expected="float" />
+		<expect have="${p6}" expected="project" />
+		<expect have="${p7}" expected="file" />
+		<expect have="${p8}" expected="list" />
+		<expect have="${p9}" expected="object" />
+	</target>
+
+	<target name="test-el-empty">
+		<init />
+		<c:let>
+        p0 := empty null
+        p1 := empty list()
+        p2 := empty ''
+    	  p3 := empty 5
+    	  p4 := empty true
+    	  p5 := empty ' '
+    	  p6 := empty 'a'
+    	  p7 := empty list(list())
+      </c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="true" />
+		<expect have="${p2}" expected="true" />
+		<expect have="${p3}" expected="false" />
+		<expect have="${p4}" expected="false" />
+		<expect have="${p5}" expected="false" />
+		<expect have="${p6}" expected="false" />
+		<expect have="${p7}" expected="false" />
+	</target>
+
+	<target name="test-el-null">
+		<init />
+		<c:let>
+	        p0 := nullp(null)
+	        p1 := nullp(list())
+	        p2 := nullp('')
+	        p3 := nullp(5)
+	        p4 := nullp(true)
+	        p5 := nullp(' ')
+	        p6 := nullp('a')
+	        p7 := nullp(list(list()))
+	      </c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="false" />
+		<expect have="${p2}" expected="false" />
+		<expect have="${p3}" expected="false" />
+		<expect have="${p4}" expected="false" />
+		<expect have="${p5}" expected="false" />
+		<expect have="${p6}" expected="false" />
+		<expect have="${p7}" expected="false" />
+	</target>
+
+	<target name="test-el-string-literals">
+		<init />
+		<c:let>
+	    p0 := "abc"
+		  p1 := 'abc'
+	    p2 := 'abc"
+	    p3 := "a'c"
+	    p4 := 'a"c'
+			p5 := 'a\'c'
+			p6 := 'a\"c'
+			p7 := "a\"c"
+			p8 := "a\'c"
+			p9 := 'a\bc'
+			pa := 'a\\bc'
+			pb := 'ab\'
+			pc := 'ab\\'
+	  </c:let>
+		<expect have="${p0}" expected="abc" />
+		<expect have="${p1}" expected="abc" />
+		<fail if="p2" />
+		<expect have="${p3}" expected="a'c" />
+		<expect have="${p4}" expected="a&quot;c" />
+		<expect have="${p5}" expected="a'c" />
+		<expect have="${p6}" expected="a\&quot;c" />
+		<expect have="${p7}" expected="a&quot;c" />
+		<expect have="${p8}" expected="a\'c" />
+		<expect have="${p9}" expected="a\bc" />
+		<expect have="${pa}" expected="a\bc" />
+		<fail if="pb" />
+		<expect have="${pc}" expected="ab\" />
+	</target>
+
 </project>

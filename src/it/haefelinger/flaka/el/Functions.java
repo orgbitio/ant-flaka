@@ -26,6 +26,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -252,11 +253,7 @@ public class Functions
     String[] arr;
     String s = args[0].toString();
     arr = s.split(regex);
-    // TODO:
-    // Let EL iterate on Arrays|[] as well. Up to 1.2, arrays
-    // are handled as singularities.
-    for (int i = 0; i < arr.length; ++i)
-      list.add(arr[i]);
+    list = Arrays.asList(arr);
     return list;
   }
 
@@ -365,24 +362,27 @@ public class Functions
       return "file";
 
     if (object.getClass().isArray())
-      return "array";
+      return "list";
 
     if (object instanceof Iterable)
       return "list";
 
     if (Integer.class.isAssignableFrom(object.getClass()))
-      return "int";
+      return "integer";
 
     if (Long.class.isAssignableFrom(object.getClass()))
-      return "int";
+      return "integer";
 
     if (Double.class.isAssignableFrom(object.getClass()))
       return "float";
 
     if (Boolean.class.isAssignableFrom(object.getClass()))
-      return "bool";
+      return "boolean";
 
-    return "bbject";
+    if(object instanceof Project)
+        return "project";
+    
+    return "object";
   }
 
 }
