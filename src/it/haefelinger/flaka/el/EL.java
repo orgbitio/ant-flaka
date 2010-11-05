@@ -562,6 +562,7 @@ public final class EL
     funcdef0("rand", Math.class, "random");
 
     funcdef("typeof", Functions.class, "typeof", Object.class);
+    funcdef("nativetype", Functions.class, "nativetype", Object.class);
     funcdef("file", Functions.class, "file", Object.class);
     funcdef("size", Functions.class, "size", Object.class);
     funcdef("sizeof", Functions.class, "size", Object.class);

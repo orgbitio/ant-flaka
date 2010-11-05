@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tools.ant.Project;
 
@@ -349,7 +350,14 @@ public class Functions
     }
     return r;
   }
-
+  static public String nativetype(Object object) {
+    if (object==null) {
+      return "";
+    }
+    Class clazz = object.getClass();
+    return clazz.getName();
+  }
+  
   static public String typeof(Object object)
   {
     if (object == null)
@@ -378,6 +386,9 @@ public class Functions
 
     if (Boolean.class.isAssignableFrom(object.getClass()))
       return "boolean";
+    
+    if (object instanceof Map)
+      return "map";
 
     if(object instanceof Project)
         return "project";

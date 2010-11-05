@@ -21,10 +21,13 @@ package it.haefelinger.flaka;
 import it.haefelinger.flaka.util.Static;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
-
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -99,23 +102,31 @@ public class For extends it.haefelinger.flaka.Task implements TaskContainer
 
   protected Iterator iterator()
   {
-    Iterator iter;
+    Iterator iter = null;
     Project project;
     Object obj;
 
     project = getProject();
     obj = Static.el2obj(project,this.expr);
 
-    iter = null;
-    if (obj instanceof Iterable)
+    if (obj == null)
+      return null;
+
+    if (obj instanceof Iterable) {
       iter = ((Iterable) obj).iterator();
-    else if (obj != null)
-    {
-      List L;
-      L = new ArrayList();
-      L.add(obj);
-      iter = L.iterator();
+      return iter;
     }
+    // If we are a map, then we iterate over the keys.
+    if (obj instanceof Map) {
+      Set keys = ((Map)obj).keySet();
+      // Do not use `keys.iterator()` here otherwise we end up in
+      // an concurrent modification exception.
+      iter = Arrays.asList(keys.toArray()).iterator();
+      return iter;
+    }
+    // Otherwise, we create an array and iterate over
+    // it's one and only argument.
+    iter = Arrays.asList(obj).iterator();
     return iter;
   }
 

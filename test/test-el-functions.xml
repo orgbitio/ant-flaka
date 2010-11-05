@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-string-literals">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-nativetype-basic">
 
 	<macrodef name="init">
 		<sequential>
@@ -142,6 +142,32 @@
 		<expect have="${p9}" expected="object" />
 	</target>
 
+	<target name="test-el-nativetype-basic">
+	    <init />
+	    <c:let>
+	        p0 := nativetype()
+	        p1 := nativetype(null)
+	        p2 := nativetype('')
+	        p3 := nativetype(true)
+	        p4 := nativetype(3)
+	        p5 := nativetype(pi)
+	        p6 := nativetype(project)
+	        p7 := nativetype(file(project))
+	        p8 := nativetype(list())
+	        p9 := nativetype(file(project).mtime)
+	      </c:let>
+	    <fail if="p0" />
+	    <expect have="${p1}" expected="" />
+	    <expect have="${p2}" expected="java.lang.String" />
+	    <expect have="${p3}" expected="java.lang.Boolean" />
+	    <expect have="${p4}" expected="java.lang.Long" />
+	    <expect have="${p5}" expected="java.lang.Double" />
+	    <expect have="${p6}" expected="org.apache.tools.ant.Project" />
+	    <expect have="${p7}" expected="java.io.File" />
+	    <expect have="${p8}" expected="java.util.ArrayList" />
+	    <expect have="${p9}" expected="java.util.Date" />
+	  </target>
+	
 	<target name="test-el-empty">
 		<init />
 		<c:let>
