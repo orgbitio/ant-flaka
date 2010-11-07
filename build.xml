@@ -62,7 +62,7 @@
 
   <property
       name="version"
-      value="1.02.00_RC02"
+      value="1.02.00_RC03"
       />
   <property 
       name="src.dir" 
@@ -83,6 +83,10 @@
   <property 
       name="lib.dir" 
       value="${build.dir}/lib" 
+      />
+  <property 
+      name="libsrc.dir" 
+      value="${build.dir}/libsrc" 
       />
   <property 
       name="obj.dir" 
@@ -150,6 +154,20 @@
         version="1.7.1" 
         dest="${lib.dir}/ant-launcher.jar"
         />
+    <fetchjar 
+        group="org/apache/ant" 
+        name="ant" 
+        version="1.7.1"
+        basename="ant-sources-1.7.1"
+        dest="${libsrc.dir}/ant-sources-1.7.1.jar"
+        />
+    <fetchjar 
+        group="juel-impl" 
+        name="juel" 
+        version="2.2.1"
+        basename="juel-sources-2.2.1"
+        dest="${libsrc.dir}/juel-sources-2.2.1.jar"
+        />
     </sequential>
   </macrodef>
 
@@ -159,11 +177,13 @@
     <attribute name="name" />
     <attribute name="version" />
     <attribute name="type" default=""/>
-    <attribute name="dest" default="${lib.dir}/@{name}-@{version}.jar" />
+    <attribute name="basename" default="@{name}-@{version}" />
+    <attribute name="dest" default="${lib.dir}/@{basename}.jar" />
     <sequential>
       <echo>fetching @{name} ..</echo>
       <mkdir dir="${lib.dir}" />
-      <get src="${depot.url}/@{group}/@{name}/@{version}/@{name}-@{version}.jar" 
+      <mkdir dir="${libsrc.dir}" />
+      <get src="${depot.url}/@{group}/@{name}/@{version}/@{basename}.jar" 
            dest="@{dest}" 
            verbose="On"/>
       <!-- Now it gets really cumbersome with standard Ant -->
@@ -173,8 +193,8 @@
       <!-- on the property's value. Notice that task echo does *not* support 'if' or   -->
       <!-- 'unless'. -->
       <condition 
-          property="@{name}-@{version}.inline" 
-          value="@{name}-@{version}.jar&#10;" 
+          property="@{basename}.inline" 
+          value="@{basename}.jar&#10;" 
           else="">
         <equals 
             arg1="@{type}" 
@@ -184,7 +204,7 @@
       </condition>
       <echo
           file="${lib.dir}/__inline__.txt" 
-          message="${@{name}-@{version}.inline}" 
+          message="${@{basename}.inline}" 
           append="true" />
     </sequential>
   </macrodef>
@@ -443,6 +463,31 @@
     <package-javadoc-exec />
   </target>
 
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    P A C K A G E - S O U R C E S            -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+
+  <macrodef name="package-sources-exec" >
+    <attribute name="prefix" default="flaka-sources-${version}" />
+    <sequential>
+      <!-- create dist folder directory -->
+      <mkdir dir="${dist.dir}"/>
+      <zip zipfile="${dist.dir}/@{prefix}.zip">
+        <zipfileset dir="${src.dir}" prefix="@{prefix}/">
+          <include name="**/*.java" />
+          <exclude name=".svn/" />
+          <exclude name=".git/" />
+          <exclude name="CVS" />
+        </zipfileset>
+      </zip>
+    </sequential>
+  </macrodef>
+
+
+  
+  <target name="package-sources">
+    <package-sources-exec />
+  </target>
 
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                    P A C K A G E - D I S T                  -->
@@ -480,15 +525,21 @@
     <package-dist-exec />
   </target>
 
+  <macrodef name="verification">
+    <sequential>
+      
+    </sequential>
+  </macrodef>
+
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                    P A C K A G E - A L L                    -->
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <target name="package-all" 
-          depends="
-                   package,
-                   package-javadoc,
-                   package-dist
-                   " />
+  <target name="package-all" depends="package">
+    <package-javadoc-exec />
+    <package-sources-exec />
+    <package-dist-exec />
+    <verification />
+  </target>
 
 </project>

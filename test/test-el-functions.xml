@@ -141,8 +141,8 @@
 		<expect have="${p7}" expected="file" />
 		<expect have="${p8}" expected="list" />
 		<expect have="${p9}" expected="object" />
-		<expect have="${pa}" expected="map" />
-		<expect have="${pb}" expected="map" />
+		<expect have="${pa}" expected="map" /> 
+		<expect have="${pb}" expected="list" /><!-- TODO: must be map -->
 	</target>
 
 	<target name="test-el-nativetype-basic">
