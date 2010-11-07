@@ -76,28 +76,65 @@ public class Functions
     return buf.toString();
   }
 
-  static public File file(Object obj)
-  {
+  static private File obj2file(Object obj) {
     String s;
-
+    
     if (obj == null)
-      return null;
+      return new File(".");
 
     if (obj instanceof Project) {
       Project p = (Project)obj;
       File basedir = p.getBaseDir();
       return basedir;
     }
-    
+
     if (obj instanceof File)
       return (File) obj;
 
-    s = (obj instanceof String ? (String) obj : obj.toString());
-
-    /* TODO: must be relative to project */
+    if (obj instanceof Iterable) {
+      Iterator iter = ((Iterable)obj).iterator();
+      File f;
+      if (iter.hasNext() == false)
+        f = new File(".");
+      else 
+        f = obj2file(iter.next());
+      while(iter.hasNext()) {
+        f = new File(f,obj2file(iter.next()).toString());
+      }
+      return f;
+    }
+    
+    if (obj instanceof String)
+      s = (String)obj;
+    else
+      s = obj.toString();
+    
     if (s.matches("\\s*"))
       s = ".";
+    
     return new File(s);
+  }
+  
+  static public Object file(Object... varg)
+  {
+    File f = null;
+    switch (varg.length) {
+      case 0 :
+        // When called without argument return the 
+        f = new File(".");
+        break;
+      case 1: {
+        f = obj2file(varg[0]);
+        break;
+      }
+      default: {
+        f = obj2file(varg[0]);
+        for(int i=1;i<varg.length;++i) {
+          f = new File(f,obj2file(varg[i]).toString());
+        }
+      }
+    }
+    return f;
   }
 
   static public Object size(Object obj)

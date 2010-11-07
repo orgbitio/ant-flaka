@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-nativetype-basic">
-
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-typeof-basic">
 	<macrodef name="init">
 		<sequential>
 			<c:unset>
@@ -129,6 +128,8 @@
 	    	p7 := typeof(file(project))
 	    	p8 := typeof(list())
 	    	p9 := typeof(file(project).mtime)
+			  pa := typeof(project.properties)
+			  pb := typeof(property)
 	    </c:let>
 		<fail if="p0" />
 		<expect have="${p1}" expected="null" />
@@ -140,11 +141,13 @@
 		<expect have="${p7}" expected="file" />
 		<expect have="${p8}" expected="list" />
 		<expect have="${p9}" expected="object" />
+		<expect have="${pa}" expected="map" />
+		<expect have="${pb}" expected="map" />
 	</target>
 
 	<target name="test-el-nativetype-basic">
-	    <init />
-	    <c:let>
+		<init />
+		<c:let>
 	        p0 := nativetype()
 	        p1 := nativetype(null)
 	        p2 := nativetype('')
@@ -156,18 +159,18 @@
 	        p8 := nativetype(list())
 	        p9 := nativetype(file(project).mtime)
 	      </c:let>
-	    <fail if="p0" />
-	    <expect have="${p1}" expected="" />
-	    <expect have="${p2}" expected="java.lang.String" />
-	    <expect have="${p3}" expected="java.lang.Boolean" />
-	    <expect have="${p4}" expected="java.lang.Long" />
-	    <expect have="${p5}" expected="java.lang.Double" />
-	    <expect have="${p6}" expected="org.apache.tools.ant.Project" />
-	    <expect have="${p7}" expected="java.io.File" />
-	    <expect have="${p8}" expected="java.util.ArrayList" />
-	    <expect have="${p9}" expected="java.util.Date" />
-	  </target>
-	
+		<fail if="p0" />
+		<expect have="${p1}" expected="" />
+		<expect have="${p2}" expected="java.lang.String" />
+		<expect have="${p3}" expected="java.lang.Boolean" />
+		<expect have="${p4}" expected="java.lang.Long" />
+		<expect have="${p5}" expected="java.lang.Double" />
+		<expect have="${p6}" expected="org.apache.tools.ant.Project" />
+		<expect have="${p7}" expected="java.io.File" />
+		<expect have="${p8}" expected="java.util.ArrayList" />
+		<expect have="${p9}" expected="java.util.Date" />
+	</target>
+
 	<target name="test-el-empty">
 		<init />
 		<c:let>
@@ -242,6 +245,38 @@
 		<expect have="${pa}" expected="a\bc" />
 		<fail if="pb" />
 		<expect have="${pc}" expected="ab\" />
+	</target>
+
+	<target name="test-el-file">
+		<init />
+		<c:let>
+	      p0 := file(null)
+			  p1 := file(true)
+			  p2 := file(5)
+			  p3 := file('')
+			  p4 := file('a/b')
+			  p5 := file()
+	      p6 := file('.')
+	      p7 := file(project).name
+	      p8 := file('/','b')
+	      p9 := file('a',file('b'))
+        pa := file('a','b','c')
+	    	pb := file(list('a','b'))
+			  pc := file( list( list( 'a', list('b') ),'c'))
+	    </c:let>
+		<expect have="${p0}" expected="." />
+		<expect have="${p1}" expected="true" />
+		<expect have="${p2}" expected="5" />
+		<expect have="${p3}" expected="." />
+		<expect have="${p4}" expected="a/b" />
+		<expect have="${p5}" expected="." />
+		<expect have="${p6}" expected="." />
+		<expect have="${p7}" expected="test" />
+		<expect have="${p8}" expected="/b" />
+		<expect have="${p9}" expected="a/b" />
+		<expect have="${pa}" expected="a/b/c" />
+		<expect have="${pb}" expected="a/b" />
+		<expect have="${pc}" expected="a/b/c" />
 	</target>
 
 </project>

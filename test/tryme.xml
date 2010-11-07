@@ -1,25 +1,6 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="xx">
-  <target name="mytarget" />
-  <macrodef name="mymacro">
-    <sequential />
-  </macrodef>
-  <c:echo>
-  #{ project.name }
-  #{ file(project) }
-  #{ file('.').absolutePath }
-  #{ file(project.basedir).absolutePath }
-  ${basedir}
-  
-  </c:echo>
-  <c:echo>
-  ;; report last modification time (as Date object)
-  Modified at #{ format('%1$tA, %1$tD', file(project).mtime) }
-
-  #{ project.targets }
-  #{ project.tasks   }
-  #{ project.taskdefs   }
-  #{ project.macrodefs   }
-  #{ project.basedir }
-  </c:echo>
+	<c:echo>
+	  #{ typeof( property ) }
+	</c:echo>
 
 </project>

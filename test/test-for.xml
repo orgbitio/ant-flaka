@@ -1,5 +1,5 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-for-gilbert">
-	
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-for-map">
+
 
 	<target name="test-case">
 
@@ -102,5 +102,18 @@
 		<fail message="X5 *not* defined" unless="X5" />
 		<fail message="X6 *not* defined" unless="X6" />
 
+	</target>
+
+	<target name="test-for-map">
+		<c:for var="x" in="project.properties">
+			<c:echo>
+			  #{ x }
+			</c:echo>
+		</c:for>
+		<c:for var="x" in="property">
+		      <c:echo>
+		        #{ x }
+		      </c:echo>
+		    </c:for>
 	</target>
 </project>

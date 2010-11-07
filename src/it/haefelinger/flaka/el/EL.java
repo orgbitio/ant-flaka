@@ -563,7 +563,7 @@ public final class EL
 
     funcdef("typeof", Functions.class, "typeof", Object.class);
     funcdef("nativetype", Functions.class, "nativetype", Object.class);
-    funcdef("file", Functions.class, "file", Object.class);
+    funcdefv("file", Functions.class, "file", Object[].class);
     funcdef("size", Functions.class, "size", Object.class);
     funcdef("sizeof", Functions.class, "size", Object.class);
     funcdef("nullp", Functions.class, "isnil", Object.class);
