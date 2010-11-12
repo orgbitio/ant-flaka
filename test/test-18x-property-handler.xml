@@ -2,7 +2,7 @@
 
   <c:noop />
   <propertyhelper>
-    <prop:flakapropertyhelper />
+    <prop:elreferences />
   </propertyhelper>
   
 </project>

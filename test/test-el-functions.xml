@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-typeof-basic">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-size">
 	<macrodef name="init">
 		<sequential>
 			<c:unset>
@@ -277,6 +277,41 @@
 		<expect have="${pa}" expected="a/b/c" />
 		<expect have="${pb}" expected="a/b" />
 		<expect have="${pc}" expected="a/b/c" />
+	</target>
+
+
+	<target name="test-el-size">
+		<init />
+    <c:trycatch>
+      <try>
+    <mkdir dir="${basedir}/dummysize" />
+    <mkdir dir="${basedir}/dummysize/d1" />
+    <mkdir dir="${basedir}/dummysize/d2" />
+		<c:let>
+	      p0 := size(null)
+			  p1 := size(true)
+			  p2 := size(5)
+			  p3 := size('')
+			  p4 := size('a/b')
+			  p5 := size(list())
+	      p6 := size(list(1))
+	      p7 := size(file(file(project),'dummysize'))
+	      p8 := size(file(file(project),'shallnotexist'))
+	    </c:let>
+		<expect have="${p0}" expected="0" />
+		<expect have="${p1}" expected="0" />
+		<expect have="${p2}" expected="0" />
+		<expect have="${p3}" expected="0" />
+		<expect have="${p4}" expected="3" />
+		<expect have="${p5}" expected="0" />
+		<expect have="${p6}" expected="1" />
+		<expect have="${p7}" expected="2" />
+		<expect have="${p8}" expected="0" />
+      </try>
+      <finally>
+        <delete dir="${basedir}/dummysize" />
+      </finally>
+    </c:trycatch>
 	</target>
 
 </project>

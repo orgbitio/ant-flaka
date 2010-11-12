@@ -76,14 +76,16 @@ public class Functions
     return buf.toString();
   }
 
-  static private File obj2file(Object obj) {
+  static private File obj2file(Object obj)
+  {
     String s;
-    
+
     if (obj == null)
       return new File(".");
 
-    if (obj instanceof Project) {
-      Project p = (Project)obj;
+    if (obj instanceof Project)
+    {
+      Project p = (Project) obj;
       File basedir = p.getBaseDir();
       return basedir;
     }
@@ -91,116 +93,138 @@ public class Functions
     if (obj instanceof File)
       return (File) obj;
 
-    if (obj instanceof Iterable) {
-      Iterator iter = ((Iterable)obj).iterator();
+    if (obj instanceof Iterable)
+    {
+      Iterator iter = ((Iterable) obj).iterator();
       File f;
       if (iter.hasNext() == false)
         f = new File(".");
-      else 
+      else
         f = obj2file(iter.next());
-      while(iter.hasNext()) {
-        f = new File(f,obj2file(iter.next()).toString());
+      while (iter.hasNext())
+      {
+        f = new File(f, obj2file(iter.next()).toString());
       }
       return f;
     }
-    
+
     if (obj instanceof String)
-      s = (String)obj;
+      s = (String) obj;
     else
       s = obj.toString();
-    
+
     if (s.matches("\\s*"))
       s = ".";
-    
+
     return new File(s);
   }
-  
+
   static public Object file(Object... varg)
   {
     File f = null;
-    switch (varg.length) {
-      case 0 :
-        // When called without argument return the 
+    switch (varg.length)
+    {
+      case 0:
+        // When called without argument return the
         f = new File(".");
         break;
-      case 1: {
+      case 1:
+      {
         f = obj2file(varg[0]);
         break;
       }
-      default: {
+      default:
+      {
         f = obj2file(varg[0]);
-        for(int i=1;i<varg.length;++i) {
-          f = new File(f,obj2file(varg[i]).toString());
+        for (int i = 1; i < varg.length; ++i)
+        {
+          f = new File(f, obj2file(varg[i]).toString());
         }
       }
     }
     return f;
   }
 
-  static public Object size(Object obj)
+  static private Object invoke(Object obj, String method)
   {
     Object r = null;
-    Class C = null;
-    /* check if obj has method size */
-    if (obj == null)
-      return null;
-
-    C = obj.getClass();
-    if (C.isArray())
-    {
-      return new Integer(Array.getLength(obj));
-    }
-    if (C.isPrimitive())
-      return null;
-
+    Method m;
     try
     {
-      Method m = null;
-      m = obj.getClass().getMethod("size");
+      m = obj.getClass().getMethod(method);
       if (m != null)
       {
         r = m.invoke(obj, (Object[]) null);
-        if (r != null)
-          return r;
       }
     }
     catch (Exception e)
     {
-      r = null;
+      /* pass */
     }
-    try
-    {
-      Field f = null;
-      f = obj.getClass().getField("length");
-      if (f != null)
-      {
-        r = f.get(obj);
-        if (r != null)
-          return r;
-      }
-    }
-    catch (Exception e)
-    {
-      r = null;
-    }
-
-    try
-    {
-      Field f = null;
-      f = obj.getClass().getField("size");
-      if (f != null)
-      {
-        r = f.get(obj);
-        if (r != null)
-          return r;
-      }
-    }
-    catch (Exception e)
-    {
-      r = null;
-    }
-
     return r;
+  }
+
+  static private Object getfield(Object obj, String name)
+  {
+    Object r = null;
+    Field f;
+    try
+    {
+      f = obj.getClass().getField(name);
+      if (f != null)
+      {
+        r = f.get(obj);
+      }
+    }
+    catch (Exception e)
+    {
+      /* pass */
+    }
+    return r;
+  }
+
+  static public Object size(Object obj)
+  {
+    Object r = null;
+    Class C;
+
+    if (obj != null)
+    {
+      C = obj.getClass();
+
+      // The size of a primitve object is 0
+      if (C.isPrimitive())
+        return new Long(0);
+
+      if (C.isArray())
+      {
+        return new Long(Array.getLength(obj));
+      }
+      if (obj instanceof File) {
+        File f = (File)obj;
+        if (f.isDirectory()) {
+          String[] entries = f.list();
+          r = new Long(entries != null ? entries.length : 0);
+        } else {
+          r = new Long(f.length());
+        }
+        return r;
+      }
+      
+      r = invoke(obj, "size");
+      if (r != null)
+        return r;
+      r = invoke(obj, "length");
+      if (r != null)
+        return r;
+      r = getfield(obj, "size");
+      if (r != null)
+        return r;
+      r = getfield(obj, "length");
+      if (r != null)
+        return r;
+    }
+    return new Long(0);
   }
 
   static public Boolean isnil(Object obj)
@@ -387,14 +411,17 @@ public class Functions
     }
     return r;
   }
-  static public String nativetype(Object object) {
-    if (object==null) {
+
+  static public String nativetype(Object object)
+  {
+    if (object == null)
+    {
       return "";
     }
     Class clazz = object.getClass();
     return clazz.getName();
   }
-  
+
   static public String typeof(Object object)
   {
     if (object == null)
@@ -423,13 +450,13 @@ public class Functions
 
     if (Boolean.class.isAssignableFrom(object.getClass()))
       return "boolean";
-    
+
     if (object instanceof Map)
       return "map";
 
-    if(object instanceof Project)
-        return "project";
-    
+    if (object instanceof Project)
+      return "project";
+
     return "object";
   }
 

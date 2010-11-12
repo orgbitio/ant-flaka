@@ -55,6 +55,10 @@
       dependency libraries.
       =====================================================================
   -->
+  <condition property="flaka_ant18_or_newer">
+    <available classname="org.apache.tools.ant.property.GetProperty" />
+  </condition>
+
   <property 
       name="depot.url" 
       value="http://download.haefelinger.it/flaka/dependencies" 
@@ -336,8 +340,7 @@
   <target name="test-init181" if="flaka_ant18_or_newer">
     <taskdef uri="antlib:it.haefelinger.flaka.prop"
              resource="it/haefelinger/flaka/prop/antlib.xml"
-             classpath="${dist.dir}/@{basename}.jar"
-             />
+             classpath="${dist.dir}/ant-flaka-${version}.jar" />
   </target>
 
   <target name="test" depends="package,test-init181" >
