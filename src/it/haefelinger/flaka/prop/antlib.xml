@@ -1,0 +1,7 @@
+<antlib>
+  <!-- you need Ant 1.8.x -->
+  <componentdef name="flakapropertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
+  <typedef name="el-propertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
+  <typedef name="el-evaluator" classname="it.haefelinger.flaka.el.ELPropertyEvaluator" />
+  <typedef name="el-expander" classname="it.haefelinger.flaka.el.ELPropertyExpander" />
+</antlib>

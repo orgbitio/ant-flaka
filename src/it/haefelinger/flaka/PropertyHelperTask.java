@@ -18,10 +18,14 @@
 
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.util.PropertyHandler;
+import it.haefelinger.flaka.prop.PropertyHelper10;
+import it.haefelinger.flaka.prop.PropertyHelper12;
+import it.haefelinger.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.PropertyHelper;
 
 /**
  * Replace property handler with one able to handle EL references.
@@ -30,27 +34,41 @@ import org.apache.tools.ant.Project;
  * @since 1.0
  * 
  */
-public class PropertyHelper extends Task
+public class PropertyHelperTask extends Task
 {
-  protected Object handler = null;
+  protected String clazzname = "Helper10";
 
+  public void setClassname(String clazzname)
+  {
+    this.clazzname = Static.trim3(getProject(), clazzname, this.clazzname);
+  }
+
+  @SuppressWarnings("deprecation")
   public void execute() throws BuildException
   {
     Project project;
-    PropertyHandler ph;
-    org.apache.tools.ant.PropertyHelper current;
-    String ANT_HELPER_REFID = "ant.PropertyHelper";
-
+    PropertyHelper ph,current;
+ 
     /* get my project */
     project = getProject();
-  
+
     /* get current property helper */
     current = org.apache.tools.ant.PropertyHelper.getPropertyHelper(project);
-    
-    /* create new property helper */
-    ph = new PropertyHandler(this.getProject(),current);
+
+    if (this.clazzname.equalsIgnoreCase("Helper12"))
+    {
+      ph = new PropertyHelper12();
+      ph.setProject(project);
+    }
+    else
+    {
+      ph = new PropertyHelper10();
+      ph.setProject(project);
+      ph.setNext(current);
+    }
+
     /* install my property handler */
-    project.getReferences().put(ANT_HELPER_REFID, ph);
+    project.getReferences().put(MagicNames.REFID_PROPERTY_HELPER, ph);
   }
 
 }

@@ -1,6 +1,17 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="xx">
-	<c:echo>
-	  #{ typeof( property ) }
-	</c:echo>
+<project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
+  <property name="woha" value="woha" />
 
+  <c:install-property-handler />
+
+ 
+
+  <c:let>
+    p0 := nativetype( project.references['ant.PropertyHelper'] )
+    p1 := 'hello'
+    </c:let>
+
+  <c:expect pname="p0" value="it.haefelinger.flaka.prop.PropertyHelper12" />
+  <c:expect pname="p1" value="hello" />
+  <!--  Test whether properties do survive change of property helper -->
+  <c:expect pname="woha" value="woha" />
 </project>

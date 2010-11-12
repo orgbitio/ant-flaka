@@ -14,9 +14,9 @@
   <!--                         TASKS                               -->
   <!--=============================================================-->
 
-  <taskdef name="install-reference-handler" classname="it.haefelinger.flaka.PropertyHelper" /><!--  deprecated --> 
+  <taskdef name="install-reference-handler" classname="it.haefelinger.flaka.PropertyHelperTask" /><!--  deprecated --> 
   <!--  TODO: fix manual -->
-  <taskdef name="install-property-handler" classname="it.haefelinger.flaka.PropertyHelper" /> 
+  <taskdef name="install-property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" /> 
   <taskdef name="while" classname="it.haefelinger.flaka.While" />
   <taskdef name="rescue" classname="it.haefelinger.flaka.Rescue" />
   <taskdef name="list" classname="it.haefelinger.flaka.List" />
@@ -39,7 +39,7 @@
   <taskdef name="properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="inline-properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="property-by-regex" classname="it.haefelinger.flaka.Select" />
-  <taskdef name="property-handler" classname="it.haefelinger.flaka.PropertyHelper" />
+  <taskdef name="property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" />
   <taskdef name="requires-ant" classname="it.haefelinger.flaka.Require" />
   <taskdef name="resdeps" classname="it.haefelinger.flaka.ResolveDeps" />
   <taskdef name="run-macro" classname="it.haefelinger.flaka.RunMacro" />

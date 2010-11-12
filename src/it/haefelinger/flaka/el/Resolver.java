@@ -178,7 +178,8 @@ public class Resolver extends ELResolver
         case Wrapper.PROPERTY:
         {
           context.setPropertyResolved(true);
-          r= Static.property(this.project,property);
+          r = this.project.getProperties().get(property);
+          //r= Static.property(this.project,property);
           break;
         }
         case Wrapper.REFERENCE:
@@ -409,6 +410,8 @@ public class Resolver extends ELResolver
       obj = this.map.get(property);
     if (obj == null)
       obj = this.project.getReference(property);
+    if (obj == null)
+      obj = this.project.getProperties().get(property);
     return obj;
   }
 

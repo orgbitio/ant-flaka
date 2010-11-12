@@ -89,6 +89,10 @@
       value="${build.dir}/libsrc" 
       />
   <property 
+      name="librun.dir" 
+      value="${build.dir}/librun" 
+      />
+  <property 
       name="obj.dir" 
       value="${build.dir}/classes" 
       />
@@ -103,6 +107,10 @@
       file="${lib.dir}/fetched/README.txt" 
       property="libs.fetched"/>
 
+  <presetdef name="javac">
+    <javac includeantruntime="true" />
+  </presetdef>
+
     
   <!-- ;;
        ;; Dependencies
@@ -115,7 +123,8 @@
       <fetchjar 
           group="junit" 
           name="junit" 
-          version="3.8.1" 
+          version="3.8.1"
+          dest="${librun.dir}/junit.jar"
           />
       <fetchjar 
           group="jdom" 
@@ -132,7 +141,8 @@
       <fetchjar 
           group="org/apache/ant" 
           name="ant-antunit" 
-          version="1.1" 
+          version="1.1"
+          dest="${librun.dir}/ant-antunit.jar"
           />
       <!-- JUEL has not been uploaded into a Maven 2 repository yet -->
       <fetchjar 
@@ -142,32 +152,32 @@
           type="inline"
           />
       <!-- Required when using Eclipse | Javadoc -->
-    <fetchjar 
-        group="org/apache/ant" 
-        name="ant" 
-        version="1.7.1" 
-        dest="${lib.dir}/ant.jar"
-        />
-    <fetchjar 
-        group="org/apache/ant" 
-        name="ant-launcher" 
-        version="1.7.1" 
-        dest="${lib.dir}/ant-launcher.jar"
-        />
-    <fetchjar 
-        group="org/apache/ant" 
-        name="ant" 
-        version="1.7.1"
-        basename="ant-sources-1.7.1"
-        dest="${libsrc.dir}/ant-sources-1.7.1.jar"
-        />
-    <fetchjar 
-        group="juel-impl" 
-        name="juel" 
-        version="2.2.1"
-        basename="juel-sources-2.2.1"
-        dest="${libsrc.dir}/juel-sources-2.2.1.jar"
-        />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant" 
+          version="1.8.1" 
+          dest="${librun.dir}/ant.jar"
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant-launcher" 
+          version="1.8.1" 
+          dest="${librun.dir}/ant-launcher.jar"
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant"
+          version="1.8.1"
+          basename="ant-sources-1.8.1"
+          dest="${libsrc.dir}/ant-sources-1.8.1.jar"
+          />
+      <fetchjar 
+          group="juel-impl" 
+          name="juel" 
+          version="2.2.1"
+          basename="juel-sources-2.2.1"
+          dest="${libsrc.dir}/juel-sources-2.2.1.jar"
+          />
     </sequential>
   </macrodef>
 
@@ -183,6 +193,7 @@
       <echo>fetching @{name} ..</echo>
       <mkdir dir="${lib.dir}" />
       <mkdir dir="${libsrc.dir}" />
+      <mkdir dir="${librun.dir}" />
       <get src="${depot.url}/@{group}/@{name}/@{version}/@{basename}.jar" 
            dest="@{dest}" 
            verbose="On"/>
@@ -251,10 +262,6 @@
         <classpath>
           <fileset dir="${lib.dir}">
             <include name="*.jar"/>
-            <exclude name="ant.jar" />
-            <exclude name="ant-antunit*.jar" />
-            <exclude name="ant-launcher.jar" />
-            <exclude name="junit-*.jar" />
           </fileset>
         </classpath>
       </javac>
@@ -270,9 +277,9 @@
           <pathelement path="${obj.dir}"/>
           <fileset dir="${lib.dir}">
             <include name="*.jar"/>
-            <exclude name="ant.jar" />
-            <exclude name="ant-antunit*.jar" />
-            <exclude name="ant-launcher.jar" />
+          </fileset>
+          <fileset dir="${librun.dir}">
+            <include name="junit.jar"/>
           </fileset>
         </classpath>
       </javac>
@@ -292,9 +299,9 @@
           </fileset>
           <fileset dir="${lib.dir}">
             <include name="*.jar"/>
-            <exclude name="ant.jar" />
-            <exclude name="ant-launcher.jar" />
-            <exclude name="ant-antunit*.jar" />
+          </fileset>
+          <fileset dir="${librun.dir}">
+            <include name="junit.jar"/>
           </fileset>
         </classpath>
         <formatter type="brief" usefile="false"/>
@@ -306,17 +313,18 @@
         </batchtest>
         <jvmarg value="-ea"/>   
       </junit>
-      <!-- Add ant-flaka.jar to classpath -->
-      <taskdef uri="antlib:it.haefelinger.flaka"
-               resource="it/haefelinger/flaka/antlib.xml"
-               classpath="${dist.dir}/@{basename}.jar"/>
       <!-- Add ant-antunit.jar to classpath -->
       <taskdef uri="antlib:org.apache.ant.antunit"
                resource="org/apache/ant/antunit/antlib.xml"
-               classpath="${lib.dir}/ant-antunit-1.1.jar" />
+               classpath="${librun.dir}/ant-antunit.jar" />
+      <!-- Add ant-flaka.jar to classpath -->
+      <taskdef uri="antlib:it.haefelinger.flaka"
+               resource="it/haefelinger/flaka/antlib.xml"
+               classpath="${dist.dir}/@{basename}.jar" />
       <au:antunit>
         <fileset dir="test">
           <include name="test-*.xml" />
+          <exclude name="test-18*.xml" unless="flaka_ant18_or_newer"/>
           <exclude name="test-scndeps.xml" />
           <exclude name="test-set-default-target.xml" />
         </fileset>
@@ -325,7 +333,14 @@
     </sequential>
   </macrodef>
 
-  <target name="test" depends="package" >
+  <target name="test-init181" if="flaka_ant18_or_newer">
+    <taskdef uri="antlib:it.haefelinger.flaka.prop"
+             resource="it/haefelinger/flaka/prop/antlib.xml"
+             classpath="${dist.dir}/@{basename}.jar"
+             />
+  </target>
+
+  <target name="test" depends="package,test-init181" >
     <test-init />
     <test-exec />
   </target>
@@ -422,9 +437,9 @@
       <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
       <link href="http://www.jdom.org/docs/apidocs" />
       <link href="http://logging.apache.org/log4j/1.2/apidocs" />
-      <link href="http://javadoc.haefelinger.it/org.apache.ant/1.7.1" />
+      <link href="http://javadoc.haefelinger.it/org.apache.ant/1.8.1" />
       <link href="http://javadoc.haefelinger.it/net.sourceforge.cruisecontrol/2.8.2" />
-      <link href="http://javadoc.haefelinger.it/net.sourceforge.juel/2.1" />
+      <link href="http://javadoc.haefelinger.it/net.sourceforge.juel/2.2.1" />
       <link href="http://logging.apache.org/log4j/1.2/apidocs" />
       <link href="http://hc.apache.org/httpclient-3.x/apidocs" />
     </javadoc>
@@ -525,11 +540,6 @@
     <package-dist-exec />
   </target>
 
-  <macrodef name="verification">
-    <sequential>
-      
-    </sequential>
-  </macrodef>
 
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                    P A C K A G E - A L L                    -->
@@ -539,7 +549,6 @@
     <package-javadoc-exec />
     <package-sources-exec />
     <package-dist-exec />
-    <verification />
   </target>
 
 </project>

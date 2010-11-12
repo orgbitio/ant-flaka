@@ -62,7 +62,7 @@ public final class EL
   Context context = null;
   ExpressionFactory factory = null;
   boolean debug = false;
-  Project project = null;
+  Project project = null; // TODO: remove me
 
   @SuppressWarnings("unused")
   private EL()
@@ -526,7 +526,6 @@ public final class EL
     TreeStore store = new TreeStore(builder, new Cache(10));
     TypeConverter tc = new it.haefelinger.flaka.el.TypeConverter();
     ef = new ExpressionFactoryImpl(store, tc);
-    // ef =ExpressionFactory.newInstance(P);
     return ef;
   }
 
@@ -540,9 +539,10 @@ public final class EL
 
   protected void init(Project project)
   {
-    this.project = project;
+    this.project = project; // TODO: remove me
     this.factory = makefactory();
     this.context = makecontext();
+    // TODO: add project to context
 
     // variables e, pi
     vardef("e", new Double(Math.E), double.class);

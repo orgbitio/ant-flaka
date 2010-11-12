@@ -1,0 +1,8 @@
+<project name="tryme" xmlns:c="antlib:it.haefelinger.flaka"  xmlns:prop="antlib:it.haefelinger.flaka.prop">
+
+  <c:noop />
+  <propertyhelper>
+    <prop:flakapropertyhelper />
+  </propertyhelper>
+  
+</project>

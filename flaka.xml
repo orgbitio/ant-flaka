@@ -142,7 +142,13 @@
   <c:for var="d" in=" dependencies.each ">
     <c:for var="r" in=" depots ">
       <c:when test=" not(d.file.exists)" >
-        <get src="#{concat(r,d.m2path)}" dest="#{d.file}" verbose="off" ignoreerrors="true"/>
+        <c:let>
+          url = concat(r,d.m2path)
+        </c:let>
+        <echo>
+          url = #{ url }
+        </echo>
+        <get src="#{url}" dest="#{d.file}" verbose="off" ignoreerrors="true"/>
       </c:when>
     </c:for>
   </c:for>

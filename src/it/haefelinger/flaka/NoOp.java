@@ -32,7 +32,7 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class NoOp extends Task
+public class NoOp extends org.apache.tools.ant.Task
 {
   /** unused */
   /**

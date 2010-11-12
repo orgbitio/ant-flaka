@@ -5,18 +5,33 @@
 <!ENTITY HSEPNL "&HSEP;&NL;" >
 ]>
 <antlib xmlns:c="ant:current">
+  <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+  <!--  Check whether we are dealing with the old or new Property API, in -->
+  <!--  other words, whether we our current Ant is pre 1.8 or not. If the -->
+  <!--  class is available, we have 1.8 or newer.                         -->
+  <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+  <macrodef name="evalwhichant">
+    <sequential>
+      <condition property="flaka_ant18_or_newer">
+        <available classname="org.apache.tools.ant.property.GetProperty" />
+      </condition>
+    </sequential>
+  </macrodef>
+
+
   <typedef name="dependency-selector" classname="it.haefelinger.flaka.dep.Select" />
   <typedef name="filterset" classname="it.haefelinger.flaka.type.FilterSet" />
   <typedef name="istext-selector" classname="it.haefelinger.flaka.IsText" />
   <typedef name="identity-globmapper" classname="it.haefelinger.flaka.GlobMap" />
 
+
+
   <!--=============================================================-->
   <!--                         TASKS                               -->
   <!--=============================================================-->
-
-  <taskdef name="install-reference-handler" classname="it.haefelinger.flaka.PropertyHelper" /><!--  deprecated --> 
-  <!--  TODO: fix manual -->
-  <taskdef name="install-property-handler" classname="it.haefelinger.flaka.PropertyHelper" /> 
+  <taskdef name="noop" classname="it.haefelinger.flaka.NoOp" />
+  <taskdef name="while" classname="it.haefelinger.flaka.While" />
+  <taskdef name="task-install-property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" />
   <taskdef name="while" classname="it.haefelinger.flaka.While" />
   <taskdef name="rescue" classname="it.haefelinger.flaka.Rescue" />
   <taskdef name="list" classname="it.haefelinger.flaka.List" />
@@ -39,7 +54,7 @@
   <taskdef name="properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="inline-properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="property-by-regex" classname="it.haefelinger.flaka.Select" />
-  <taskdef name="property-handler" classname="it.haefelinger.flaka.PropertyHelper" />
+  <taskdef name="property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" />
   <taskdef name="requires-ant" classname="it.haefelinger.flaka.Require" />
   <taskdef name="resdeps" classname="it.haefelinger.flaka.ResolveDeps" />
   <taskdef name="run-macro" classname="it.haefelinger.flaka.RunMacro" />
@@ -47,7 +62,7 @@
   <taskdef name="scndeps" classname="it.haefelinger.flaka.ScanDeps" />
   <taskdef name="scandeps" classname="it.haefelinger.flaka.ScanDeps" />
   <taskdef name="set-default-target" classname="it.haefelinger.flaka.SetDefault" />
-  <taskdef name="switch"   classname="it.haefelinger.flaka.Switch02" />
+  <taskdef name="switch" classname="it.haefelinger.flaka.Switch02" />
   <taskdef name="taskdotclasspath" classname="it.haefelinger.flaka.DotClassPath" />
   <taskdef name="throw" classname="it.haefelinger.flaka.Throw" />
   <taskdef name="try-exec" classname="it.haefelinger.flaka.Exec" />
@@ -58,6 +73,47 @@
   <taskdef name="uploadtask" classname="it.haefelinger.flaka.HttpUploadTask" />
   <taskdef name="when" classname="it.haefelinger.flaka.When" />
   <taskdef name="xmlmerge" classname="it.haefelinger.flaka.XmlMerger" />
+
+
+
+  <!--  deprecated: stay clear from it -->
+  <macrodef name="install-reference-handler">
+    <sequential>
+      <c:install-property-handler />
+    </sequential>
+  </macrodef>
+
+
+  <macrodef name="install-property-handler">
+    <sequential>
+      <c:evalwhichant />
+      <c:choose>
+        <when test=" property.flaka_ant18_or_newer ">
+          <echo level="debug">FLAKA: ENABLING 1.7 PROPRTY HANDLING </echo>
+          <c:task-install-property-handler classname="Helper12"/>
+        </when>
+        <otherwise>
+          <echo level="debug">FLAKA: ENABLING 1.7 PROPRTY HANDLING </echo>
+          <c:task-install-property-handler classname="Helper10"/>
+        </otherwise>
+      </c:choose>
+    </sequential>
+  </macrodef>
+  
+  
+  <macrodef name="expect">
+    <attribute name="pname" />
+    <attribute name="value" />
+    <attribute name="pvalue" default="${@{pname}}" />
+    <sequential>
+      <c:switch value="@{pvalue}">
+        <cmp eq="@{value}" />
+        <otherwise>
+          <fail message="expected @{pname} to hold `@{value}', got `@{pvalue}' .." />
+        </otherwise>
+      </c:switch>
+    </sequential>
+  </macrodef>
 
   <!--=============================================================-->
   <!--                         MACROS                              -->
@@ -228,22 +284,15 @@
     <attribute name="dir" default="${build.dir}/antlib" />
     <sequential>
       <mkdir dir="${build.dir}/antlib" />
-      <c:export-task src="antlib.xml" dst="@{dir}/antlib.xml"
-                     tee="true" />
+      <c:export-task src="antlib.xml" dst="@{dir}/antlib.xml" tee="true" />
     </sequential>
   </macrodef>
 
   <macrodef name="define-targets" backtrace="true">
     <sequential>
-      <c:create-target 
-          name="package"
-          task="antlib:it.haefelinger.flaka:internal-package"
-          description="package distributables." />
+      <c:create-target name="package" task="antlib:it.haefelinger.flaka:internal-package" description="package distributables." />
 
-      <c:create-target 
-          name="local-package"
-          task="antlib:it.haefelinger.flaka:local-package" 
-          depends="local-compile" />
+      <c:create-target name="local-package" task="antlib:it.haefelinger.flaka:local-package" depends="local-compile" />
 
       <!-- Synonym targets for target "package" -->
       <c:create-target name="all" depends="package" />
@@ -254,171 +303,104 @@
       <!-- dependencies                                                -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="depends"
-          task="antlib:it.haefelinger.flaka:local-depends" 
-          description="report dependencies of this project" />
+      <c:create-target name="depends" task="antlib:it.haefelinger.flaka:local-depends" description="report dependencies of this project" />
 
       <!--=============================================================-->
       <!-- export                                                      -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="export"
-          task="antlib:it.haefelinger.flaka:local-export" 
-          description="export scripting layer (antlib.xml) to stdout" />
+      <c:create-target name="export" task="antlib:it.haefelinger.flaka:local-export" description="export scripting layer (antlib.xml) to stdout" />
 
 
       <!--=============================================================-->
       <!-- properties                                                  -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="properties"
-          task="antlib:it.haefelinger.flaka:local-apropos" />
+      <c:create-target name="properties" task="antlib:it.haefelinger.flaka:local-apropos" />
 
-      <c:create-target 
-          name="apropos"
-          task="antlib:it.haefelinger.flaka:local-apropos" 
-          description="export project properties" />
+      <c:create-target name="apropos" task="antlib:it.haefelinger.flaka:local-apropos" description="export project properties" />
 
       <!--=============================================================-->
       <!-- clean                                                       -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="clean"
-          task="antlib:it.haefelinger.flaka:internal-clean"
-          description="remove object files" />
+      <c:create-target name="clean" task="antlib:it.haefelinger.flaka:internal-clean" description="remove object files" />
 
-      <c:create-target 
-          name="local-clean"
-          task="antlib:it.haefelinger.flaka:local-clean" />
+      <c:create-target name="local-clean" task="antlib:it.haefelinger.flaka:local-clean" />
 
       <!--=============================================================-->
       <!-- distclean                                                   -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="distclean"
-          task="antlib:it.haefelinger.flaka:internal-distclean"
-          description="remove build folder" />
+      <c:create-target name="distclean" task="antlib:it.haefelinger.flaka:internal-distclean" description="remove build folder" />
 
-      <c:create-target 
-          name="local-distclean"
-          task="antlib:it.haefelinger.flaka:local-distclean" />
+      <c:create-target name="local-distclean" task="antlib:it.haefelinger.flaka:local-distclean" />
 
       <!--=============================================================-->
       <!-- test                                                        -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="test"
-          task="antlib:it.haefelinger.flaka:internal-test" 
-          description="execute unit tests" />
+      <c:create-target name="test" task="antlib:it.haefelinger.flaka:internal-test" description="execute unit tests" />
 
-      <c:create-target 
-          name="local-test"
-          task="antlib:it.haefelinger.flaka:local-test" 
-          depends="local-compile,local-compile-test" />
+      <c:create-target name="local-test" task="antlib:it.haefelinger.flaka:local-test" depends="local-compile,local-compile-test" />
 
 
       <!--=============================================================-->
       <!-- eclipse                                                     -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name=".classpath"
-          task="antlib:it.haefelinger.flaka:internal-dotclasspath"
-          description="creates/updates .classpath file" />
-      
-      <c:create-target 
-          name="dotclasspath"
-          task="antlib:it.haefelinger.flaka:internal-dotclasspath" />
+      <c:create-target name=".classpath" task="antlib:it.haefelinger.flaka:internal-dotclasspath" description="creates/updates .classpath file" />
 
-      <c:create-target 
-          name="local-dotclasspath"
-          task="antlib:it.haefelinger.flaka:local-dotclasspath" />
-      <c:create-target 
-          name="local-.classpath"
-          task="antlib:it.haefelinger.flaka:local-dotclasspath" />
+      <c:create-target name="dotclasspath" task="antlib:it.haefelinger.flaka:internal-dotclasspath" />
+
+      <c:create-target name="local-dotclasspath" task="antlib:it.haefelinger.flaka:local-dotclasspath" />
+      <c:create-target name="local-.classpath" task="antlib:it.haefelinger.flaka:local-dotclasspath" />
 
       <!--=============================================================-->
       <!-- compile                                                     -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="compile"
-          task="antlib:it.haefelinger.flaka:internal-compile"
-          description="execute compilation step" />
+      <c:create-target name="compile" task="antlib:it.haefelinger.flaka:internal-compile" description="execute compilation step" />
 
-      <c:create-target 
-          name="local-compile"
-          task="antlib:it.haefelinger.flaka:local-compile" />
+      <c:create-target name="local-compile" task="antlib:it.haefelinger.flaka:local-compile" />
 
-      <c:create-target 
-          name="compile-test"
-          task="antlib:it.haefelinger.flaka:internal-compile-test"
-          description="execute compilation step for tests" />
+      <c:create-target name="compile-test" task="antlib:it.haefelinger.flaka:internal-compile-test" description="execute compilation step for tests" />
 
-      <c:create-target 
-          name="local-compile-test"
-          task="antlib:it.haefelinger.flaka:local-compile-test"
-          depends="local-compile" />
+      <c:create-target name="local-compile-test" task="antlib:it.haefelinger.flaka:local-compile-test" depends="local-compile" />
 
       <!--=============================================================-->
       <!-- deploy                                                      -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="deploy"
-          task="antlib:it.haefelinger.flaka:local-deploy" 
-          depends="package"
-          description="install on remote machine" />
+      <c:create-target name="deploy" task="antlib:it.haefelinger.flaka:local-deploy" depends="package" description="install on remote machine" />
 
 
       <!--=============================================================-->
       <!-- install                                                     -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="install"
-          task="antlib:it.haefelinger.flaka:local-install" depends="package"
-          description="install on your local machine" />
+      <c:create-target name="install" task="antlib:it.haefelinger.flaka:local-install" depends="package" description="install on your local machine" />
 
       <!--=============================================================-->
       <!-- create a project structure                                  -->
       <!--=============================================================-->
 
-      <c:create-target name="create-project"
-                       task="antlib:it.haefelinger.flaka:local-create-project"
-                       description="create project based on property 'project.type'" />
+      <c:create-target name="create-project" task="antlib:it.haefelinger.flaka:local-create-project" description="create project based on property 'project.type'" />
 
       <!--=============================================================-->
       <!-- upload                                                      -->
       <!--=============================================================-->
-      <c:create-target 
-          name="upload"
-          task="antlib:it.haefelinger.flaka:local-upload" 
-          description="upload artefact(s) on depot" />
+      <c:create-target name="upload" task="antlib:it.haefelinger.flaka:local-upload" description="upload artefact(s) on depot" />
 
-      <c:create-target 
-          name="upload-test"
-          task="antlib:it.haefelinger.flaka:local-upload-test"
-          description="test upload artefact(s) on depot" />
+      <c:create-target name="upload-test" task="antlib:it.haefelinger.flaka:local-upload-test" description="test upload artefact(s) on depot" />
 
       <!--=============================================================-->
       <!-- baseline                                                    -->
       <!--=============================================================-->
 
-      <c:create-target 
-          name="reload-baseline"
-          task="antlib:it.haefelinger.flaka:internal-reload-baseline"
-          description="throw Baseline away and get last revision" />
+      <c:create-target name="reload-baseline" task="antlib:it.haefelinger.flaka:internal-reload-baseline" description="throw Baseline away and get last revision" />
 
-      <c:create-target 
-          name="local-reload-baseline"
-          task="antlib:it.haefelinger.flaka:local-reload-baseline" />
+      <c:create-target name="local-reload-baseline" task="antlib:it.haefelinger.flaka:local-reload-baseline" />
 
     </sequential>
   </macrodef>
@@ -539,7 +521,7 @@
         <c:test-init />
       </presetdef>
 
- 
+
       <!--macro `test-post'-->
       <presetdef name="test-post">
         <c:test-post />
@@ -651,10 +633,10 @@
   </macrodef>
 
   <!--
-      A macro to extend a path element. The way to do so is quite cumber-
-      some and should probably be implemented as (Java) task. @refid The
-      id of a Path resource which must exist. @element-path Any element
-      which accepted by Path
+    A macro to extend a path element. The way to do so is quite cumber-
+    some and should probably be implemented as (Java) task. @refid The
+    id of a Path resource which must exist. @element-path Any element
+    which accepted by Path
   -->
 
   <macrodef name="path-prepend" backtrace="true">

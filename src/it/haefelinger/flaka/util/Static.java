@@ -1798,6 +1798,7 @@ final public class Static
   }
 
   
+  @SuppressWarnings("deprecation")
   static final public Project unset(Project project, String... properties)
   {
     Object obj;
