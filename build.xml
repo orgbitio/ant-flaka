@@ -433,8 +433,11 @@
         <fileset dir="${lib.dir}">
           <include name="**/*.jar"/>
         </fileset>
+        <fileset dir="${librun.dir}">
+          <include name="**/*.jar"/>
+        </fileset>
       </classpath> 
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api" />
+      <link href="http://download.oracle.com/javase/6/docs/api" />
       <link href="http://www.jdom.org/docs/apidocs" />
       <link href="http://logging.apache.org/log4j/1.2/apidocs" />
       <link href="http://javadoc.haefelinger.it/org.apache.ant/1.8.1" />
