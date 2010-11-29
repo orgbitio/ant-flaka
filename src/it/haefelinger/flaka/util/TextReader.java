@@ -356,7 +356,7 @@ public class TextReader
   final public static String stripcomment(String comment, String text)
   {
     int i, j, n;
-    String pat = String.format("^\\s*%s.*$", comment);
+    String pat = String.format("^[ \t\f]*%s.*$", comment);
     Pattern S = Pattern.compile(pat, Pattern.MULTILINE);
     Matcher m = S.matcher(text);
     StringBuffer b;
@@ -378,13 +378,13 @@ public class TextReader
   {
     if (this.bufreader == null)
     {
-      // if skipws is on, strip out unwanted whitespace stuff.
-      if (this.skipws)
-        this.text = TextReader.stripws(this.text);
-
       // strip comments
       this.text = TextReader.stripcomment(this.comment, this.text);
 
+      // if skipws is on, strip out unwanted whitespace stuff.
+      if (this.skipws)
+        this.text = TextReader.stripws(this.text);
+ 
       // if resolve continuation lines is on, merge continuation lines
       if (this.continuation)
         this.text = TextReader.resolvecontlines2(this.text);

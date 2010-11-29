@@ -1,11 +1,10 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
 
-  <!-- first line: ws significant if non-ws -->
-  <c:echo shift="5_">
-      
-    a
-    b
-    
-    
-  </c:echo>
+  <c:echo>
+  ; comment
+  
+  foo
+    bar
+   
+</c:echo>
 </project>

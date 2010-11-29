@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case-01">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="tryme">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
