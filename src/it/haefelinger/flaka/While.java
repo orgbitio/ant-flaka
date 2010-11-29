@@ -22,7 +22,7 @@ public class While extends it.haefelinger.flaka.Task implements TaskContainer
 
   public void setTest(String test)
   {
-    this.test = Static.trim3(getProject(), test, this.test);
+    this.test = Static.elresolve(this.getProject(), test);
   }
 
   public void addTask(Task nestedTask)

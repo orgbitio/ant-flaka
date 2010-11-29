@@ -47,7 +47,7 @@ public class Break extends Task
 
   public void setTest(String test)
   {
-    this.test = Static.trim3(getProject(), test, this.test);
+    this.test = Static.elresolve(getProject(), test);
   }
 
   public void setIf(String ifp)

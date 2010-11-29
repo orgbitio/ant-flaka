@@ -130,7 +130,8 @@ public class TextReader
         int times = Integer.parseInt(p.group(1));
         String what = p.group(2);
         StringBuilder accu = new StringBuilder();
-        if (what.length()<1) what = " ";
+        if (what.length() < 1)
+          what = " ";
         for (int i = 0; i < times; ++i)
           accu.append(what);
         this.shift = accu.toString();
@@ -167,7 +168,6 @@ public class TextReader
     return this.text;
   }
 
- 
   protected boolean ignore(String line)
   {
     return this.skipempty && line.matches("\\s*") ? true : false;
@@ -188,19 +188,21 @@ public class TextReader
     Matcher s, t, u;
     String out, prefix;
     int n = 0;
-    // Match all ws at input's begin (includes \n)
-    // TODO: make me static
+
+    // Compile a regex matching all whitespace starting from the begin of
+    // input till the first non-whitespace character. Note, that '\s'
+    // matches EOL as well as classical whitespace.
     S = Pattern.compile("^\\s*");
-    // Match everthing after last \n (which must exist)
-    // TODO: make me static
+
+    // Compile a regex matching all characters after the last EOL.
     T = Pattern.compile("\\n([^\\n]*)$");
 
     // create match object on input and execute RE on it.
     s = S.matcher(text);
     s.find();
 
-    // The matching sequence - must always find something.
-    // TODO: Possible to avoid taking a substring??
+    // Apply regex T on the prefix. The length of the match will determine
+    // the number of characters to strip off.
     prefix = s.group();
     t = T.matcher(prefix);
     if (t.find())
@@ -213,7 +215,9 @@ public class TextReader
     }
 
     // Remove leading whitespace characters.
-    out = s.replaceFirst("");
+    //out = s.replaceFirst("");
+    out = text.replaceFirst("\\A[ \\t\\f]+\n","\n");
+    //out = out.replaceFirst("\n","");
     if (n > 0)
     {
       // Compile a pattern on the fly.
@@ -221,7 +225,7 @@ public class TextReader
       // must a whitespace character except a newline.
       // Is there a way to express this as a difference operation? Such
       // as {\s - \n} ??
-      U = Pattern.compile("\\n[ \\t\\x0B\\f\\r]{1," + n + "}");
+      U = Pattern.compile("(\\n|\\A)[ \\t\\f]{1," + n + "}");
       u = U.matcher(out);
       out = u.replaceAll("\n");
     }
@@ -253,14 +257,14 @@ public class TextReader
         break;
       // text[i] == '\'
       j = i;
-      p.setIndex(j+1);
+      p.setIndex(j + 1);
       if (lookahead(text, n, p))
       {
         // we are at the start of a cont line sequence which means, that
         // parse position is either at EOF or EOL. We skip current '\'
         // and copy any remaining '\'.
         i = p.getIndex();
-        b.append(text, j+1, i);
+        b.append(text, j + 1, i);
         // skip eol or eof
         if (i >= n)
           continue;
@@ -273,7 +277,8 @@ public class TextReader
             i = i + 1;
         }
         // ignore whitespace after EOL
-        while (i < n && TextReader.isspace(text,i)) ++i;
+        while (i < n && TextReader.isspace(text, i))
+          ++i;
       }
       else
       {
@@ -286,14 +291,16 @@ public class TextReader
 
   /**
    * A helper function to define what <em>whitespace</em> means in this context.
+   * 
    * @param c
    * @return
    */
-  static public final boolean isspace(String text,int i) {
+  static public final boolean isspace(String text, int i)
+  {
     char c = text.charAt(i);
     return (c == ' ' || c == '\t' || c == '\f') ? true : false;
   }
-   
+
   /**
    * A function to lookahead the end of a continuation line.
    * 
@@ -341,26 +348,50 @@ public class TextReader
     return false;
   }
 
-  
   final public static BufferedReader tobufreader(String text)
   {
     return new BufferedReader(new StringReader(text));
   }
 
-  final public static String stripcomment(String c, String text)
+  final public static String stripcomment(String comment, String text)
   {
-    // MULTILINE: This should change the meaning of ^ and $ to match the
-    // line termination character as well (as begin and end of input).
-    // However: ^ and $ are boundaries, i.e. they do not match. Instead
-    // the matched content is *after* ^ and *before* $.
-    // TODO: ws characters
-
-    // TODO: bad, removing comment lines via a Regex does not work out.
-    String pat = String.format("(\\n|^)[ \\t]*%s.*|\\n\\z", "" + c);
+    int i, j, n;
+    String pat = String.format("^\\s*%s.*$", comment);
     Pattern S = Pattern.compile(pat, Pattern.MULTILINE);
-    Matcher s = S.matcher(text);
-    String out = s.replaceAll("");
-    return out;
+    Matcher m = S.matcher(text);
+    StringBuffer b;
+    i = 0;
+    b = new StringBuffer();
+    n = text.length();
+    while (i < n && m.find(i))
+    {
+      j = m.start();
+      b.append(text, i, j);
+      i = m.end() + 1;
+    }
+    if (i <= n)
+      b.append(text, i, n);
+    return b.toString();
+  }
+
+  protected void init()
+  {
+    if (this.bufreader == null)
+    {
+      // if skipws is on, strip out unwanted whitespace stuff.
+      if (this.skipws)
+        this.text = TextReader.stripws(this.text);
+
+      // strip comments
+      this.text = TextReader.stripcomment(this.comment, this.text);
+
+      // if resolve continuation lines is on, merge continuation lines
+      if (this.continuation)
+        this.text = TextReader.resolvecontlines2(this.text);
+
+      /* initialize buffered reader */
+      this.bufreader = TextReader.tobufreader(this.text);
+    }
   }
 
   /*
@@ -371,22 +402,8 @@ public class TextReader
   public String readLine()
   {
     String line;
-    if (this.bufreader == null)
-    {
-      // strip comments
-      this.text = TextReader.stripcomment(this.comment, this.text);
 
-      // if skipws is on, strip out unwanted whitespace stuff.
-      if (this.skipws)
-        this.text = TextReader.stripws(this.text);
-
-      // if resolve continuation lines is on, merge continuation lines
-      if (this.continuation)
-        this.text = TextReader.resolvecontlines2(this.text);
-
-      /* initialize buffered reader */
-      this.bufreader = TextReader.tobufreader(this.text);
-    }
+    init();
     try
     {
       while ((line = this.bufreader.readLine()) != null && this.ignore(line))
@@ -415,20 +432,46 @@ public class TextReader
 
   public String read()
   {
-    String line;
-    String accu = null;
-
-    while ((line = this.readLine()) != null)
+    String r;
+    final char[] buf = new char[1024];
+    final StringBuffer b = new StringBuffer();
+    int n;
+    
+    init();
+    try
     {
-      if (accu == null)
-        accu = line;
-      else
+      while ((n = this.bufreader.read(buf)) >= 0)
       {
-        accu += "\n";
-        accu += line;
+        b.append(buf, 0, n);
       }
     }
-    return accu;
+    catch (Exception e)
+    {
+      /* can't happen */
+    }
+    r = b.toString();
+    // trim trailing whitespace
+    r = r.replaceAll("[ \\t\\f]+\\z","");
+    // trim leading newline
+    r = r.replaceFirst("\\A\n","");
+    if (this.shift!=null) {
+      // replace all but last \n ..
+      Matcher m = Pattern.compile("\n\\z").matcher(r);
+      if (m.find()) {
+        r = r.substring(0,m.start());
+        r = r.replaceAll("\n","\n" + this.shift);
+        r = r + "\n";
+      } else {
+        r = r.replaceAll("\n","\n" + this.shift);
+      }
+      r = this.shift + r;
+    }
+    /* resolve all Ant properties ${ } */
+    r = this.project.replaceProperties(r);
+
+    /* resolve all EL references #{ ..} */
+    r = Static.elresolve(this.project, r);
+    return r;
   }
 
   /**

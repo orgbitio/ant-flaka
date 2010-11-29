@@ -1,16 +1,11 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
 
-
-	<c:install-property-handler />
-	<c:for var="x" in="split('a,b')">
-		<c:echo>
-	   #{x}
-	 </c:echo>
-	</c:for>
-	<c:for var="x" in="split('a,b','\s*,\s*')">
-		<c:echo>
-	     #{x}
-	   </c:echo>
-	</c:for>
-
+  <!-- first line: ws significant if non-ws -->
+  <c:echo shift="5_">
+      
+    a
+    b
+    
+    
+  </c:echo>
 </project>

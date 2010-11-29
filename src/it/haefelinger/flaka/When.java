@@ -45,7 +45,7 @@ public class When extends Task implements TaskContainer
    */
   public void setTest(String s)
   {
-    this.test = Static.trim3(getProject(),s, this.test);
+    this.test = Static.elresolve(this.getProject(), s);
   }
 
   public void addTask(org.apache.tools.ant.Task task)

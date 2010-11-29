@@ -75,7 +75,7 @@ public class Switch extends Task
 
   public void setValue(String value)
   {
-    this.value = Static.trim3(getProject(), value, this.value);
+    this.value = Static.elresolve(getProject(), value);
   }
 
   /** Case class */

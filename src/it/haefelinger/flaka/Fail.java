@@ -59,7 +59,7 @@ public class Fail extends Exit
 
   public void setTest(String expr)
   {
-    this.test = Static.trim3(getProject(),expr, this.test);
+    this.test = Static.elresolve(getProject(), expr);
   }
 
   public void setIf(String s)

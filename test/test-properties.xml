@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-tryme">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -54,7 +54,11 @@
 		<c:expect pname="p6" value="" />
 		<c:expect pname="p7" value="null" />
 		<c:expect pname="p8" value="12" />
-		<c:expect pname="p9" value="hello " />
-		<c:expect pname="pa" value="hello " />
+		<!-- properties are trimmed -->
+		<c:expect pname="p9" value="hello" />
+		<c:expect pname="pa" value="hello" />
 	</target>
+	
+
+	
 </project>

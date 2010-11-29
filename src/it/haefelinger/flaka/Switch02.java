@@ -94,8 +94,7 @@ public class Switch02 extends Task
 
   public void setValue(String value)
   {
-    /* provide empty string if value would resolve to null after trimming */
-    this.value = Static.trim3(getProject(), value, "");
+    this.value = Static.elresolve(this.getProject(),value);
   }
 
   /** Case class */
@@ -105,7 +104,7 @@ public class Switch02 extends Task
 
     public void setExpr(String value)
     {
-      this.regexstr = Static.trim3(getProject(), value, this.regexstr);
+      this.regexstr = Static.elresolve(getProject(), value);
     }
 
     /**
@@ -132,7 +131,7 @@ public class Switch02 extends Task
 
     public void setExpr(String value)
     {
-      this.regexstr = Static.trim3(getProject(), value, this.regexstr);
+      this.regexstr = Static.elresolve(this.getProject(),value);
     }
 
     /**
@@ -330,17 +329,18 @@ public class Switch02 extends Task
 
     public void setEq(String value)
     {
-      this.eq = Static.trim3(getProject(), value, "");
+      // TODO: remove trim3 from all value assignments.
+      this.eq = Static.elresolve(this.getProject(),value);
     }
 
     public void setLt(String value)
     {
-      this.lt = Static.trim3(getProject(), value, "");
+      this.lt = Static.elresolve(this.getProject(), value);
     }
 
     public void setGt(String value)
     {
-      this.gt = Static.trim3(getProject(), value, "");
+      this.gt = Static.elresolve(this.getProject(), value);
     }
 
     /**

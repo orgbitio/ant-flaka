@@ -196,11 +196,11 @@
 	<target name="test-switch-glob-with-el">
 		<c:let>
       foo = 'foo'
-      glob = 'f*'
+      glob = ' f*'
     </c:let>
 		<fail if="pass" />
 		<c:switch value=" #{foo} " debug="true">
-			<glob expr="f*">
+			<glob expr=" f*">
 				<property name="pass" value="true" />
 			</glob>
 			<otherwise>
@@ -230,7 +230,7 @@
 
 	<target name="test-switch-re-with-el">
 		<c:let>
-      expr = 'fo{2}'
+      expr = ' fo{2} '
     </c:let>
 		<fail if="pass" />
 		<c:switch value=" foo " debug="true">
