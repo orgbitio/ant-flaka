@@ -1,8 +1,5 @@
 <project xmlns:c="antlib:it.haefelinger.flaka">
 <target name="test-case">
-
-  <c:property-handler/>
-
   <c:let>
       basefolder = '${ant.file}'.tofile.parent
   </c:let>

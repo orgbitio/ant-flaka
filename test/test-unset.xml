@@ -10,6 +10,7 @@
       <fail if="p0x2" message="[1]" />
       <fail if="p0x3" message="[2]" />
       <fail if="p0x4" message="[3]" />
+      <fail if="p0x5" message="[4]" />
     </sequential>
   </macrodef>
 
@@ -33,13 +34,13 @@
         p0x3 := 'p0x3'
         p0x4 ::= #{'p0x4'}
       </c:let>
-      
+    	<property name="p0x5" value="p0x5" />
       <!-- Test -->
       <fail unless="p0x1" message="[1]"/>
       <fail unless="p0x2" message="[2]" />
       <fail unless="p0x3" message="[3]" />
       <fail if="p0x4" />
-      
+      <fail unless="p0x5" />
       <c:unset>
         ;; comment
         #{'p0x1'}
@@ -50,6 +51,9 @@
         ;; not \
         continued \\
         p0x4
+      	p0\
+      	 x5
+      
       </c:unset>
     </sequential>
   </macrodef>

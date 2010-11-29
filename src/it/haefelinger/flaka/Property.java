@@ -93,10 +93,10 @@ public class Property extends Task
       v = M.group(2).trim();
       try
       {
-        k = project.replaceProperties(k);
-        k = Static.elresolve(project, k);
-        v = project.replaceProperties(v);
-        v = Static.elresolve(project, v);
+        //k = project.replaceProperties(k);
+        //k = Static.elresolve(project, k);
+        //v = project.replaceProperties(v);
+        //v = Static.elresolve(project, v);
       } catch (Exception e)
       {
         Static.debug(project, "line : error evaluating EL expression (ignored) in "

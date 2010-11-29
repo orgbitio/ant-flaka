@@ -1,20 +1,60 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
-<target name="test-case">
-  <c:let>
-    foo = 'foo'
-  </c:let>
-  <c:properties>
-    ; this is \
-    a comment
-    bar = bar
-    foobar = \
-    #{foo.toupper}${bar}
-  </c:properties>
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
+	<macrodef name="reset">
+		<sequential>
+			<c:unset>
+	      p0
+	      p1
+	      p2
+	      p3
+	    </c:unset>
+			<fail if="p0" />
+			<fail if="p1" />
+			<fail if="p2" />
+		</sequential>
+	</macrodef>
 
-  <echo>foobar = ${foobar}</echo>
-  <c:when test="not (property.foobar == 'FOObar')">
-    <c:fail message="unexpected value for property foobar: #{property.foobar}" />
-  </c:when>
 
-</target>
+	<target name="test-case">
+		<reset />
+		<c:properties>
+	  	p0 = v0
+	    ; test that comments are not continued \
+	  	p1 = v1
+	  </c:properties>
+		<fail unless="p0" />
+	  <fail unless="p1" />
+		
+		<reset />
+		<c:properties>
+		  p0 = v0
+			p1 = ${p0}
+			p2 = v\
+			     2
+		  p3 : v3
+			p4:v4
+			; TODO p5      v5
+			p6 = 
+			p7 = null
+			p8 = #{3 * 4}
+			p9 = h\
+			     e\
+			     l\
+			     lo \
+			
+			pa = hello \
+		</c:properties>
+		<c:expect pname="p0" value="v0" />
+		<c:expect pname="p1" value="v0" />
+		<c:expect pname="p2" value="v2" />
+		<c:expect pname="p3" value="v3" />
+		<c:expect pname="p4" value="v4" />
+		<!--
+		<c:expect pname="p5" value="v5" />
+    -->
+		<c:expect pname="p6" value="" />
+		<c:expect pname="p7" value="null" />
+		<c:expect pname="p8" value="12" />
+		<c:expect pname="p9" value="hello " />
+		<c:expect pname="pa" value="hello " />
+	</target>
 </project>

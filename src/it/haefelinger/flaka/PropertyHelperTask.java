@@ -18,8 +18,6 @@
 
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.prop.PropertyHelper10;
-import it.haefelinger.flaka.prop.PropertyHelper12;
 import it.haefelinger.flaka.util.Static;
 
 import org.apache.tools.ant.BuildException;
@@ -46,6 +44,7 @@ public class PropertyHelperTask extends Task
   @SuppressWarnings("deprecation")
   public void execute() throws BuildException
   {
+    Class clazz;
     Project project;
     PropertyHelper ph,current;
  
@@ -55,16 +54,14 @@ public class PropertyHelperTask extends Task
     /* get current property helper */
     current = org.apache.tools.ant.PropertyHelper.getPropertyHelper(project);
 
-    if (this.clazzname.equalsIgnoreCase("Helper12"))
-    {
-      ph = new PropertyHelper12();
-      ph.setProject(project);
-    }
-    else
-    {
-      ph = new PropertyHelper10();
+    try {
+      clazz = Class.forName(this.clazzname);
+      ph = (PropertyHelper) clazz.newInstance();
       ph.setProject(project);
       ph.setNext(current);
+    }
+    catch(Exception e) {
+      throw new BuildException(e);
     }
 
     /* install my property handler */

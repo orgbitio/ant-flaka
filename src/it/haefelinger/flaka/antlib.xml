@@ -54,7 +54,6 @@
   <taskdef name="properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="inline-properties" classname="it.haefelinger.flaka.Property" />
   <taskdef name="property-by-regex" classname="it.haefelinger.flaka.Select" />
-  <taskdef name="property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" />
   <taskdef name="requires-ant" classname="it.haefelinger.flaka.Require" />
   <taskdef name="resdeps" classname="it.haefelinger.flaka.ResolveDeps" />
   <taskdef name="run-macro" classname="it.haefelinger.flaka.RunMacro" />
@@ -83,24 +82,30 @@
     </sequential>
   </macrodef>
 
+  <!--  deprecated: stay clear from it -->
+  <macrodef name="property-handler">
+    <sequential>
+      <c:install-property-handler />
+    </sequential>
+  </macrodef>
 
   <macrodef name="install-property-handler">
     <sequential>
       <c:evalwhichant />
       <c:choose>
         <when test=" property.flaka_ant18_or_newer ">
-          <echo level="debug">FLAKA: ENABLING 1.7 PROPRTY HANDLING </echo>
-          <c:task-install-property-handler classname="Helper12"/>
+          <echo level="debug">FLAKA: USING 1.8 PROPERTY HANDLER </echo>
+          <c:task-install-property-handler classname="it.haefelinger.flaka.prop.PropertyHelper12" />
         </when>
         <otherwise>
-          <echo level="debug">FLAKA: ENABLING 1.7 PROPRTY HANDLING </echo>
-          <c:task-install-property-handler classname="Helper10"/>
+          <echo level="debug">FLAKA: USING 1.7 PROPERTY HANDLER </echo>
+          <c:task-install-property-handler classname="it.haefelinger.flaka.prop.PropertyHelper10" />
         </otherwise>
       </c:choose>
     </sequential>
   </macrodef>
-  
-  
+
+
   <macrodef name="expect">
     <attribute name="pname" />
     <attribute name="value" />

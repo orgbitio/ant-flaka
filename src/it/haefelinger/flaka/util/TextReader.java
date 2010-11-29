@@ -21,6 +21,7 @@ package it.haefelinger.flaka.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParsePosition;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,11 +63,11 @@ import org.apache.tools.ant.Project;
  */
 /**
  * @author geronimo
- *
+ * 
  */
-public class TextReader 
+public class TextReader
 {
-  protected Pattern comment = makepattern(";");
+  protected String comment = ";";
   protected boolean skipempty = true;
   protected boolean continuation = true;
   protected String text;
@@ -75,19 +76,23 @@ public class TextReader
   protected BufferedReader bufreader;
   protected Project project;
   protected boolean resolve = false;
- 
+
   public TextReader(String text)
   {
     this.setText(text);
   }
+
   public TextReader()
   {
     this.setText("");
   }
-  public TextReader setProject(Project project) {
+
+  public TextReader setProject(Project project)
+  {
     this.project = project;
     return this;
   }
+
   public TextReader setText(String text)
   {
 
@@ -97,19 +102,22 @@ public class TextReader
       this.text = text;
     return this;
   }
+
   public void addText(String text)
   {
     this.setText(this.text + text);
   }
+
   public TextReader setSkipws(boolean b)
   {
     this.skipws = b;
     return this;
   }
+
   public TextReader setShift(String s)
-  { 
+  {
     this.shift = null;
-    if (s != null && s.matches("\\s*")==false)
+    if (s != null && s.matches("\\s*") == false)
     {
       Pattern P;
       Matcher p;
@@ -118,32 +126,30 @@ public class TextReader
       p = P.matcher(s);
 
       if (p.matches())
-      { 
+      {
         int times = Integer.parseInt(p.group(1));
         String what = p.group(2);
         StringBuilder accu = new StringBuilder();
+        if (what.length()<1) what = " ";
         for (int i = 0; i < times; ++i)
           accu.append(what);
         this.shift = accu.toString();
-      } 
+      }
     }
     return this;
   }
-  public String getShift() {
+
+  public String getShift()
+  {
     return this.shift == null ? "" : this.shift;
   }
-  
+
   public TextReader setComment(String comment)
   {
-    this.comment = makepattern(Static.trim2(comment,null));
+    this.comment = Static.trim2(comment, null);
     return this;
   }
-  public TextReader setComment(Pattern comment)
-  {
-    this.comment = comment;
-    return this;
-  }
-  
+
   public TextReader setResolveContLines(boolean b)
   {
     this.continuation = b;
@@ -156,96 +162,31 @@ public class TextReader
     return this;
   }
 
-  public String getText() {
+  public String getText()
+  {
     return this.text;
   }
-   /**
-   * A small helper function generating a regular expression pattern.
-   * 
-   * The pattern generated is meant to define the begin of a comment
-   * line. When using this pattern, use the Pattern.search() method
-   * instead of match.
-   * 
-   * The pattern holds essentially the following regular expression
-   * <pre>
-   * ^\s*\Q{s}\E
-   * </pre>
-   * where {s} denotes parameter <code>s</code> and where <code>\Q</code>
-   * means: treat upcoming chars literally until reaching <code>\E</code>.
-   * In other words, meta regular expression characters like <code>*</code>
-   * and the like are not honoured.
-   * 
-   * @param s null allowed
-   * @return null if s is null, otherwise proper RE pattern.
-   */
-  static public Pattern makepattern(String s)
-  {
-    Pattern P;
-    
-    if (s == null)
-      P = null;
-    else 
-    {
-      try
-      {
-        String p;
-        p = "^\\s*" + Pattern.quote(s);
-        P = Pattern.compile(p);
-      } catch (Exception e)
-      {
-        /* This can't happen cause the RE above is valid 
-         * regardless of s's value.
-         */
-        P = null;
-      }
-    }
-    return P;
-  }
 
-  /**
-   * A method checking whether a input line shall be ignored or not.
-   * 
-   * The given line is expected to hold any character but newline terminators.
-   * Such a line is typically given using the readLine() method of a Reader
-   * class. 
-   * 
-   * A line is ignored if 
-   * <ol>
-   * <li>being a comment line</li>
-   * <li>empty</li>
-   * </ol>
-   * However, checks wheather a comment line are only executed if a comment
-   * pattern has been installed. Empty lines are removed if attribute skipempty
-   * has been set to true.
-   * 
-   * @param line not null
-   * @return true if line to be ignored
-   */
+ 
   protected boolean ignore(String line)
   {
-    if (this.comment != null && this.comment.matcher(line).find()) 
-        return true;
-    if (this.skipempty && line.matches("\\s*"))
-      return true;
-    return false;
+    return this.skipempty && line.matches("\\s*") ? true : false;
   }
 
-
-  
   /**
    * A helper method to strip unwanted whitespace from an input text.
    * 
-   * This method is expected to be called on a input text consiting of
-   * multiple lines.
+   * This method is expected to be called on a input text consiting of multiple
+   * lines.
    * 
    * @param text
    * @return not null
    */
   final static public String stripws(String text)
   {
-    Pattern S,T,U;
-    Matcher s,t,u;
-    String out,prefix;
+    Pattern S, T, U;
+    Matcher s, t, u;
+    String out, prefix;
     int n = 0;
     // Match all ws at input's begin (includes \n)
     // TODO: make me static
@@ -253,64 +194,175 @@ public class TextReader
     // Match everthing after last \n (which must exist)
     // TODO: make me static
     T = Pattern.compile("\\n([^\\n]*)$");
-    
+
     // create match object on input and execute RE on it.
     s = S.matcher(text);
     s.find();
 
-    // The matching sequence - must always find something. 
+    // The matching sequence - must always find something.
     // TODO: Possible to avoid taking a substring??
     prefix = s.group();
     t = T.matcher(prefix);
-    if (t.find()) {
+    if (t.find())
+    {
       n = t.end(1) - t.start(1);
     }
     else
     {
       n = s.end() - s.start();
-    } 
-      
+    }
+
     // Remove leading whitespace characters.
     out = s.replaceFirst("");
-    if (n>0)
+    if (n > 0)
     {
-      // Compile a pattern on the fly. 
+      // Compile a pattern on the fly.
       // Matches a newline followed by {1,n} characters. Such a character
-      // must a whitespace character except a newline. 
+      // must a whitespace character except a newline.
       // Is there a way to express this as a difference operation? Such
       // as {\s - \n} ??
-      U = Pattern.compile("\\n[ \\t\\x0B\\f\\r]{1,"+n+"}");
-      u  = U.matcher(out);
+      U = Pattern.compile("\\n[ \\t\\x0B\\f\\r]{1," + n + "}");
+      u = U.matcher(out);
       out = u.replaceAll("\n");
     }
     return out;
-  } 
-  
+  }
+
+  final public static String resolvecontlines2(String text)
+  {
+    char c;
+    int i, j, n;
+    StringBuffer b;
+    ParsePosition p;
+
+    i = 0;
+    n = text.length();
+    p = new ParsePosition(0);
+    b = new StringBuffer();
+
+    while (i < n)
+    {
+      // remember where we are and advance until '\' or EOF.
+      j = i;
+      while (i < n && (c = text.charAt(i)) != '\\')
+        ++i;
+      // copy
+      b.append(text, j, i);
+      // bail out if EOF
+      if (i >= n)
+        break;
+      // text[i] == '\'
+      j = i;
+      p.setIndex(j+1);
+      if (lookahead(text, n, p))
+      {
+        // we are at the start of a cont line sequence which means, that
+        // parse position is either at EOF or EOL. We skip current '\'
+        // and copy any remaining '\'.
+        i = p.getIndex();
+        b.append(text, j+1, i);
+        // skip eol or eof
+        if (i >= n)
+          continue;
+        c = text.charAt(i);
+        // ignore EOL
+        if (c == '\n' || c == '\r')
+        {
+          i = i + 1;
+          if (c == '\r' && i < n && text.charAt(i) == '\n')
+            i = i + 1;
+        }
+        // ignore whitespace after EOL
+        while (i < n && TextReader.isspace(text,i)) ++i;
+      }
+      else
+      {
+        i = p.getIndex();
+        b.append(text, j, i);
+      }
+    }
+    return b.toString();
+  }
+
   /**
-   * A helper function to resolve continuation lines.
+   * A helper function to define what <em>whitespace</em> means in this context.
+   * @param c
+   * @return
+   */
+  static public final boolean isspace(String text,int i) {
+    char c = text.charAt(i);
+    return (c == ' ' || c == '\t' || c == '\f') ? true : false;
+  }
+   
+  /**
+   * A function to lookahead the end of a continuation line.
    * 
    * @param text
-   * @return not null
+   * @param n
+   * @param p
+   * @return true, if the looked ahead sequence is
    */
-  final public static String resolvecontlines(String text)
+  final static public boolean lookahead(String text, int n, ParsePosition p)
   {
-    // TODO: move S into static 
-    Pattern S = Pattern.compile("(^|[^\\\\])(\\\\\\n|\\\\$)");
-    Matcher s = S.matcher(text);
-    String out = s.replaceAll("");
-    return out;
+    int i, j, d;
+    char c;
+
+    // advance over all '\'
+    i = p.getIndex();
+    j = i;
+
+    // Preconditon: text[i-1] == '\'
+    if (i > n)
+    {
+      return true;
+    }
+
+    while (i < n && text.charAt(i) == '\\')
+      i++;
+
+    d = i - j;
+    p.setIndex(i);
+
+    // Handle EOF
+    if (i >= n)
+    {
+      return d % 2 == 0;
+    }
+
+    // Handle EOL
+    c = text.charAt(i);
+    if (c == '\n' || c == '\r')
+    {
+      return (d % 2) == 0;
+    }
+
+    // not a cont line
+    p.setIndex(i);
+    return false;
   }
+
   
- 
   final public static BufferedReader tobufreader(String text)
   {
     return new BufferedReader(new StringReader(text));
   }
-  
-  
-  
-  
-  
+
+  final public static String stripcomment(String c, String text)
+  {
+    // MULTILINE: This should change the meaning of ^ and $ to match the
+    // line termination character as well (as begin and end of input).
+    // However: ^ and $ are boundaries, i.e. they do not match. Instead
+    // the matched content is *after* ^ and *before* $.
+    // TODO: ws characters
+
+    // TODO: bad, removing comment lines via a Regex does not work out.
+    String pat = String.format("(\\n|^)[ \\t]*%s.*|\\n\\z", "" + c);
+    Pattern S = Pattern.compile(pat, Pattern.MULTILINE);
+    Matcher s = S.matcher(text);
+    String out = s.replaceAll("");
+    return out;
+  }
+
   /*
    * Read the next line. Ignores comment lines and empty lines if desired.
    * 
@@ -321,57 +373,114 @@ public class TextReader
     String line;
     if (this.bufreader == null)
     {
-      /* massage */
+      // strip comments
+      this.text = TextReader.stripcomment(this.comment, this.text);
+
       // if skipws is on, strip out unwanted whitespace stuff.
       if (this.skipws)
         this.text = TextReader.stripws(this.text);
-      
-      // if resolve continuation lines is on, merge continuation lines 
+
+      // if resolve continuation lines is on, merge continuation lines
       if (this.continuation)
-        this.text = TextReader.resolvecontlines(this.text);
-             
+        this.text = TextReader.resolvecontlines2(this.text);
+
       /* initialize buffered reader */
       this.bufreader = TextReader.tobufreader(this.text);
     }
-    try {
-      while ( (line = this.bufreader.readLine())!=null && this.ignore(line)) {
+    try
+    {
+      while ((line = this.bufreader.readLine()) != null && this.ignore(line))
+      {
         // read another line
       }
       if (line != null)
       {
         /* resolve all Ant properties ${ } */
         line = this.project.replaceProperties(line);
-      
+
         /* resolve all EL references #{ ..} */
-        line = Static.elresolve(this.project,line);
-      
+        line = Static.elresolve(this.project, line);
+
         if (line != null && this.shift != null)
           line = this.shift + line;
       }
     }
-    catch(IOException e)
+    catch (IOException e)
     {
       line = null;
     }
-    
+
     return line;
   }
 
-  public String read() 
+  public String read()
   {
     String line;
     String accu = null;
-    
-    while ((line = this.readLine())!=null)
+
+    while ((line = this.readLine()) != null)
     {
       if (accu == null)
         accu = line;
-      else {
+      else
+      {
         accu += "\n";
         accu += line;
       }
     }
     return accu;
   }
-  
+
+  /**
+   * Unescape escaped characters.
+   * 
+   * This function replaces characters escaped by backslash with the character
+   * itself. Thus
+   * 
+   * <pre>
+   * \c  becomes c
+   * \\  becomes \
+   * \\c becomes \c
+   * 
+   * <pre>
+   * &#064;param text
+   * @return
+   */
+  static public String unescape(String text)
+  {
+    String r = null;
+    int n;
+
+    n = text.length();
+    switch (n)
+    {
+      case 0:
+        r = text;
+        break;
+      default:
+      {
+        StringBuffer b;
+        char c;
+
+        b = new StringBuffer();
+        for (int i = 0; i < n; ++i)
+        {
+          c = text.charAt(i);
+          if (c != '\\' || i + 1 > n)
+            b.append(c);
+          else
+          {
+            char p;
+            p = text.charAt(i + 1); // look ahead
+            // handle '\?'
+            b.append(p);
+            i = i + 1;
+          }
+        }
+        r = b.toString();
+      }
+    }
+    return r;
+  }
+
 }

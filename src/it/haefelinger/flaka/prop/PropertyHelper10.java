@@ -10,12 +10,14 @@ import org.apache.tools.ant.PropertyHelper;
 
 public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
 {
-
+  protected Project project;
+  
   @SuppressWarnings("deprecation")
   public void setProject(Project project)
   {
     PropertyHelper otherhelper;
     super.setProject(project);
+    this.project = project;
     otherhelper = PropertyHelper.getPropertyHelper(project);
     if (otherhelper == this)
     {
@@ -24,11 +26,10 @@ public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
     this.setNext(otherhelper);
   }
 
-  protected void debug(String msg)
-  {
-    Static.debug(getProject(), msg);
+  public Project getProject() {
+    return this.project;
   }
-
+  
   protected Hashtable getInternalInheritedProperties()
   {
     /* should not be called */

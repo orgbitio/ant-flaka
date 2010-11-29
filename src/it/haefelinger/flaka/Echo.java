@@ -94,9 +94,12 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       // Read all text in one go instead line by line.
       this.message = this.tr.read();
     }
+    // Unescape escaped characters
+    if (this.message != null) {
+      this.message = TextReader.unescape(this.message);
+    }
     if (this.message == null)
       this.message = this.tr.getShift();
-    
     /* let my parent handle this */
     super.execute();
   }

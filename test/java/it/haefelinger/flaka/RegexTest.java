@@ -18,6 +18,8 @@
 
 package it.haefelinger.flaka;
 
+import it.haefelinger.flaka.util.TextReader;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -246,20 +248,7 @@ public class RegexTest extends TestCase
   }
   
   
-  static String commentlineRemover(String text)
-  {
-    // MULTILINE: This should change the meaning of ^ and $ to match the
-    // line termination character as well (as begin and end of input). 
-    // However: ^ and $ are boundaries, i.e. they do not match. Instead
-    // the matched content is *after* ^ and *before* $.
-    // TODO: ws characters
-    
-    // TODO: bad, removing comment lines via a Regex does not work out.
-    Pattern S = Pattern.compile("(\\n|^)[ \\t]*;.*|\\n\\z",Pattern.MULTILINE);
-    Matcher s = S.matcher(text);
-    String out = s.replaceAll("");
-    return out;
-  }
+  
   
   public void testComment01() {
     // examples of comment lines (a line starting with ;). The comment line
@@ -282,7 +271,7 @@ public class RegexTest extends TestCase
       ;
     
     String expect =  "";
-    String out = commentlineRemover(text);
+    String out = TextReader.stripcomment(";",text);
     assertEquals(expect, out);
   }
  

@@ -1,71 +1,245 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
-<target name="test-case">
-  <c:echo shift="80%" />
-  <c:echo />
-  <echo>foobar
-</echo>
-  <c:echo>
-    foo
-</c:echo>
-  <c:echo>
-    foo
-</c:echo>
-  <c:echo comment=";" shift=" 0* ">
-    ; ignore \
-    me (still a comment here)
-    Hello\
-    ,
-    ..World.
-</c:echo>
-  <echo>=======</echo>
-  <echo>=======</echo>
-  <c:echo shift="0">[1a]</c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0"> [1b]</c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0">[2a]
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0"> [2b]
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0">[3a]
-    2ndline
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0"> [3b]
-    2ndline
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-indent-01">
+	<macrodef name="reset">
+		<sequential>
+			<c:unset>
+				  p
+	        p0
+	        p1
+	        p2
+	        p3
+	      </c:unset>
+			<fail if="p" />
+			<fail if="p0" />
+			<fail if="p1" />
+			<fail if="p2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="reset-tmpdir">
+		<sequential>
+			<mkdir dir="${tmpdir}" />
+			<delete dir="${tmpdir}">
+				<include name="**/*" />
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="myecho">
+		<attribute name="pname" default="p" />
+		<attribute name="shift" default="" />
+		<attribute name="comment" default=";" />
+		<text name="text" optional="true" />
+		<sequential>
+			<reset-tmpdir />
+			<c:unset>@{pname}</c:unset>
+			<fail if="@{pname}" />
+			<c:echo shift="@{shift}" file="${tmpfile}">@{text}</c:echo>
+			<!-- loadfile does not set property if file is empty. A empty -->
+			<!-- echo would still give a echo line. Therefore we correct  -->
+			<!-- this misbehaviour and define the property if the file    -->
+			<!-- exists and it's length is zero. -->
+			<loadfile property="@{pname}" srcfile="${tmpfile}" />
+			<condition property="@{pname}" value="">
+				<and>
+					<available file="${tmpfile}" />
+					<length file="${tmpfile}" when="eq" length="0" />
+				</and>
+			</condition>
+		</sequential>
+	</macrodef>
+
+
+	<target name="test-case-01">
+		<reset />
+		<myecho shift="5%" />
+		<c:expect pname="p" value="%%%%%" />
+	</target>
+
+	<target name="test-case-02">
+		<myecho />
+		<c:expect pname="p" value="" />
+	</target>
+
+	<target name="test-case-03">
+		<myecho>foobar&#xA;</myecho>
+		<c:expect pname="p" value="foobar" />
+	</target>
+
+	<target name="test-case-04">
+		<myecho>&#xA;foo&#xA;</myecho>
+		<c:expect pname="p" value="foo" />
+	</target>
+
+	<target name="test-case-05">
+		<myecho>&#xA;&#xA;foo&#xA;</myecho>
+		<c:expect pname="p" value="foo" />
+	</target>
+
+
+	<target name="test-case-07">
+		<myecho shift="0">[1a]</myecho>
+		<c:expect pname="p" value="[1a]" />
+	</target>
+
+	<target name="test-case-08">
+		<myecho shift="0"> [1b]</myecho>
+		<c:expect pname="p" value="[1b]" />
+	</target>
+	<target name="test-case-09">
+		<myecho shift="0">[2a]
+  </myecho>
+		<c:expect pname="p" value="[2a]" />
+	</target>
+	<target name="test-case-10">
+		<myecho shift="0"> [2b]
+  </myecho>
+		<c:expect pname="p" value="[2b]" />
+	</target>
+
+	<target name="test-case-11">
+		<!-- TODO: check me -->
+		<myecho shift="0">[3a]&#xA;    2ndline&#xA;</myecho>
+		<c:expect pname="p" value="[3a]&#xA;    2ndline&#xA;" />
+	</target>
+	<target name="test-case-12">
+		<!-- how does this work ?? -->
+		<myecho shift="0"> [3b]&#xA;    2ndline&#xA;</myecho>
+		<c:expect pname="p" value="[3b]&#xA;   2ndline" />
+	</target>
+	<target name="test-case-13">
+		<myecho shift="0">
     [4a]
     2ndline
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0">
-    [4b]
-    2ndline
-  </c:echo>
-  <c:echo shift="0"> \
-    [4c]
-    2ndline
-  </c:echo>
-  <c:echo shift="0">a
-    b
-  </c:echo>
-  <echo>=======</echo>
-  <c:echo shift="0">
-    aa
-    b b
-  </c:echo>
-  <c:echo shift="0">
-    aa
-    b b
-  </c:echo>
-  <echo>=======</echo>
-  <c:let>
-    f = ''.tofile
-  </c:let>
+		</myecho>
+		<c:expect pname="p" value="[4a]&#xA;2ndline" />
+	</target>
 
-</target>
+	<!-- Test continuation lines -->
+	<target name="test-cont-01">
+		<myecho>
+    ; ignore \
+    Hello\
+    ,\
+    ..World.
+    </myecho>
+		<c:expect pname="p" value="Hello,..World." />
+	</target>
+
+	<target name="test-cont-02">
+		<myecho shift="0">\&#xA;</myecho>
+		<c:expect pname="p" value="" />
+		<myecho shift="0">\&#xA;a</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho shift="0">\&#xA; a</myecho>
+		<c:expect pname="p" value="a" />
+	</target>
+
+	<target name="test-case-15">
+		<myecho shift="0">a
+    b
+  </myecho>
+		<c:expect pname="p" value="a&#xA;    b" />
+	</target>
+
+	<target name="test-case-16">
+		<myecho shift="0">
+    aa
+    b b
+  </myecho>
+		<c:expect pname="p" value="aa&#xA;b b" />
+	</target>
+
+	<!-- Test Comments -->
+	<!-- A comment line starts with a certain character and eats up -->
+	<!-- the whole line. Cont lines are not supported though. -->
+
+	<target name="test-comment-01">
+		<myecho>;</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>;&#xA;</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>&#xA;;&#xA;</myecho>
+		<c:expect pname="p" value="" />
+	</target>
+
+	<target name="test-comment-02">
+		<myecho>;</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>;&#xA;</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>&#xA;;&#xA;</myecho>
+		<c:expect pname="p" value="" />
+	</target>
+
+	<target name="test-comment-03">
+		<myecho>;&#xA;a</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>&#xA;;&#xA;b</myecho>
+		<c:expect pname="p" value="b" />
+	</target>
+
+	<target name="test-comment-04">
+		<myecho>;\&#xA;a</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>\&#xA;;b</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>\&#xA;;\&#xA;b</myecho>
+		<c:expect pname="p" value="b" />
+	</target>
+
+
+
+	<target name="test-escape-01">
+		<!-- The outcome here is "" cause \EOF is a continuation line -->
+		<myecho>\</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>\a</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>\\b</myecho>
+		<c:expect pname="p" value="\b" />
+	</target>
+
+	<target name="test-escape-02">
+		<myecho>a</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>a\</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>\a\</myecho>
+		<c:expect pname="p" value="a" />
+		<myecho>\a\\</myecho>
+		<c:expect pname="p" value="a\" />
+		<myecho>\\</myecho>
+		<c:expect pname="p" value="\" />
+		<myecho>\\\\</myecho>
+		<c:expect pname="p" value="\\" />
+	</target>
+
+	<target name="test-indent-01">
+		<myecho>
+	    a
+	     b
+		</myecho>
+		<c:expect pname="p" value="a&#xA; b" />
+	</target>
+
+	<property name="tmpfile" location="${basedir}/tmp/echo.txt" />
+	<dirname property="tmpdir" file="${tmpfile}" />
+
+	<reset-tmpdir />
+	<echo file="${tmpfile}" message="hello, world" />
+	<loadfile property="p" srcfile="${tmpfile}" />
+	<c:expect pname="p" value="hello, world" />
+
+	<!-- We have to deal with a change in Ant 1.7.1 and 1.8.: -->
+	<!-- 1.7.1: echo "" => empty file -->
+	<!-- 1.8.1: echo "" => file with one character (\n) -->
+	<reset-tmpdir />
+	<c:unset>p</c:unset>
+	<fail if="p" />
+	<echo file="${tmpfile}" />
+	<loadfile property="p" srcfile="${tmpfile}" />
+	<condition property="empty-echo-eol" value="true" else="false">
+		<isset property="p" />
+	</condition>
+	<echo>empty echo prints eol-char? ${empty-echo-eol}</echo>
 </project>

@@ -1,21 +1,16 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
-  <property name="woha" value="woha" />
-  <c:install-property-handler />
 
-  <c:let>
-    p0 := nativetype( project.references['ant.PropertyHelper'] )
-    p1 := 'hello'
-    p3 := 3 * size(woha)
-  </c:let>
 
-  <property name="p2" value="#{woha}" />
+	<c:install-property-handler />
+	<c:for var="x" in="split('a,b')">
+		<c:echo>
+	   #{x}
+	 </c:echo>
+	</c:for>
+	<c:for var="x" in="split('a,b','\s*,\s*')">
+		<c:echo>
+	     #{x}
+	   </c:echo>
+	</c:for>
 
-  <!--  Test whether properties do survive change of property helper -->
-  <c:expect pname="woha" value="woha" />
-  <c:expect pname="p0" value="it.haefelinger.flaka.prop.PropertyHelper12" />
-  <c:expect pname="p1" value="hello" />
-  <c:expect pname="p2" value="woha" />
-  <c:expect pname="p3" value="12" />
-
-</project>  
- 
+</project>

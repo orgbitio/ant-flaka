@@ -4,6 +4,11 @@
     === This is the build script building the Flaka project from scratch ===
     ========================================================================
 
+    Hint:
+    You need to compile Flaka against Ant 1.8.0 or newer. Compiling against an
+    older version will not work. However, you can and you also should test 
+    Flaka against Ant 1.7.1.
+
     Use option -p to see a list of targets. By  default, Flaka gets compiled
     and packaged as
 
@@ -20,7 +25,7 @@
     Use target `package-all' to generate all distribution packages and pick
     them from folder ${build.dir}.
 
-    You can at any time remove folder 
+    You can at *any time* (assuming that you are online) remove folder 
 
       ${build.dir}.
 
@@ -55,9 +60,11 @@
       dependency libraries.
       =====================================================================
   -->
-  <condition property="flaka_ant18_or_newer">
+  <condition property="ant-gte-180">
     <available classname="org.apache.tools.ant.property.GetProperty" />
   </condition>
+
+  <diagnostics />
 
   <property 
       name="depot.url" 
@@ -268,6 +275,9 @@
             <include name="*.jar"/>
           </fileset>
         </classpath>
+        <exclude name="it/haefelinger/flaka/el/ELPropertyExpander.java" unless="ant-gte-180" />
+        <exclude name="it/haefelinger/flaka/el/ELPropertyEvaluator.java" unless="ant-gte-180" />
+        <exclude name="**/*PropertyHelper12*" unless="ant-gte-180" />
       </javac>
     </sequential>
   </target>
@@ -328,7 +338,7 @@
       <au:antunit>
         <fileset dir="test">
           <include name="test-*.xml" />
-          <exclude name="test-18*.xml" unless="flaka_ant18_or_newer"/>
+          <exclude name="test-18*.xml" unless="ant-gte-180"/>
           <exclude name="test-scndeps.xml" />
           <exclude name="test-set-default-target.xml" />
         </fileset>
@@ -337,7 +347,7 @@
     </sequential>
   </macrodef>
 
-  <target name="test-init181" if="flaka_ant18_or_newer">
+  <target name="test-init181" if="ant-gte-180">
     <taskdef uri="antlib:it.haefelinger.flaka.prop"
              resource="it/haefelinger/flaka/prop/antlib.xml"
              classpath="${dist.dir}/ant-flaka-${version}.jar" />

@@ -310,7 +310,7 @@ public class Functions
     if (args.length > 1)
       regex = args[1].toString();
     else
-      regex = "\\s*,\\*s";
+      regex = "\\s*,\\s*";
 
     String[] arr;
     String s = args[0].toString();

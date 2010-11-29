@@ -90,7 +90,7 @@
     [a,b] denotes a list with one element ('a,b').
      -->
 		<expect have="${p0}" expected="[]" />
-		<expect have="${p1}" expected="[a,b]" />
+		<expect have="${p1}" expected="[a, b]" />
 		<expect have="${p2}" expected="[a, b]" />
 		<expect have="${p3}" expected="[a, b]" />
 		<expect have="${p4}" expected="[a, b]" />
