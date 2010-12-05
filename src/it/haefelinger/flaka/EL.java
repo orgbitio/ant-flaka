@@ -19,8 +19,6 @@
 package it.haefelinger.flaka;
 
 import it.haefelinger.flaka.prop.IFPropertyHelper;
-import it.haefelinger.flaka.prop.PropertyHelper10;
-import it.haefelinger.flaka.prop.PropertyHelper12;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;

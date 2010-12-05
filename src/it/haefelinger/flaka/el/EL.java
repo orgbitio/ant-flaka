@@ -44,7 +44,6 @@ import de.odysseus.el.tree.impl.Parser;
 import de.odysseus.el.tree.impl.Scanner;
 import de.odysseus.el.tree.impl.Scanner.ScanException;
 import de.odysseus.el.tree.impl.Scanner.Symbol;
-import de.odysseus.el.tree.impl.Scanner.Token;
 import de.odysseus.el.tree.impl.ast.AstComposite;
 import de.odysseus.el.tree.impl.ast.AstEval;
 import de.odysseus.el.tree.impl.ast.AstNode;

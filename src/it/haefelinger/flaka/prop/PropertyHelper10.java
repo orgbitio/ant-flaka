@@ -11,7 +11,7 @@ import org.apache.tools.ant.PropertyHelper;
 public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper implements IFPropertyHelper
 {
   protected Project project;
-  protected boolean enabled;
+  protected boolean enabled = true;
   
   @SuppressWarnings("deprecation")
   public void setProject(Project project)

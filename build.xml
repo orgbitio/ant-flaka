@@ -166,14 +166,26 @@
       <fetchjar 
           group="org/apache/ant" 
           name="ant" 
+          version="1.8.1" 
+          dest="${librun.dir}/ant-1.8.1.jar"
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant-launcher" 
+          version="1.8.1" 
+          dest="${librun.dir}/ant-launcher-1.8.1.jar"
+          />
+      <fetchjar 
+          group="org/apache/ant" 
+          name="ant" 
           version="1.7.1" 
-          dest="${librun.dir}/ant.jar"
+          dest="${librun.dir}/ant-1.7.1.jar"
           />
       <fetchjar 
           group="org/apache/ant" 
           name="ant-launcher" 
           version="1.7.1" 
-          dest="${librun.dir}/ant-launcher.jar"
+          dest="${librun.dir}/ant-launcher-1.7.1.jar"
           />
       <fetchjar 
           group="org/apache/ant" 
