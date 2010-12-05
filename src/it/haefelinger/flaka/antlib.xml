@@ -29,6 +29,7 @@
   <!--=============================================================-->
   <!--                         TASKS                               -->
   <!--=============================================================-->
+  <taskdef name="el" classname="it.haefelinger.flaka.EL" />
   <taskdef name="noop" classname="it.haefelinger.flaka.NoOp" />
   <taskdef name="while" classname="it.haefelinger.flaka.While" />
   <taskdef name="task-install-property-handler" classname="it.haefelinger.flaka.PropertyHelperTask" />

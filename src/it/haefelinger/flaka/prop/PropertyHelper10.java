@@ -8,9 +8,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 
-public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
+public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper implements IFPropertyHelper
 {
   protected Project project;
+  protected boolean enabled;
   
   @SuppressWarnings("deprecation")
   public void setProject(Project project)
@@ -28,6 +29,12 @@ public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
 
   public Project getProject() {
     return this.project;
+  }
+  
+  public boolean enable(boolean b) {
+    boolean c = this.enabled;
+    this.enabled = b;
+    return c;
   }
   
   protected Hashtable getInternalInheritedProperties()
@@ -139,7 +146,8 @@ public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
     text = next.replaceProperties(ns, text, keys);
 
     /* resolve references to embedded EL expressions */
-    text = Static.elresolve(project, text);
+    if (this.enabled)
+      text = Static.elresolve(project, text);
     return text;
   }
 

@@ -48,56 +48,70 @@ import org.apache.tools.ant.PropertyHelper;
  * @since Flaka 1.2
  */
 
-public class PropertyHelper12 extends PropertyHelper
+public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
 {
-  public PropertyHelper12() {
+  protected boolean enabled = true;
+
+  public PropertyHelper12()
+  {
     super();
   }
- 
-  protected void copyProperties(PropertyHelper ph) {
+
+  public boolean enable(boolean b)
+  {
+    boolean c = this.enabled;
+    this.enabled = b;
+    return c;
+  }
+
+  protected void copyProperties(PropertyHelper ph)
+  {
     // copy over all properties.
     Hashtable p;
     Enumeration e;
-    Object k,v;
-    
+    Object k, v;
+
     p = ph.getProperties();
     e = p.keys();
-    while(e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       k = e.nextElement();
       v = p.get(k);
-      this.setProperty((String)k,v,false);
+      this.setProperty((String) k, v, false);
     }
-    
+
     p = ph.getInheritedProperties();
     e = p.keys();
-    while(e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       k = e.nextElement();
       v = p.get(k);
-      this.setInheritedProperty((String)k,v);
+      this.setInheritedProperty((String) k, v);
     }
-    
+
     p = ph.getUserProperties();
     e = p.keys();
-    while(e.hasMoreElements()) {
+    while (e.hasMoreElements())
+    {
       k = e.nextElement();
       v = p.get(k);
-      this.setUserProperty((String)k,v);
+      this.setUserProperty((String) k, v);
     }
-    
+
   }
-  
-  
-  
-  public void setProject(Project project) {
+
+  public void setProject(Project project)
+  {
     PropertyHelper otherhelper;
     super.setProject(project);
     otherhelper = PropertyHelper.getPropertyHelper(project);
-    if(otherhelper == this) {
+    if (otherhelper == this)
+    {
       throw new BuildException("uups, Ant's interface changed again.");
     }
     copyProperties(otherhelper);
   }
-  
+
   /**
    * Decode properties from a String representation. If the entire contents of
    * the String resolve to a single property, that value is returned. Otherwise
@@ -120,7 +134,7 @@ public class PropertyHelper12 extends PropertyHelper
     // Ask the original handler to resolve ${..} references for me.
     obj = super.parseProperties(value);
 
-    if (obj != null && obj instanceof String)
+    if (this.enabled && obj != null && obj instanceof String)
     {
       // Resolve EL References #{..}
       String text = obj.toString();
@@ -129,5 +143,5 @@ public class PropertyHelper12 extends PropertyHelper
     }
     return obj;
   }
-  
+
 }

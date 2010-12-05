@@ -32,7 +32,6 @@ import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
-
 import org.apache.tools.ant.Project;
 
 import de.odysseus.el.ExpressionFactoryImpl;
@@ -45,6 +44,7 @@ import de.odysseus.el.tree.impl.Parser;
 import de.odysseus.el.tree.impl.Scanner;
 import de.odysseus.el.tree.impl.Scanner.ScanException;
 import de.odysseus.el.tree.impl.Scanner.Symbol;
+import de.odysseus.el.tree.impl.Scanner.Token;
 import de.odysseus.el.tree.impl.ast.AstComposite;
 import de.odysseus.el.tree.impl.ast.AstEval;
 import de.odysseus.el.tree.impl.ast.AstNode;
@@ -174,7 +174,8 @@ public final class EL
           try
           {
             node = new AstEval(expr(true), true);
-          } catch (Exception e)
+          }
+          catch (Exception e)
           {
             handleEx(e);
             recover();
@@ -196,7 +197,8 @@ public final class EL
         /* serious error here, cause we expect here "#{..}" or "${..}" */
         syntaxerror("expected " + q("${}") + " or " + q("#{}"), start);
         recover();
-      } finally
+      }
+      finally
       {
         trytoken();
       }
@@ -267,7 +269,8 @@ public final class EL
         AstNode node = null;
         if ((node = text()) != null)
           this.list.add(node);
-      } catch (Exception e)
+      }
+      catch (Exception e)
       {
         handleEx(e);
       }
@@ -287,15 +290,18 @@ public final class EL
       try
       {
         consumeToken();
-      } catch (ScanException se)
+      }
+      catch (ScanException se)
       {
         // this is a serious error!!
         System.err.println("serious internal error");
         System.exit(1);
-      } catch (ParseException pe)
+      }
+      catch (ParseException pe)
       {
         handleEx(pe);
-      } catch (Exception e)
+      }
+      catch (Exception e)
       {
         handleEx(e);
       }
@@ -444,6 +450,94 @@ public final class EL
       return token;
     }
 
+    protected Token nextText() throws ScanException
+    {
+      this.builder.setLength(0);
+      int i = this.getPosition();
+      int l = this.getInput().length();
+      boolean escaped = false;
+      while (i < l)
+      {
+        char c = this.getInput().charAt(i);
+        switch (c)
+        {
+          case '\\':
+            // If we are in state 'escaped' then take the previous character,
+            // which must be '\\' literally while staying in state 'escaped'.
+            // Otherwise:
+            // Just consume character '\' but do not take a decision what to
+            // do by now. It depends on the next character: being `#` or `$`,
+            // then there is good chance that it starts an eval-expr. See
+            // handling of those two chars below.
+            if (escaped)
+            {
+              this.builder.append('\\');
+            }
+            else
+            {
+              escaped = true;
+            }
+            break;
+          case '#':
+            // case '$':
+            // Let's first handle the regular case where we at the start of '#{'
+            // or '${'. If the current character is escaped, then add '#{' and
+            // '${' as literal-expr. Since the escape character is meaningfull
+            // for us here, we *consume* it, i.e. it will *not* be part of the
+            // literal-expr. If we are not escaped, then our current
+            // literal-expr ends before the current character.
+            if (i + 1 < l && this.getInput().charAt(i + 1) == '{')
+            {
+              if (escaped)
+              {
+                this.builder.append(c);
+                escaped = false;
+                break;
+              }
+              // we reached the end of the current literal-expr. Bail out ..
+              return makeText(i - this.getPosition());
+            }
+            // Handle the case where we have '#c' or '$c' and c is any other
+            // character than '{' or c is the EOF (or more appropriate, EOI, the
+            // end-of-input). Now, if we have '\#c' then we leave this as it is
+            // cause the escape char is not meaningful for us.
+            if (escaped)
+            {
+              this.builder.append('\\');
+              escaped = false;
+            }
+            this.builder.append(c);
+            break;
+          default:
+            // Handle '\c', where c stands for any character except '\'. Then,
+            // append oth characters and mark the next character on the stream
+            // as not escaped.
+            if (escaped)
+            {
+              this.builder.append('\\');
+              escaped = false;
+            }
+            // Append character in any case.
+            this.builder.append(c);
+        }
+        i++;
+      }
+      // Handle situation '\<EOF>`. Here we have seen '\' so far and marked it
+      // as escaped. Then we consumed EOF which terminates the loop. In that
+      // case we need to make sure that our character will made it.
+      if (escaped)
+      {
+        this.builder.append('\\');
+      }
+      return makeText(i - this.getPosition());
+    }
+
+    protected Token makeText(int length)
+    {
+      String buf = this.builder.toString();
+      return token(Symbol.TEXT, buf, length);
+    }
+
     protected Token nextToken() throws ScanException
     {
       String text;
@@ -464,16 +558,17 @@ public final class EL
           text = this.getInput().substring(this.getPosition(), Math.min(p, l));
           token = this.token(s, text, text.length());
           this.recover = false;
-        } else
+        }
+        else
         {
           token = super.nextToken();
         }
-      } catch (ScanException se)
+      }
+      catch (ScanException se)
       {
         // Scan exceptions abort scanning. Rather than throwing an exception, we
         // generate the EOF token. This allows the caller to consume tokens
-        // until
-        // EOF is seen.
+        // until EOF is seen.
         token = this.token(Symbol.EOF, "", 0);
         // TODO: print scan exception on log screen?
         // 
@@ -503,10 +598,11 @@ public final class EL
       tree = parser.maketree();
       if (!parser.errors.isEmpty())
       {
-        for (@SuppressWarnings("unused") Exception ex : parser.errors)
+        for (@SuppressWarnings("unused")
+        Exception ex : parser.errors)
         {
           // TODO: print on debug stream ..
-          //System.err.println(ex.getMessage());
+          // System.err.println(ex.getMessage());
         }
       }
       return tree;
@@ -573,7 +669,7 @@ public final class EL
 
     funcdefv("list", Functions.class, "list", Object[].class);
     funcdefv("append", Functions.class, "append", Object[].class);
-    
+
     funcdefv("split", Functions.class, "split", Object[].class);
     funcdef("split_ws", Functions.class, "split_ws", Object.class);
     funcdefv("replace", Functions.class, "replace", Object[].class);
@@ -604,7 +700,8 @@ public final class EL
       Method method;
       method = clazz.getMethod(func);
       this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm)
+    }
+    catch (NoSuchMethodException nsm)
     {
       Static.error(this.project, "no such method:" + nsm);
     }
@@ -617,7 +714,8 @@ public final class EL
       Method method;
       method = clazz.getMethod(func, arg);
       this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm)
+    }
+    catch (NoSuchMethodException nsm)
     {
       Static.error(this.project, "no such method:" + nsm);
     }
@@ -630,7 +728,8 @@ public final class EL
       Method method;
       method = clazz.getMethod(func, arg1, arg2);
       this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm)
+    }
+    catch (NoSuchMethodException nsm)
     {
       Static.error(this.project, "no such method:" + nsm);
     }
@@ -643,24 +742,27 @@ public final class EL
       Method method;
       method = clazz.getMethod(func, new Class[] { arg });
       this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm)
+    }
+    catch (NoSuchMethodException nsm)
     {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
-  
+
   void funcdef1v(String name, Class clazz, String func, Class arg)
   {
     try
     {
       Method method;
-      method = clazz.getMethod(func, new Class[] { arg, Object[].class } );
+      method = clazz.getMethod(func, new Class[] { arg, Object[].class });
       this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm)
+    }
+    catch (NoSuchMethodException nsm)
     {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
+
   /**
    * Evaluate <code>expr</code> according to EL rules.
    * 
@@ -682,13 +784,15 @@ public final class EL
     {
       ve = this.factory.createValueExpression(this.context, expr, clazz);
       obj = ve.getValue(this.context);
-    } catch (TreeBuilderException tbe)
+    }
+    catch (TreeBuilderException tbe)
     {
       // TODO: error handling
-      //System.err.println(tbe.getMessage());
-    } catch (ELException ele)
+      // System.err.println(tbe.getMessage());
+    }
+    catch (ELException ele)
     {
-      //System.err.println(ele.getMessage());
+      // System.err.println(ele.getMessage());
     }
     return obj;
   }
@@ -701,8 +805,8 @@ public final class EL
   public File tofile(String expr)
   {
     Object obj;
-    obj = eval(expr,File.class);
-    return (File)obj;
+    obj = eval(expr, File.class);
+    return (File) obj;
   }
 
   public String tostr(String expr)
@@ -711,13 +815,14 @@ public final class EL
     obj = eval(expr, String.class);
     if (obj == null)
       return "";
-    if (! (obj instanceof String))
+    if (!(obj instanceof String))
       return obj.toString();
-    if (obj.getClass().isArray()) {
-      String[] arr = (String[])obj;
+    if (obj.getClass().isArray())
+    {
+      String[] arr = (String[]) obj;
       return Arrays.toString(arr);
     }
-    return (String)obj;
+    return (String) obj;
   }
 
   public boolean tobool(String expr)
@@ -741,11 +846,12 @@ public final class EL
       Iterator I = L.iterator();
       while (I.hasNext())
       {
-        //System.err.println("=>" + I.next());
+        // System.err.println("=>" + I.next());
       }
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
-      //System.err.println("error: " + e);
+      // System.err.println("error: " + e);
     }
   }
 
