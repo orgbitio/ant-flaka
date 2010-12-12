@@ -39,8 +39,7 @@ public class Unset extends Task
 
   public void addText(String text)
   {
-    this.tr.setProject(getProject());
-    this.tr.addText(text);
+    this.tr.setText(text);
   }
 
   public void execute() throws BuildException
@@ -52,6 +51,14 @@ public class Unset extends Task
     while ((line = this.tr.readLine()) != null)
     {
       line = line.trim();
+      line = project.replaceProperties(line);
+
+      /* resolve all EL references #{ ..} */
+      line = Static.elresolve(project, line);
+
+      // Unescape escaped characters
+      // TODO: I believe this should be done after (key,val) separation.
+      line = TextReader.unescape(line);
       Static.unset(project,line);
     }
 

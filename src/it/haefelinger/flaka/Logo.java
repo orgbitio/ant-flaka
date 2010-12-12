@@ -22,6 +22,7 @@ import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 /**
  * 
@@ -37,7 +38,7 @@ public class Logo extends Task
 
   public void addText(String s)
   {
-    this.tr.addText(s);
+    this.tr.setText(s);
   }
 
   public void setChr(String s)
@@ -52,23 +53,31 @@ public class Logo extends Task
 
   public void execute() throws BuildException
   {
-    this.tr.setComment(";");
+    Project project = this.getProject();
+    this.tr.setCChar(";");
     this.tr.setSkipws(true);
     this.tr.setResolveContLines(true);
-    this.tr.setProject(getProject());
     this.tr.setSkipEmpty(false);
     String line = this.tr.readLine();
-    System.out.println(Static.mkchrseq(this.chr,this.width));
+    System.out.println(Static.mkchrseq(this.chr, this.width));
     int w = this.chr.length();
-    while(line != null)
+    while (line != null)
     {
+      line = project.replaceProperties(line);
+
+      /* resolve all EL references #{ ..} */
+      line = Static.elresolve(project, line);
+
+      // Unescape escaped characters
+      // TODO: I believe this should be done after (key,val) separation.
+      line = TextReader.unescape(line);
       System.out.print(this.chr);
-      System.out.print(Static.center(line,this.width - 2 * w," "));
+      System.out.print(Static.center(line, this.width - 2 * w, " "));
       System.out.print(this.chr);
       System.out.println();
       line = this.tr.readLine();
     }
-    System.out.println(Static.mkchrseq(this.chr,this.width));
+    System.out.println(Static.mkchrseq(this.chr, this.width));
     System.out.flush();
   }
 }

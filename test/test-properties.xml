@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-tryme">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -18,11 +18,11 @@
 		<reset />
 		<c:properties>
 	  	p0 = v0
-	    ; test that comments are not continued \
+	    ; test that comments are continued \
 	  	p1 = v1
 	  </c:properties>
 		<fail unless="p0" />
-	  <fail unless="p1" />
+	  <fail if="p1" />
 		
 		<reset />
 		<c:properties>

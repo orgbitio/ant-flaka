@@ -50,8 +50,7 @@ public class List extends Task
 
   public void addText(String text)
   {
-    this.tr.setProject(getProject());
-    this.tr.addText(text);
+    this.tr.setText(text);
   }
 
  
@@ -74,6 +73,15 @@ public class List extends Task
       /* read line by line */
       while ((line = this.tr.readLine()) != null)
       {
+        line = project.replaceProperties(line);
+
+        /* resolve all EL references #{ ..} */
+        line = Static.elresolve(project, line);
+
+        // Unescape escaped characters
+        // TODO: I believe this should be done after (key,val) separation.
+        line = TextReader.unescape(line);
+        
         try
         {
           if (this.el)

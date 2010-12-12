@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="tryme">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-cont-02">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -61,10 +61,12 @@
 
 	<target name="test-case-01">
 		<reset />
-		<myecho></myecho>
+		<myecho>
+		</myecho>
 		<echo>${p}</echo>
 		<c:expect pname="p" value="" />
-		<myecho shift="5%"></myecho>
+		<myecho shift="5%">
+		</myecho>
 		<echo>${p}</echo>
 		<c:expect pname="p" value="%%%%%" />
 		<myecho shift="5%">a</myecho>
@@ -144,7 +146,7 @@
     ,\
     ..World.
     </myecho>
-		<c:expect pname="p" value="Hello,..World.&#xA;" />
+		<c:expect pname="p" value="" />
 	</target>
 
 	<target name="test-cont-02">
@@ -217,38 +219,55 @@
 		<c:expect pname="p" value="a&#xA;b" />
 
 		<myecho>;\&#xA;a</myecho>
-		<c:expect pname="p" value="a" />
+		<c:expect pname="p" value="" />
 		<myecho>\&#xA;;b</myecho>
 		<c:expect pname="p" value="" />
 		<myecho>\&#xA;;\&#xA;b</myecho>
-		<c:expect pname="p" value="b" />
+		<c:expect pname="p" value="" />
 	</target>
 
+	<target name="test-comment-05">
+		<myecho>a ; comment</myecho>
+		<!-- TODO
+    <c:expect pname="p" value="a " />
+    -->
+	</target>
 
 
 	<target name="test-escape-01">
 		<!-- The outcome here is "" cause \EOF is a continuation line -->
 		<myecho>\</myecho>
 		<c:expect pname="p" value="" />
+		<!-- The backslash has no effect -->
 		<myecho>\a</myecho>
-		<c:expect pname="p" value="a" />
+		<c:expect pname="p" value="\a" />
+		<!-- Neither in this example -->
 		<myecho>\\b</myecho>
-		<c:expect pname="p" value="\b" />
+		<c:expect pname="p" value="\\b" />
 	</target>
 
 	<target name="test-escape-02">
 		<myecho>a</myecho>
 		<c:expect pname="p" value="a" />
+		<!-- an \ followed by EOF is a cont line. Therefore, the \ is -->
+		<!-- eaten up.-->
 		<myecho>a\</myecho>
 		<c:expect pname="p" value="a" />
+		<!-- a backslash used on an non-escaped char has no effect. -->
 		<myecho>\a\</myecho>
-		<c:expect pname="p" value="a" />
+		<c:expect pname="p" value="\a" />
+		<!-- two backslashes followed by EOF disables a cont line. -->
 		<myecho>\a\\</myecho>
-		<c:expect pname="p" value="a\" />
+		<c:expect pname="p" value="\a\" />
+		<!-- simimlar as above -->
 		<myecho>\\</myecho>
 		<c:expect pname="p" value="\" />
+		<!-- the second last backslash disables the cont line, the -->
+		<!-- other two have no effect. -->
 		<myecho>\\\\</myecho>
-		<c:expect pname="p" value="\\" />
+		<c:expect pname="p" value="\\\" />
+		<myecho>a\\\\</myecho>
+		<c:expect pname="p" value="a\\\" />
 	</target>
 
 	<target name="test-indent-01">

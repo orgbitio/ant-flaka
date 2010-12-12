@@ -88,8 +88,7 @@ public class ScanDeps extends MatchingTask
   public TextReader createDecorate() 
   {
     this.dec = new TextReader();
-    this.dec.setProject(getProject());
-    return this.dec;
+     return this.dec;
   }
   
   
@@ -123,6 +122,15 @@ public class ScanDeps extends MatchingTask
       File dest;
       
       while ((line = this.dec.readLine()) != null) {
+        line = project.replaceProperties(line);
+
+        /* resolve all EL references #{ ..} */
+        line = Static.elresolve(project, line);
+
+        // Unescape escaped characters
+        // TODO: I believe this should be done after (key,val) separation.
+        line = TextReader.unescape(line);
+        
         p = P.matcher(line);
         if (p.matches())
         {

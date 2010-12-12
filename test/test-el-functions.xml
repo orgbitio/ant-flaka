@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-size">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-el-string-literals">
 	<macrodef name="init">
 		<sequential>
 			<c:unset>
@@ -80,7 +80,7 @@
       p0 := format('%s',  split()                     )
       p1 := format('%s',  split('a,b')                )
       p2 := format('%s',  split('a,b',',')            )
-      p3 := format('%s',  split('a ,b','\s*,\s*')     )
+      p3 := format('%s',  split('a ,b','\s*,\s*')     )  
       p4 := format('%s',  split('a,b','\s*,\s*',':')  )
       p5 := format('%s',  split('a,b',':' )           )
     </c:let>

@@ -18,8 +18,6 @@
 
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.util.TextReader;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -250,29 +248,5 @@ public class RegexTest extends TestCase
   
   
   
-  public void testComment01() {
-    // examples of comment lines (a line starting with ;). The comment line
-    // remover should remove *each* comment line. Thus the expected outcome
-    // of this text is the empty string.
-    String text = 
-      ";\n" + 
-      ";;\n" +
-      "\t;\n" +
-      " ;\n" +
-      "; \n" + 
-      ";; \n" +
-      "\t; \n" +
-      " ; \n" +
-      ";a\n" + 
-      ";;a\n" +
-      "\t;a\n" +
-      " ;a\n" +
-      ""
-      ;
-    
-    String expect =  "";
-    String out = TextReader.stripcomment(";",text);
-    assertEquals(expect, out);
-  }
  
 }

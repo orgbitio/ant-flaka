@@ -47,8 +47,7 @@ public class Property extends Task
 
   public void addText(String text)
   {
-    this.tr.setProject(getProject());
-    this.tr.addText(text);
+    this.tr.setText(text);
   }
 
   protected Pattern makeregex(String s)
@@ -83,6 +82,15 @@ public class Property extends Task
 
     while ((line = this.tr.readLine()) != null)
     {
+      line = project.replaceProperties(line);
+
+      /* resolve all EL references #{ ..} */
+      line = Static.elresolve(project, line);
+
+      // Unescape escaped characters
+      // TODO: I believe this should be done after (key,val) separation.
+      line = TextReader.unescape(line);
+      
       if (!(M = regex.matcher(line)).matches())
       {
         Static.debug(getProject(), "line : bad property line '" + line + "'");

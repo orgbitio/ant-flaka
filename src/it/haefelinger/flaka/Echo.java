@@ -21,9 +21,11 @@
  */
 package it.haefelinger.flaka;
 
+import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 /**
  * 
@@ -34,7 +36,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
 {
   protected boolean debug = true;
   protected TextReader tr;
-  
+
   public Echo()
   {
     super();
@@ -50,14 +52,15 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   }
 
   /**
-   * Set the character  (sequence) identifying a comment line. A line
-   * having only whitespace characters before that character sequence
-   * will be ignored. In order to turn this feature off, provide the
-   * empty string or a string consisting of whitespace characters
-   * only.
+   * Set the character (sequence) identifying a comment line. A line having only
+   * whitespace characters before that character sequence will be ignored. In
+   * order to turn this feature off, provide the empty string or a string
+   * consisting of whitespace characters only.
    * 
    * The default comment sequence is <code>;</code>.
-   * @param s not null
+   * 
+   * @param s
+   *          not null
    */
   public void setComment(String s)
   {
@@ -83,24 +86,37 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.tr.setShift(s);
   }
 
- 
-  
   public void execute() throws BuildException
   {
-    if (this.message != null)
+    String t;
+    Project p;
+
+    t = this.message;
+    p = this.getProject();
+
+    if (t != null)
     {
-      this.tr.setProject(getProject());
-      this.tr.setText(this.message);
-      // Read all text in one go instead line by line.
-      this.message = this.tr.read();
+      t = this.tr.setText(t).read();
+
+      /* resolve all Ant properties ${ } */
+      // TODO: I would expect that properties are already
+      // resolved by now.
+      if (t != null)
+        t = p.replaceProperties(t);
+
+      /* resolve all EL references #{ ..} */
+      if (t != null)
+        t = Static.elresolve(p, t);
+
+      // Unescape escaped characters
+      if (t != null)
+        t = TextReader.unescape(t);
     }
-    // Unescape escaped characters
-    if (this.message != null) {
-      this.message = TextReader.unescape(this.message);
-    }
-    if (this.message == null)
-      this.message = this.tr.getShift();
+    if (t == null)
+      t = this.tr.getShift();
+
     /* let my parent handle this */
+    this.message = t;
     super.execute();
   }
 
