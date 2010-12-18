@@ -64,9 +64,19 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
    */
   public void setComment(String s)
   {
-    this.tr.setComment(s);
+    this.tr.setCL(s);
   }
 
+  public void setCL(String s)
+  {
+    this.tr.setCL(s);
+  }
+  
+  public void setIC(String s)
+  {
+    this.tr.setIC(s);
+  }
+  
   /**
    * Set the shift attribute.
    * 
@@ -86,6 +96,10 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.tr.setShift(s);
   }
 
+  public void setCont(boolean b) {
+    this.tr.setResolveContLines(b);
+  }
+  
   public void execute() throws BuildException
   {
     String t;
@@ -99,8 +113,6 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       t = this.tr.setText(t).read();
 
       /* resolve all Ant properties ${ } */
-      // TODO: I would expect that properties are already
-      // resolved by now.
       if (t != null)
         t = p.replaceProperties(t);
 

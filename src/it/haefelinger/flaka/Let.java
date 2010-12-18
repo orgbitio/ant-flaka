@@ -24,7 +24,6 @@ import it.haefelinger.flaka.util.TextReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -37,10 +36,19 @@ public class Let extends Task
 {
   protected TextReader tr = new TextReader();
 
- 
   public void setComment(String s)
   {
-    this.tr.setComment(s);
+    this.tr.setCL(s);
+  }
+
+  public void setCL(String s)
+  {
+    this.tr.setCL(s);
+  }
+
+  public void setIC(String s)
+  {
+    this.tr.setIC(s);
   }
 
   public void addText(String text)
@@ -56,7 +64,8 @@ public class Let extends Task
       buf.append("<let>\n");
       buf.append(this.tr.getText());
       buf.append("\n</let>\n");
-    } else
+    }
+    else
     {
       buf.append("<let/>\n");
     }
@@ -69,7 +78,8 @@ public class Let extends Task
     try
     {
       re = Pattern.compile(s);
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
       /* TODO: error */
       this.debug("error compiling regex '" + s + "'", e);
@@ -117,7 +127,6 @@ public class Let extends Task
     project = this.getProject();
     type = Static.VARREF;
 
- 
     regex = getPropRegex();
 
     while ((line = this.tr.readLine()) != null)
@@ -130,8 +139,7 @@ public class Let extends Task
       // Unescape escaped characters
       // TODO: I believe this should be done after (key,val) separation.
       line = TextReader.unescape(line);
-      
-      
+
       /* eval text */
       if ((M = regex.matcher(line)).matches() == false)
       {
@@ -148,11 +156,11 @@ public class Let extends Task
         o = Static.el2obj(project, v);
         Static.assign(project, k, o, type);
 
-      } catch (Exception e)
+      }
+      catch (Exception e)
       {
         if (this.debug)
-          debug("line : error evaluating EL expression (ignored) in "
-              + Static.q(line));
+          debug("line : error evaluating EL expression (ignored) in " + Static.q(line));
       }
     }
   }

@@ -1,86 +1,11 @@
 <project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
-  <!--  make sure that this value is set when EL is not activated!! -->
-  <property name="reference-value" value="#{3*4}" />
-  <macrodef name="reset">
-    <sequential>
-      <c:unset>
-        p0
-        p1
-        p2
-        p3
-        p4
-        p5
-        p6
-        p7
-        p8
-        p9
-        pa
-        pb
-        pc
-     </c:unset>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="test">
-    <attribute name="text" />
-    <attribute name="expect" />
-    <sequential>
-      <c:let>p ::= null</c:let>
-      <fail if="p" message="property p exists while expected to be absent" />
-      <c:el enable="true" />
-      <property name="p" value="@{text}" />
-      <c:el enable="false" />
-      <c:expect pname="p" value="@{expect}" />
-    </sequential>
-  </macrodef>
-
-  <!--  install EL property handler, then disable it. -->
-  <c:install-property-handler />
-  <property name="p1" value="prop #{ 'v' }" />
-  <property name="p2" value="#{ '${p1}' }" />
-  <echo>p1=${p1},p2=${p2}</echo>
-  <c:el enable="false" />
-
-  <test text="\#{3*4}" expect="#{3*4}" />
-  <condition property="panic">
-    <not>
-      <equals arg1="${p}" arg2="${reference-value}" />
-    </not>
-  </condition>
-  <echo>p = ${p}, ${reference-value}</echo>
-  <fail if="panic">;
-    =============================================
-    precondition for verification not established
-    =============================================
-    The outcome of macro test did not meet it's
-    expected result. This could have two reasons:
-    (a) either EL kicked in while should have been
-    disabled ; OR
-    (b) the EL engine has changed to produce a
-    different outcome.
-    Nevertheless, you can't ignore this and you
-    must check this using a debugger or by some
-    other means.
-    The outcome of all further tests here can't be
-    trusted.
-  </fail>
-
-  <test text='#{ "#{3 * 4}" }' expect="#{3 * 4}" />
-  <test text='\#{' expect="#{" />
-
-  <test text="#{" expect="" />
-  <test text="\\#{a" expect="\#{a" />
-  <test text="\\#{a{" expect="\#{a{" />
-
-  <!--  pathologcial cases -->
-  <test text="#" expect="#" />
-  <test text="#{" expect="" />
-  <test text="#{a" expect="" />
-  <test text="\" expect="\" />
-  <test text="\#" expect="\#" />
-  <test text="\#{" expect="#{" />
-  <test text="\\" expect="\\" />
-  <test text="\\#" expect="\\#" />
-  <test text="\\#{" expect="\#{" />
-
+	
+	
+  <c:echo>
+    foobar
+     </c:echo>
+  <c:echo>
+    foobar\
+  </c:echo>
+	
 </project>

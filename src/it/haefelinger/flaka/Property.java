@@ -24,7 +24,6 @@ import it.haefelinger.flaka.util.TextReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -39,10 +38,19 @@ public class Property extends Task
 {
   protected TextReader tr = new TextReader();
 
-
   public void setComment(String s)
   {
-    this.tr.setComment(s);
+    this.tr.setCL(s);
+  }
+
+  public void setCL(String s)
+  {
+    this.tr.setCL(s);
+  }
+
+  public void setIC(String s)
+  {
+    this.tr.setIC(s);
   }
 
   public void addText(String text)
@@ -56,7 +64,8 @@ public class Property extends Task
     try
     {
       re = Pattern.compile(s);
-    } catch (Exception e)
+    }
+    catch (Exception e)
     {
       /* TODO: error */
       Static.debug(getProject(), "error compiling regex '" + s + "'", e);
@@ -79,7 +88,6 @@ public class Property extends Task
     project = this.getProject();
     regex = this.getPropRegex();
 
-
     while ((line = this.tr.readLine()) != null)
     {
       line = project.replaceProperties(line);
@@ -90,7 +98,7 @@ public class Property extends Task
       // Unescape escaped characters
       // TODO: I believe this should be done after (key,val) separation.
       line = TextReader.unescape(line);
-      
+
       if (!(M = regex.matcher(line)).matches())
       {
         Static.debug(getProject(), "line : bad property line '" + line + "'");
@@ -101,14 +109,14 @@ public class Property extends Task
       v = M.group(2).trim();
       try
       {
-        //k = project.replaceProperties(k);
-        //k = Static.elresolve(project, k);
-        //v = project.replaceProperties(v);
-        //v = Static.elresolve(project, v);
-      } catch (Exception e)
+        // k = project.replaceProperties(k);
+        // k = Static.elresolve(project, k);
+        // v = project.replaceProperties(v);
+        // v = Static.elresolve(project, v);
+      }
+      catch (Exception e)
       {
-        Static.debug(project, "line : error evaluating EL expression (ignored) in "
-            + Static.q(v));
+        Static.debug(project, "line : error evaluating EL expression (ignored) in " + Static.q(v));
       }
       Static.assign(project, k, v, Static.PROPTY);
     }

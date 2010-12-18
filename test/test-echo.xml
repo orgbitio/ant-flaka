@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-cont-02">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-manual-example">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -27,13 +27,14 @@
 	<macrodef name="myecho">
 		<attribute name="pname" default="p" />
 		<attribute name="shift" default="" />
-		<attribute name="comment" default=";" />
+		<attribute name="ic" default=";" />
+		<attribute name="cl" default=";" />
 		<text name="text" optional="true" />
 		<sequential>
 			<reset-tmpdir />
 			<c:unset>@{pname}</c:unset>
 			<fail if="@{pname}" />
-			<c:echo shift="@{shift}" file="${tmpfile}">@{text}</c:echo>
+			<c:echo ic="@{ic}" cl="@{cl}" shift="@{shift}" file="${tmpfile}">@{text}</c:echo>
 			<!-- loadfile does not set property if file is empty. A empty -->
 			<!-- echo would still give a echo line. Therefore we correct  -->
 			<!-- this misbehaviour and define the property if the file    -->
@@ -74,7 +75,7 @@
 		<myecho shift="5%">
 			a
 		</myecho>
-		<c:expect pname="p" value="%%%%%a&#xA;" />
+		<c:expect pname="p" value="%%%%%a" />
 	</target>
 
 	<target name="test-case-02">
@@ -89,11 +90,11 @@
 
 	<target name="test-case-04">
 		<myecho>&#xA;foo&#xA;</myecho>
-		<c:expect pname="p" value="foo&#xA;" />
+		<c:expect pname="p" value="foo" />
 	</target>
 
 	<target name="test-case-05">
-		<myecho>&#xA;&#xA;foo&#xA;</myecho>
+		<myecho>&#xA;&#xA;foo&#xA;&#xA;</myecho>
 		<c:expect pname="p" value="&#xA;foo&#xA;" />
 	</target>
 
@@ -105,19 +106,19 @@
 
 	<target name="test-case-08">
 		<myecho shift="0"> [1b]</myecho>
-		<c:expect pname="p" value="[1b]" />
+		<c:expect pname="p" value=" [1b]" />
 	</target>
 
 	<target name="test-case-09">
 		<myecho shift="0">[2a]
-  </myecho>
-		<c:expect pname="p" value="[2a]&#xA;" />
+    </myecho>
+		<c:expect pname="p" value="[2a]&#xA;    " />
 	</target>
 
 	<target name="test-case-10">
 		<myecho> [2b]
-  </myecho>
-		<c:expect pname="p" value="[2b]&#xA;" />
+    </myecho>
+		<c:expect pname="p" value=" [2b]&#xA;    " />
 	</target>
 
 	<target name="test-case-11">
@@ -128,14 +129,14 @@
 	<target name="test-case-12">
 		<!-- how does this work ?? -->
 		<myecho shift="0"> [3b]&#xA;    2ndline&#xA;</myecho>
-		<c:expect pname="p" value="[3b]&#xA;   2ndline&#xA;" />
+		<c:expect pname="p" value=" [3b]&#xA;    2ndline&#xA;" />
 	</target>
 	<target name="test-case-13">
 		<myecho shift="0">
     [4a]
     2ndline
 		</myecho>
-		<c:expect pname="p" value="[4a]&#xA;2ndline&#xA;" />
+		<c:expect pname="p" value="[4a]&#xA;2ndline" />
 	</target>
 
 	<!-- Test continuation lines -->
@@ -161,13 +162,24 @@
 	<target name="test-case-15">
 		<myecho shift="0">a
     b
-
-		  </myecho>
-		<c:expect pname="p" value="a&#xA;    b&#xA;&#xA;" />
-		<!-- whitespace before EOF is chopped off -->
+    
+    </myecho>
+		<c:expect pname="p" value="a&#xA;    b&#xA;    &#xA;    " />
+		<!-- whitespace before EOF is NOT chopped off -->
 		<myecho>a&#xA;b&#xA;&#xA;  </myecho>
-		<c:expect pname="p" value="a&#xA;b&#xA;&#xA;" />
-		<myecho>a&#xA;b  </myecho>
+		<c:expect pname="p" value="a&#xA;b&#xA;&#xA;  " />
+		<!-- if you want trailing whitespace chopped off, then use a cont line -->
+		<myecho>a&#xA;b&#xA;\&#xA;  </myecho>
+		<c:expect pname="p" value="a&#xA;b&#xA;" />
+		<myecho>a&#xA;b\&#xA;  </myecho>
+		<c:expect pname="p" value="a&#xA;b" />
+		<!-- This shows that leading whitespace (incl. EOL) is eaten up. -->
+		<!-- Trailing ws is not eaten. If necessary, you can end the last -->
+		<!-- line using a continuation line to get the desired effect. -->
+		<myecho>
+		a
+		b\
+		</myecho>
 		<c:expect pname="p" value="a&#xA;b" />
 	</target>
 
@@ -176,7 +188,7 @@
     aa
     b b
   </myecho>
-		<c:expect pname="p" value="aa&#xA;b b&#xA;" />
+		<c:expect pname="p" value="aa&#xA;b b" />
 	</target>
 
 	<!-- Test Comments -->
@@ -228,9 +240,7 @@
 
 	<target name="test-comment-05">
 		<myecho>a ; comment</myecho>
-		<!-- TODO
-    <c:expect pname="p" value="a " />
-    -->
+		<c:expect pname="p" value="a " />
 	</target>
 
 
@@ -275,7 +285,7 @@
 	    a
 	     b
 		</myecho>
-		<c:expect pname="p" value="a&#xA; b&#xA;" />
+		<c:expect pname="p" value="a&#xA; b" />
 	</target>
 
 	<target name="test-trailing-01">
@@ -288,6 +298,76 @@
 		<c:expect pname="p" value="a&#xA;&#xA;" />
 
 	</target>
+
+	<target name="test-case-17">
+		<!-- test escaping inline comments -->
+		<myecho>
+  	  ; comment
+  	</myecho>
+		<c:expect pname="p" value="" />
+		<myecho>
+  	  \; comment
+  	</myecho>
+		<c:expect pname="p" value="; comment" />
+		<myecho>
+      \\; comment
+    </myecho>
+		<c:expect pname="p" value="\; comment" />
+	</target>
+
+	<target name="test-case-18">
+		<!-- test other comment chars -->
+		<myecho cl="#" ic=";;">
+	    # kskdjskjds
+	    foobar ;; '[c:echo] foobar'
+	     </myecho>
+		<c:expect pname="p" value="foobar " />
+
+		<myecho cl="#" ic="">
+	    #{3 * 4}   you cannot see me
+	    not ; any longer an inline comment!
+	  </myecho>
+		<c:expect pname="p" value="not ; any longer an inline comment!" />
+
+		<myecho>
+	    \#{3 * 4} ; #{3 * 4}
+	    \; not a comment
+	  </myecho>
+		<c:expect pname="p" value="#{3 * 4} &#10;; not a comment" />
+	</target>
+
+	<target name="test-manual-example">
+		<!-- test example given in manual -->
+		<myecho>
+	    \#{3 * 4}            ; '#{3 * 4}'
+		</myecho>
+    <c:expect pname="p" value="#{3 * 4}            "/>
+		<myecho>
+	    \\#{3 * 4}           ; '\#{3 * 4}'
+    </myecho>
+    <c:expect pname="p" value="\#{3 * 4}           "/>
+		<myecho>
+	    #{ '\\' }#{3 * 4}    ; '\12'
+    </myecho>
+    <c:expect pname="p" value="\12    " />
+		<myecho>
+	    #{ concat('\\',3*4)} ; '\12'
+    </myecho>
+    <c:expect pname="p" value="\12 " />
+		<myecho>
+	    ; comment            ; 
+    </myecho>
+    <c:expect pname="p" value="" />
+		<myecho>
+	    \; not a comment     ; '; not a comment'
+    </myecho>
+    <c:expect pname="p" value="; not a comment     " />
+		<myecho>
+	    \\; not a comment    ; '\; not a comment'
+	  </myecho>
+		<c:expect pname="p" value="\; not a comment    " />
+	</target>
+
 
 	<property name="tmpfile" location="${basedir}/tmp/echo.txt" />
 	<dirname property="tmpdir" file="${tmpfile}" />

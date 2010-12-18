@@ -67,8 +67,8 @@ import java.util.regex.Pattern;
 public class TextReader
 {
   static protected HashMap TheCache;
-  protected String cchar = ";";
-  protected String icchar = this.cchar;
+  protected String cl = ";";
+  protected String ic = ";";
   protected boolean skipempty = true;
   protected boolean continuation = true;
   protected String text;
@@ -76,10 +76,6 @@ public class TextReader
   protected String shift;
   protected BufferedReader bufreader;
   protected boolean resolve = false;
-  // Strip comments
-  protected boolean stripc = true;
-  // Strip inline comments
-  protected boolean stripic = true;
 
   static
   {
@@ -144,21 +140,31 @@ public class TextReader
     return this.text;
   }
 
-  public TextReader setCChar(String s)
+  public TextReader setCL(String s)
   {
-    this.cchar = s;
+    String t = s.trim();
+    if (t.matches("\\s*") == false)
+    {
+      this.cl = Pattern.quote(t);
+    }
+    else
+    {
+      this.cl = null;
+    }
     return this;
   }
 
-  public TextReader setICChar(String s)
+  public TextReader setIC(String s)
   {
-    this.icchar = s;
-    return this;
-  }
-
-  public TextReader setComment(String comment)
-  {
-    this.cchar = Static.trim2(comment, null);
+    String t = s.trim();
+    if (t.matches("\\s*") == false)
+    {
+      this.ic = Pattern.quote(t);
+    }
+    else
+    {
+      this.ic = null;
+    }
     return this;
   }
 
@@ -171,18 +177,6 @@ public class TextReader
   public TextReader setSkipEmpty(boolean b)
   {
     this.skipempty = b;
-    return this;
-  }
-
-  public TextReader setStripComment(boolean b)
-  {
-    this.stripc = b;
-    return this;
-  }
-
-  public TextReader setStripInlineComment(boolean b)
-  {
-    this.stripic = b;
     return this;
   }
 
@@ -215,40 +209,41 @@ public class TextReader
    */
   final static public String stripws(String text)
   {
-    Pattern S, T, U;
-    Matcher s, t, u;
-    String out, prefix;
+    Pattern P, T;
+    Matcher m, t;
+    String s;
     int n = 0;
 
     // Compile a regex matching all whitespace starting from the begin of
     // input till the first non-whitespace character. Note, that '\s'
     // matches EOL as well as classical whitespace.
-    S = makeregex("^\\s*");
+    // TODO: make me a class property
+    P = makeregex("^[ \\t\\f]*(?:\\n|\\r\\n)(\\s*)");
 
     // Compile a regex matching all characters after the last EOL.
+    // TODO: make me a class property
     T = makeregex("\\n([^\\n]*)$");
 
     // create match object on input and execute RE on it.
-    s = S.matcher(text);
-    s.find();
+    m = P.matcher(text);
+    if (m.find() == false)
+    {
+      return text;
+    }
 
+    s = m.replaceFirst("$1");
     // Apply regex T on the prefix. The length of the match will determine
     // the number of characters to strip off.
-    prefix = s.group();
-    t = T.matcher(prefix);
+    t = T.matcher(m.group());
     if (t.find())
     {
       n = t.end(1) - t.start(1);
     }
     else
     {
-      n = s.end() - s.start();
+      n = m.end() - m.start();
     }
 
-    // Remove leading whitespace characters.
-    // out = s.replaceFirst("");
-    out = text.replaceFirst("\\A[ \\t\\f]+\n", "\n");
-    // out = out.replaceFirst("\n","");
     if (n > 0)
     {
       // Compile a pattern on the fly.
@@ -256,19 +251,25 @@ public class TextReader
       // must a whitespace character except a newline.
       // Is there a way to express this as a difference operation? Such
       // as {\s - \n} ??
-      U = makeregex("(\\n|\\A)[ \\t\\f]{1," + n + "}");
-      u = U.matcher(out);
-      out = u.replaceAll("\n");
+      P = makeregex("(?m)(^|\\A)[ \\t\\f]{1," + n + "}");
+      m = P.matcher(s);
+      s = m.replaceAll("");
     }
-    return out;
+    
+    // Eventually remove trailing whitespace
+    // Regex: closing the regex using '$' does not work. It remains
+    // unclear when '$' means EOL or EOF?
+    P = makeregex("\\n[ \\t\\f]*\\z");
+    m = P.matcher(s);
+    s = m.replaceAll("");
+    return s;
   }
-
 
   final public static String resolvecontlines1(String text)
   {
     String t;
-    Pattern P1,P2;
-    Matcher M1,M2;
+    Pattern P1, P2;
+    Matcher M1, M2;
     P1 = Pattern.compile("(?m)([^\\\\]|\\A)\\\\(\\n[ \\t|\\f]*|\\z)");
     P2 = Pattern.compile("(?m)\\\\\\\\(\\n|\\z)");
     M1 = P1.matcher(text);
@@ -277,7 +278,7 @@ public class TextReader
     t = M2.replaceAll("\\\\$1");
     return t;
   }
-  
+
   final public static String resolvecontlines2(String text)
   {
     char c;
@@ -407,25 +408,30 @@ public class TextReader
     Matcher m;
 
     s = this.text;
-    if (this.stripc)
+    if (this.cl != null)
     {
       // TODO: will this also handle \r\n ?
       // TODO: make sure to quote cchar
-      p = String.format("(?m)[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", this.cchar);
+      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", this.cl);
       S = makeregex(p);
       m = S.matcher(this.text);
       s = m.replaceAll("");
-
-      if (this.stripic)
-      {
-        // TODO:A naive approach to handle ';' as the begin of a comment. Test
-        // '\;' and '\\;' ..
-        p = String.format("([^\\\\])%s.*$", this.icchar);
-        S = makeregex(p);
-        m = S.matcher(s);
-        s = m.replaceAll("$1");
-      }
     }
+
+    if (this.ic != null)
+    {
+      // TODO:A naive approach to handle ';' as the begin of a comment. Test
+      // '\;' and '\\;' ..
+      p = String.format("(?m)([^\\\\])%s.*$", this.ic);
+      S = makeregex(p);
+      m = S.matcher(s);
+      s = m.replaceAll("$1");
+      p = String.format("(?m)\\\\(%s.*)$", this.ic);
+      S = makeregex(p);
+      m = S.matcher(s);
+      s = m.replaceAll("$1");
+    }
+
     return s;
   }
 
@@ -503,10 +509,6 @@ public class TextReader
       /* can't happen */
     }
     r = b.toString();
-    // trim trailing whitespace
-    r = r.replaceAll("[ \\t\\f]+\\z", "");
-    // trim leading newline
-    r = r.replaceFirst("\\A\n", "");
     if (this.shift != null)
     {
       // replace all but last \n ..
@@ -523,10 +525,6 @@ public class TextReader
       }
       r = this.shift + r;
     }
-    /* resolve all Ant properties ${ } */
-    // r = this.project.replaceProperties(r);
-    /* resolve all EL references #{ ..} */
-    // r = Static.elresolve(this.project, r);
     return r;
   }
 
@@ -537,49 +535,6 @@ public class TextReader
   static public String unescape(String text)
   {
     return text;
-//    String r = null;
-//    int n;
-//
-//    n = text.length();
-//    switch (n)
-//    {
-//      case 0:
-//        r = text;
-//        break;
-//      default:
-//      {
-//        StringBuffer b;
-//        char c;
-//
-//        b = new StringBuffer();
-//        for (int i = 0; i < n; ++i)
-//        {
-//          c = text.charAt(i);
-//          if (c != '\\' || i + 1 > n)
-//            b.append(c);
-//          else
-//          {
-//            char p;
-//            p = text.charAt(i + 1); // look ahead
-//            // handle '\?'
-//            // How about handling only characters that have an escaped meaning?
-//            // That would be the escaped escape character (\\->\) and escaped
-//            // comment (\; -> ;).
-//            if (p == '\\' || p == ';') {
-//              b.append(p);
-//              i = i + 1;
-//            }
-//            else {
-//              b.append(c);
-//              b.append(p);
-//              i = i + 1;
-//            }
-//          }
-//        }
-//        r = b.toString();
-//      }
-//    }
-//    return r;
   }
 
 }

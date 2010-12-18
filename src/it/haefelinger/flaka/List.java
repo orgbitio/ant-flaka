@@ -36,11 +36,20 @@ public class List extends Task
   protected String var;
   protected java.util.List list = new ArrayList();
   protected TextReader tr = new TextReader();
- 
- 
+
   public void setComment(String s)
   {
-    this.tr.setComment(s);
+    this.tr.setCL(s);
+  }
+
+  public void setCL(String s)
+  {
+    this.tr.setCL(s);
+  }
+
+  public void setIC(String s)
+  {
+    this.tr.setIC(s);
   }
 
   public void setVar(String var)
@@ -53,7 +62,6 @@ public class List extends Task
     this.tr.setText(text);
   }
 
- 
   protected void append(Object obj)
   {
     this.list.add(obj);
@@ -81,19 +89,18 @@ public class List extends Task
         // Unescape escaped characters
         // TODO: I believe this should be done after (key,val) separation.
         line = TextReader.unescape(line);
-        
+
         try
         {
           if (this.el)
-            obj = Static.el2obj(project,line);
+            obj = Static.el2obj(project, line);
           else
             obj = line.trim();
           append(obj);
-        } 
+        }
         catch (Exception e)
         {
-          String s = "line : error evaluating EL expression (ignored) in "
-            + Static.q(line);
+          String s = "line : error evaluating EL expression (ignored) in " + Static.q(line);
           this.log(s);
         }
       }

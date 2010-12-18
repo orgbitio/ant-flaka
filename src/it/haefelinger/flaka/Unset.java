@@ -34,7 +34,17 @@ public class Unset extends Task
 
   public void setComment(String comment)
   {
-    this.tr.setComment(comment);
+    this.tr.setCL(comment);
+  }
+
+  public void setCL(String s)
+  {
+    this.tr.setCL(s);
+  }
+
+  public void setIC(String s)
+  {
+    this.tr.setIC(s);
   }
 
   public void addText(String text)
@@ -59,7 +69,7 @@ public class Unset extends Task
       // Unescape escaped characters
       // TODO: I believe this should be done after (key,val) separation.
       line = TextReader.unescape(line);
-      Static.unset(project,line);
+      Static.unset(project, line);
     }
 
   }

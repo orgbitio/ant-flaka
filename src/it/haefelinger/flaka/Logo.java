@@ -54,7 +54,7 @@ public class Logo extends Task
   public void execute() throws BuildException
   {
     Project project = this.getProject();
-    this.tr.setCChar(";");
+    this.tr.setIC(";");
     this.tr.setSkipws(true);
     this.tr.setResolveContLines(true);
     this.tr.setSkipEmpty(false);
