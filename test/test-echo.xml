@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-manual-example">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-cont-01">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -27,14 +27,16 @@
 	<macrodef name="myecho">
 		<attribute name="pname" default="p" />
 		<attribute name="shift" default="" />
-		<attribute name="ic" default=";" />
-		<attribute name="cl" default=";" />
+		<attribute name="ics" default=";" />
+		<attribute name="cs" default=";" />
+		<attribute name="ws" default="true" />
+		<attribute name="cl" default="true" />
 		<text name="text" optional="true" />
 		<sequential>
 			<reset-tmpdir />
 			<c:unset>@{pname}</c:unset>
 			<fail if="@{pname}" />
-			<c:echo ic="@{ic}" cl="@{cl}" shift="@{shift}" file="${tmpfile}">@{text}</c:echo>
+			<c:echo cl="@{cl}" ws="@{ws}" ics="@{ics}" cs="@{cs}" shift="@{shift}" file="${tmpfile}">@{text}</c:echo>
 			<!-- loadfile does not set property if file is empty. A empty -->
 			<!-- echo would still give a echo line. Therefore we correct  -->
 			<!-- this misbehaviour and define the property if the file    -->
@@ -317,13 +319,13 @@
 
 	<target name="test-case-18">
 		<!-- test other comment chars -->
-		<myecho cl="#" ic=";;">
+		<myecho cs="#" ics=";;">
 	    # kskdjskjds
 	    foobar ;; '[c:echo] foobar'
 	     </myecho>
 		<c:expect pname="p" value="foobar " />
 
-		<myecho cl="#" ic="">
+		<myecho cs="#" ics="">
 	    #{3 * 4}   you cannot see me
 	    not ; any longer an inline comment!
 	  </myecho>

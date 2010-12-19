@@ -66,9 +66,6 @@ public class Unset extends Task
       /* resolve all EL references #{ ..} */
       line = Static.elresolve(project, line);
 
-      // Unescape escaped characters
-      // TODO: I believe this should be done after (key,val) separation.
-      line = TextReader.unescape(line);
       Static.unset(project, line);
     }
 

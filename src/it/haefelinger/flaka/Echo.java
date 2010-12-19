@@ -67,16 +67,25 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.tr.setCL(s);
   }
 
-  public void setCL(String s)
+  public void setCs(String s)
   {
     this.tr.setCL(s);
   }
   
-  public void setIC(String s)
+  public void setIcs(String s)
   {
     this.tr.setIC(s);
   }
   
+  public void setWs(boolean b) {
+    // TODO: document me
+    this.tr.setSkipws(b);
+  }
+  
+  public void setCl(boolean b) {
+    // TODO: document me
+    this.tr.setResolveContLines(b);
+  }
   /**
    * Set the shift attribute.
    * 
@@ -94,10 +103,6 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
   public void setShift(String s)
   {
     this.tr.setShift(s);
-  }
-
-  public void setCont(boolean b) {
-    this.tr.setResolveContLines(b);
   }
   
   public void execute() throws BuildException
@@ -120,9 +125,6 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
       if (t != null)
         t = Static.elresolve(p, t);
 
-      // Unescape escaped characters
-      if (t != null)
-        t = TextReader.unescape(t);
     }
     if (t == null)
       t = this.tr.getShift();

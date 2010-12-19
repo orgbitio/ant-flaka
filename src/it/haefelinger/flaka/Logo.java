@@ -67,10 +67,6 @@ public class Logo extends Task
 
       /* resolve all EL references #{ ..} */
       line = Static.elresolve(project, line);
-
-      // Unescape escaped characters
-      // TODO: I believe this should be done after (key,val) separation.
-      line = TextReader.unescape(line);
       System.out.print(this.chr);
       System.out.print(Static.center(line, this.width - 2 * w, " "));
       System.out.print(this.chr);

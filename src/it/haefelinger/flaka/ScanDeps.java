@@ -126,11 +126,7 @@ public class ScanDeps extends MatchingTask
 
         /* resolve all EL references #{ ..} */
         line = Static.elresolve(project, line);
-
-        // Unescape escaped characters
-        // TODO: I believe this should be done after (key,val) separation.
-        line = TextReader.unescape(line);
-        
+       
         p = P.matcher(line);
         if (p.matches())
         {

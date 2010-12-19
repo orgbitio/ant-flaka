@@ -21,7 +21,6 @@ package it.haefelinger.flaka.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.ParsePosition;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,7 +144,7 @@ public class TextReader
     String t = s.trim();
     if (t.matches("\\s*") == false)
     {
-      this.cl = Pattern.quote(t);
+      this.cl = t;
     }
     else
     {
@@ -159,7 +158,7 @@ public class TextReader
     String t = s.trim();
     if (t.matches("\\s*") == false)
     {
-      this.ic = Pattern.quote(t);
+      this.ic = t;
     }
     else
     {
@@ -255,10 +254,12 @@ public class TextReader
       m = P.matcher(s);
       s = m.replaceAll("");
     }
-    
+
     // Eventually remove trailing whitespace
-    // Regex: closing the regex using '$' does not work. It remains
-    // unclear when '$' means EOL or EOF?
+    // Warning: do not use '$' to denote ONLY the end of input - this can
+    // be tricky. Cause '$' also matches the *last* \eol before \eof. Better
+    // to use \z cause always means \eof. See also unit cases for further
+    // details.
     P = makeregex("\\n[ \\t\\f]*\\z");
     m = P.matcher(s);
     s = m.replaceAll("");
@@ -270,8 +271,8 @@ public class TextReader
     String t;
     Pattern P1, P2;
     Matcher M1, M2;
-    P1 = Pattern.compile("(?m)([^\\\\]|\\A)\\\\(\\n[ \\t|\\f]*|\\z)");
-    P2 = Pattern.compile("(?m)\\\\\\\\(\\n|\\z)");
+    P1 = makeregex("(?m)([^\\\\]|\\A)\\\\(\\n[ \\t|\\f]*|\\z)");
+    P2 = makeregex("(?m)\\\\\\\\(\\n|\\z)");
     M1 = P1.matcher(text);
     t = M1.replaceAll("$1");
     M2 = P2.matcher(t);
@@ -279,126 +280,7 @@ public class TextReader
     return t;
   }
 
-  final public static String resolvecontlines2(String text)
-  {
-    char c;
-    int i, j, n;
-    StringBuffer b;
-    ParsePosition p;
 
-    i = 0;
-    n = text.length();
-    p = new ParsePosition(0);
-    b = new StringBuffer();
-
-    while (i < n)
-    {
-      // remember where we are and advance until '\' or EOF.
-      j = i;
-      while (i < n && (c = text.charAt(i)) != '\\')
-        ++i;
-      // copy
-      b.append(text, j, i);
-      // bail out if EOF
-      if (i >= n)
-        break;
-      // text[i] == '\'
-      j = i;
-      p.setIndex(j + 1);
-      if (lookahead(text, n, p))
-      {
-        // we are at the start of a cont line sequence which means, that
-        // parse position is either at EOF or EOL. We skip current '\'
-        // and copy any remaining '\'.
-        i = p.getIndex();
-        b.append(text, j + 1, i);
-        // skip eol or eof
-        if (i >= n)
-          continue;
-        c = text.charAt(i);
-        // ignore EOL
-        if (c == '\n' || c == '\r')
-        {
-          i = i + 1;
-          if (c == '\r' && i < n && text.charAt(i) == '\n')
-            i = i + 1;
-        }
-        // ignore whitespace after EOL
-        while (i < n && TextReader.isspace(text, i))
-          ++i;
-      }
-      else
-      {
-        i = p.getIndex();
-        b.append(text, j, i);
-      }
-    }
-    return b.toString();
-  }
-
-  /**
-   * A helper function to define what <em>whitespace</em> means in this context.
-   * 
-   * @param c
-   * @return
-   */
-  static public final boolean isspace(String text, int i)
-  {
-    char c = text.charAt(i);
-    return (c == ' ' || c == '\t' || c == '\f') ? true : false;
-  }
-
-  /**
-   * A function to lookahead the end of a continuation line.
-   * 
-   * @param text
-   * @param n
-   * @param p
-   * @return true, if the looked ahead sequence is
-   */
-  final static public boolean lookahead(String text, int n, ParsePosition p)
-  {
-    int i, j, d;
-    char c;
-
-    // advance over all '\'
-    i = p.getIndex();
-    j = i;
-
-    // Preconditon: text[i-1] == '\'
-    if (i > n)
-    {
-      return true;
-    }
-
-    while (i < n && text.charAt(i) == '\\')
-      i++;
-
-    d = i - j;
-    p.setIndex(i);
-
-    // Handle EOF
-    if (i >= n)
-    {
-      return d % 2 == 0;
-    }
-
-    // Handle EOL
-    c = text.charAt(i);
-    if (c == '\n' || c == '\r')
-    {
-      return (d % 2) == 0;
-    }
-
-    // not a cont line
-    p.setIndex(i);
-    return false;
-  }
-
-  final public static BufferedReader tobufreader(String text)
-  {
-    return new BufferedReader(new StringReader(text));
-  }
 
   final protected String stripcomments()
   {
@@ -412,7 +294,7 @@ public class TextReader
     {
       // TODO: will this also handle \r\n ?
       // TODO: make sure to quote cchar
-      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", this.cl);
+      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", Pattern.quote(this.cl));
       S = makeregex(p);
       m = S.matcher(this.text);
       s = m.replaceAll("");
@@ -420,18 +302,21 @@ public class TextReader
 
     if (this.ic != null)
     {
-      // TODO:A naive approach to handle ';' as the begin of a comment. Test
+      // A naive approach to handle ';' as the begin of a comment. Test
       // '\;' and '\\;' ..
-      p = String.format("(?m)([^\\\\])%s.*$", this.ic);
+      // Step 1: remove all unescaped inline comments till \eol
+      p = String.format("(?m)([^\\\\])%s.*$", Pattern.quote(this.ic));
       S = makeregex(p);
       m = S.matcher(s);
       s = m.replaceAll("$1");
-      p = String.format("(?m)\\\\(%s.*)$", this.ic);
+      // Step 2: handle escaped inline comment sequence, i.e. turn
+      // '\;' into ';'. Ignore on purpose any escape sequence before
+      // this escaped sequence.
+      p = String.format("(?m)\\\\(%s.*)$", Pattern.quote(this.ic));
       S = makeregex(p);
       m = S.matcher(s);
       s = m.replaceAll("$1");
     }
-
     return s;
   }
 
@@ -451,7 +336,7 @@ public class TextReader
         this.text = TextReader.stripws(this.text);
 
       /* initialize buffered reader */
-      this.bufreader = TextReader.tobufreader(this.text);
+      this.bufreader = new BufferedReader(new StringReader(this.text));
     }
   }
 
@@ -467,16 +352,13 @@ public class TextReader
     init();
     try
     {
-      while ((line = this.bufreader.readLine()) != null && this.ignore(line))
+      line = this.bufreader.readLine();
+      while (line != null && this.ignore(line))
       {
-        // read another line
+        line = this.bufreader.readLine();
       }
       if (line != null)
       {
-        /* resolve all Ant properties ${ } */
-        // line = this.project.replaceProperties(line);
-        /* resolve all EL references #{ ..} */
-        // line = Static.elresolve(this.project, line);
         if (this.shift != null)
           line = this.shift + line;
       }
@@ -493,7 +375,7 @@ public class TextReader
   {
     String r;
     final char[] buf = new char[1024];
-    final StringBuffer b = new StringBuffer();
+    final StringBuilder b = new StringBuilder();
     int n;
 
     init();
@@ -528,13 +410,6 @@ public class TextReader
     return r;
   }
 
-  /**
-   * Unescape escaped characters.
-   * 
-   */
-  static public String unescape(String text)
-  {
-    return text;
-  }
+
 
 }

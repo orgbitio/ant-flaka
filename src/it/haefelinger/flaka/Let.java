@@ -136,10 +136,6 @@ public class Let extends Task
       /* resolve all EL references #{ ..} */
       line = Static.elresolve(project, line);
 
-      // Unescape escaped characters
-      // TODO: I believe this should be done after (key,val) separation.
-      line = TextReader.unescape(line);
-
       /* eval text */
       if ((M = regex.matcher(line)).matches() == false)
       {
