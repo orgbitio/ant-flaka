@@ -42,14 +42,22 @@ public class List extends Task
     this.tr.setCL(s);
   }
 
-  public void setCL(String s)
+  public void setCs(String s)
   {
+    // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIC(String s)
+  public void setIcs(String s)
   {
+    // TODO: document me
     this.tr.setIC(s);
+  }
+
+  public void setCL(boolean b)
+  {
+    // TODO: document me
+    this.tr.setResolveContLines(b);
   }
 
   public void setVar(String var)

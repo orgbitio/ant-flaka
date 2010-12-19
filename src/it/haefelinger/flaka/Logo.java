@@ -36,6 +36,15 @@ public class Logo extends Task
   protected int width = 80;
   protected TextReader tr = new TextReader();
 
+  public Logo()
+  {
+    super();
+    this.tr.setIC(";");
+    this.tr.setSkipws(true);
+    this.tr.setResolveContLines(true);
+    this.tr.setSkipEmpty(false);
+  }
+
   public void addText(String s)
   {
     this.tr.setText(s);
@@ -51,13 +60,31 @@ public class Logo extends Task
     this.width = s;
   }
 
+  public void setCs(String s)
+  {
+    this.tr.setCL(s);
+  }
+
+  public void setIcs(String s)
+  {
+    this.tr.setIC(s);
+  }
+
+  public void setWs(boolean b)
+  {
+    // TODO: document me
+    this.tr.setSkipws(b);
+  }
+
+  public void setCl(boolean b)
+  {
+    // TODO: document me
+    this.tr.setResolveContLines(b);
+  }
+
   public void execute() throws BuildException
   {
     Project project = this.getProject();
-    this.tr.setIC(";");
-    this.tr.setSkipws(true);
-    this.tr.setResolveContLines(true);
-    this.tr.setSkipEmpty(false);
     String line = this.tr.readLine();
     System.out.println(Static.mkchrseq(this.chr, this.width));
     int w = this.chr.length();

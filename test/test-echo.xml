@@ -1,4 +1,4 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" default="test-cont-01">
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case-19">
 	<macrodef name="reset">
 		<sequential>
 			<c:unset>
@@ -283,10 +283,14 @@
 	</target>
 
 	<target name="test-indent-01">
-		<myecho>
-	    a
-	     b
-		</myecho>
+		<!-- one tab will eat up 4 blank characters -->
+		<myecho>&#xA;&#x9;a&#xA; b&#xA;</myecho>
+		<c:expect pname="p" value="a&#xA;b" />
+
+		<myecho>&#xA;&#x9;a&#xA;&#x9;&#x9;b&#xA;</myecho>
+		<c:expect pname="p" value="a&#xA;&#x9;b" />
+
+		<myecho>&#xA;&#x9;  a&#xA;    b&#xA;</myecho>
 		<c:expect pname="p" value="a&#xA; b" />
 	</target>
 
@@ -338,32 +342,44 @@
 		<c:expect pname="p" value="#{3 * 4} &#10;; not a comment" />
 	</target>
 
+	<target name="test-case-19">
+		<!-- test, that we can make echo behaving like the standard one -->
+		<myecho cl="false" ics="" cs="" ws="false">
+      ;
+      a;b
+      c\
+       d
+    </myecho>
+    <c:expect pname="p" value="&#10;      ;&#10;      a;b&#10;      c\&#10;       d&#10;    " />
+	</target>
+
+
 	<target name="test-manual-example">
 		<!-- test example given in manual -->
 		<myecho>
 	    \#{3 * 4}            ; '#{3 * 4}'
 		</myecho>
-    <c:expect pname="p" value="#{3 * 4}            "/>
+		<c:expect pname="p" value="#{3 * 4}            " />
 		<myecho>
 	    \\#{3 * 4}           ; '\#{3 * 4}'
     </myecho>
-    <c:expect pname="p" value="\#{3 * 4}           "/>
+		<c:expect pname="p" value="\#{3 * 4}           " />
 		<myecho>
 	    #{ '\\' }#{3 * 4}    ; '\12'
     </myecho>
-    <c:expect pname="p" value="\12    " />
+		<c:expect pname="p" value="\12    " />
 		<myecho>
 	    #{ concat('\\',3*4)} ; '\12'
     </myecho>
-    <c:expect pname="p" value="\12 " />
+		<c:expect pname="p" value="\12 " />
 		<myecho>
 	    ; comment            ; 
     </myecho>
-    <c:expect pname="p" value="" />
+		<c:expect pname="p" value="" />
 		<myecho>
 	    \; not a comment     ; '; not a comment'
     </myecho>
-    <c:expect pname="p" value="; not a comment     " />
+		<c:expect pname="p" value="; not a comment     " />
 		<myecho>
 	    \\; not a comment    ; '\; not a comment'
 	  </myecho>

@@ -208,51 +208,53 @@ public class TextReader
    */
   final static public String stripws(String text)
   {
-    Pattern P, T;
-    Matcher m, t;
-    String s;
-    int n = 0;
+    Pattern P;
+    Matcher m;
+    String t;
+    int e,n;
 
     // Compile a regex matching all whitespace starting from the begin of
     // input till the first non-whitespace character. Note, that '\s'
     // matches EOL as well as classical whitespace.
-    // TODO: make me a class property
+
     P = makeregex("^[ \\t\\f]*(?:\\n|\\r\\n)(\\s*)");
 
-    // Compile a regex matching all characters after the last EOL.
-    // TODO: make me a class property
-    T = makeregex("\\n([^\\n]*)$");
-
-    // create match object on input and execute RE on it.
+    // Create matcher object, then test whether basic regex matches. If not
+    // then there is no \eol between begin-of-input and first non-ws char -
+    // in which case we do not strip any ws on purpose.
     m = P.matcher(text);
     if (m.find() == false)
     {
       return text;
     }
 
-    s = m.replaceFirst("$1");
-    // Apply regex T on the prefix. The length of the match will determine
-    // the number of characters to strip off.
-    t = T.matcher(m.group());
-    if (t.find())
+    // Calculate the number of ws characters between first non-ws character
+    // and \eol before that character. Such a character must exist, other-
+    // wise regex 'P' could not have matched.
+
+    e = m.end();
+    n = 0;
+    while (e>0)
     {
-      n = t.end(1) - t.start(1);
+      switch (text.charAt(--e))
+      {
+        case '\n':
+          break;
+        default:
+          n = n + 1;
+      }
     }
-    else
-    {
-      n = m.end() - m.start();
-    }
+
+    // Remove initial ws including \eol.
+    t = m.replaceFirst("$1");
 
     if (n > 0)
     {
-      // Compile a pattern on the fly.
-      // Matches a newline followed by {1,n} characters. Such a character
-      // must a whitespace character except a newline.
-      // Is there a way to express this as a difference operation? Such
-      // as {\s - \n} ??
+      // Compile a pattern on the fly that matches a newline followed by
+      // at most n whitespace characters (but newline). 
       P = makeregex("(?m)(^|\\A)[ \\t\\f]{1," + n + "}");
-      m = P.matcher(s);
-      s = m.replaceAll("");
+      m = P.matcher(t);
+      t = m.replaceAll("");
     }
 
     // Eventually remove trailing whitespace
@@ -261,9 +263,9 @@ public class TextReader
     // to use \z cause always means \eof. See also unit cases for further
     // details.
     P = makeregex("\\n[ \\t\\f]*\\z");
-    m = P.matcher(s);
-    s = m.replaceAll("");
-    return s;
+    m = P.matcher(t);
+    t = m.replaceAll("");
+    return t;
   }
 
   final public static String resolvecontlines1(String text)
@@ -280,8 +282,6 @@ public class TextReader
     return t;
   }
 
-
-
   final protected String stripcomments()
   {
     String s;
@@ -292,8 +292,6 @@ public class TextReader
     s = this.text;
     if (this.cl != null)
     {
-      // TODO: will this also handle \r\n ?
-      // TODO: make sure to quote cchar
       p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", Pattern.quote(this.cl));
       S = makeregex(p);
       m = S.matcher(this.text);
@@ -409,7 +407,5 @@ public class TextReader
     }
     return r;
   }
-
-
 
 }

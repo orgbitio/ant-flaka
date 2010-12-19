@@ -37,16 +37,24 @@ public class Unset extends Task
     this.tr.setCL(comment);
   }
 
-  public void setCL(String s)
+  public void setCs(String s)
   {
+    // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIC(String s)
+  public void setIcs(String s)
   {
+    // TODO: document me
     this.tr.setIC(s);
   }
 
+  public void setCL(boolean b)
+  {
+    // TODO: document me
+    this.tr.setResolveContLines(b);
+  }
+  
   public void addText(String text)
   {
     this.tr.setText(text);
