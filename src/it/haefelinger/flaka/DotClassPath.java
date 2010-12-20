@@ -269,7 +269,7 @@ public class DotClassPath extends Task
    * @param v
    *          (attribute value)
    */
-  static protected void attr2buf(StringBuffer buf, String v, String name)
+  static protected void attr2buf(StringBuilder buf, String v, String name)
   {
     if (name != null && v != null)
     {
@@ -347,8 +347,8 @@ public class DotClassPath extends Task
      */
     public String toString()
     {
-      StringBuffer b;
-      b = new StringBuffer();
+      StringBuilder b;
+      b = new StringBuilder();
       b.append("{classpathentry:");
       attr2buf(b, this.kind, "kind");
       attr2buf(b, this.path, "path");
@@ -676,11 +676,11 @@ public class DotClassPath extends Task
 
     public String toString()
     {
-      StringBuffer sb;
+      StringBuilder sb;
       ArrayList bucket;
 
       bucket = new ArrayList();
-      sb = new StringBuffer();
+      sb = new StringBuilder();
 
       this.eval(bucket);
       for (int i = 0; i < bucket.size(); i++)
@@ -774,11 +774,11 @@ public class DotClassPath extends Task
   public String toString()
   {
     LogicalClassPathEntry entry;
-    StringBuffer buf;
+    StringBuilder buf;
     List bucket;
     String s;
 
-    buf = new StringBuffer();
+    buf = new StringBuilder();
     bucket = new ArrayList();
 
     /* Collect entries */

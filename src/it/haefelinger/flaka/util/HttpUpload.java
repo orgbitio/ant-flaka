@@ -196,7 +196,7 @@ public class HttpUpload
     return get("errmsg", null);
   }
 
-  protected static void xmlattr(StringBuffer buf, String key, String val)
+  protected static void xmlattr(StringBuilder buf, String key, String val)
   {
     if (buf != null && key != null && val != null && val.matches("\\s*") == false)
     {
@@ -208,7 +208,7 @@ public class HttpUpload
     }
   }
 
-  protected static void xmldata(StringBuffer buf, String elm, String val)
+  protected static void xmldata(StringBuilder buf, String elm, String val)
   {
     if (buf != null && elm != null && val != null && val.matches("\\s*") == false)
     {
@@ -255,7 +255,7 @@ public class HttpUpload
   {
     Matcher regex;
     String response = null;
-    StringBuffer buf = new StringBuffer("");
+    StringBuilder buf = new StringBuilder("");
     String errmsg = null;
     String errtyp = null; // no error
 

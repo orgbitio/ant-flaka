@@ -127,30 +127,23 @@ public class Task extends org.apache.tools.ant.Task
     }
   }
 
+  @SuppressWarnings("boxing")
   final public void warn(String msg)
   {
     if (msg != null)
     {
-      StringBuffer buf;
       Location where;
-      String bname;
+      String bname,tname;
+      String buf;
       int line;
       int col;
 
       where = getLocation();
       bname = new File(where.getFileName()).getName();
+      tname = this.getTaskName();
       line = where.getLineNumber();
       col = where.getColumnNumber();
-      buf = new StringBuffer();
-      buf.append(bname);
-      buf.append(':');
-      buf.append(line);
-      buf.append(':');
-      buf.append(col);
-      buf.append("[");
-      buf.append(getTaskName());
-      buf.append("]: ");
-      buf.append(msg);
+      buf = String.format("%s:%s:%s[%s]: %s",bname,line,col,tname,msg);
       Static._log_(getProject(), buf.toString(), Project.MSG_WARN);
     }
   }

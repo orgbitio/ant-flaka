@@ -66,15 +66,14 @@ import java.util.regex.Pattern;
 public class TextReader
 {
   static protected HashMap TheCache;
-  protected String cl = ";";
-  protected String ic = ";";
+  protected String cs = ";";
+  protected String ics = ";";
   protected boolean skipempty = true;
-  protected boolean continuation = true;
+  protected boolean cl = true;
   protected String text;
-  protected boolean skipws = false;
+  protected boolean ws = false;
   protected String shift;
   protected BufferedReader bufreader;
-  protected boolean resolve = false;
 
   static
   {
@@ -99,7 +98,7 @@ public class TextReader
 
   public TextReader setSkipws(boolean b)
   {
-    this.skipws = b;
+    this.ws = b;
     return this;
   }
 
@@ -144,11 +143,11 @@ public class TextReader
     String t = s.trim();
     if (t.matches("\\s*") == false)
     {
-      this.cl = t;
+      this.cs = t;
     }
     else
     {
-      this.cl = null;
+      this.cs = null;
     }
     return this;
   }
@@ -158,18 +157,18 @@ public class TextReader
     String t = s.trim();
     if (t.matches("\\s*") == false)
     {
-      this.ic = t;
+      this.ics = t;
     }
     else
     {
-      this.ic = null;
+      this.ics = null;
     }
     return this;
   }
 
   public TextReader setResolveContLines(boolean b)
   {
-    this.continuation = b;
+    this.cl = b;
     return this;
   }
 
@@ -290,27 +289,27 @@ public class TextReader
     Matcher m;
 
     s = this.text;
-    if (this.cl != null)
+    if (this.cs != null)
     {
-      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", Pattern.quote(this.cl));
+      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", Pattern.quote(this.cs));
       S = makeregex(p);
       m = S.matcher(this.text);
       s = m.replaceAll("");
     }
 
-    if (this.ic != null)
+    if (this.ics != null)
     {
       // A naive approach to handle ';' as the begin of a comment. Test
       // '\;' and '\\;' ..
       // Step 1: remove all unescaped inline comments till \eol
-      p = String.format("(?m)([^\\\\])%s.*$", Pattern.quote(this.ic));
+      p = String.format("(?m)([^\\\\])%s.*$", Pattern.quote(this.ics));
       S = makeregex(p);
       m = S.matcher(s);
       s = m.replaceAll("$1");
       // Step 2: handle escaped inline comment sequence, i.e. turn
       // '\;' into ';'. Ignore on purpose any escape sequence before
       // this escaped sequence.
-      p = String.format("(?m)\\\\(%s.*)$", Pattern.quote(this.ic));
+      p = String.format("(?m)\\\\(%s.*)$", Pattern.quote(this.ics));
       S = makeregex(p);
       m = S.matcher(s);
       s = m.replaceAll("$1");
@@ -322,15 +321,15 @@ public class TextReader
   {
     if (this.bufreader == null)
     {
-      // if resolve continuation lines is on, merge continuation lines
-      if (this.continuation)
+      // if resolve cl lines is on, merge cl lines
+      if (this.cl)
         this.text = TextReader.resolvecontlines1(this.text);
 
       // strip comments
       this.text = stripcomments();
 
-      // if skipws is on, strip out unwanted whitespace stuff.
-      if (this.skipws)
+      // if ws is on, strip out unwanted whitespace stuff.
+      if (this.ws)
         this.text = TextReader.stripws(this.text);
 
       /* initialize buffered reader */
@@ -355,17 +354,15 @@ public class TextReader
       {
         line = this.bufreader.readLine();
       }
-      if (line != null)
-      {
-        if (this.shift != null)
-          line = this.shift + line;
-      }
     }
     catch (IOException e)
     {
       line = null;
     }
-
+    if (line != null && this.shift != null)
+    {
+      line = this.shift + line;
+    }
     return line;
   }
 

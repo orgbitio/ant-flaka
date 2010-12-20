@@ -349,14 +349,14 @@ final public class Static
   public static String readlines(Reader reader)
   {
     String r;
-    StringBuffer b;
+    StringBuilder b;
 
     try
     {
       BufferedReader R;
       String L;
 
-      b = new StringBuffer();
+      b = new StringBuilder();
       R = new BufferedReader(reader);
       L = R.readLine();
 
@@ -1507,7 +1507,7 @@ final public class Static
     }
   }
 
-  final static public String flushxml(Project P, Element root, StringBuffer buf)
+  final static public String flushxml(Project P, Element root, StringBuilder buf)
   {
     String s = null;
     if (P != null && root != null)
@@ -1539,7 +1539,7 @@ final public class Static
     String s = null;
     if (P != null && root != null && file != null)
     {
-      s = flushxml(P, root, (StringBuffer) null);
+      s = flushxml(P, root, (StringBuilder) null);
 
       /* create loc */
       try
