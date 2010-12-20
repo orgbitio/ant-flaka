@@ -73,7 +73,7 @@
 
   <property
       name="version"
-      value="1.02.00_RC04"
+      value="1.02.00"
       />
   <property 
       name="src.dir" 
@@ -478,7 +478,9 @@
     <sequential>
       <mkdir dir="${javadoc.dir}"/>
       <javadoc destdir="${javadoc.dir}" >
-        <fileset dir="${src.dir}" defaultexcludes="yes"/>
+        <fileset dir="${src.dir}" defaultexcludes="yes">
+          <include name="**/*.java" />
+        </fileset>
       </javadoc>      
     </sequential>
   </macrodef>
@@ -505,6 +507,13 @@
   <target name="package-javadoc" depends="javadoc">
     <package-javadoc-exec />
   </target>
+
+  <macrodef name="package-javadoc">
+    <sequential>
+      <javadoc-exec />
+      <package-javadoc-exec />
+    </sequential>
+  </macrodef>
 
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
   <!--                    P A C K A G E - S O U R C E S            -->
@@ -574,7 +583,7 @@
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
   <target name="package-all" depends="package">
-    <package-javadoc-exec />
+    <package-javadoc />
     <package-sources-exec />
     <package-dist-exec />
   </target>
