@@ -72,7 +72,7 @@
 
   <property
       name="version"
-      value="1.03.00-SNAPSHOT"
+      value="1.02.01"
       />
   <property 
       name="src.dir" 
@@ -360,6 +360,7 @@
       <au:antunit>
         <fileset dir="test">
           <include name="test-*.xml" />
+          <exclude name="test-18*-no-ns.xml" />
           <exclude name="test-18*.xml" unless="ant-gte-180"/>
           <exclude name="test-scndeps.xml" />
           <exclude name="test-set-default-target.xml" />
