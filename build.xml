@@ -615,7 +615,7 @@
     </fail>
   </target>
   
-  <target name="package-dist" depends="-ensure180,package-all" 
+  <target name="package-dist" depends="-ensure180,test,package-all" 
           description=">> use me when building a release - requires 1.8 or newer">
   </target>
 
