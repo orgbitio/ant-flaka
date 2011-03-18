@@ -1,13 +1,12 @@
 <project name="ant-flaka" default="package" xmlns:au="antlib:org.apache.ant.antunit">
   <description>
+    ////////////////////////////////////////////////////////////////////////
+    //     PLEASE USE ANT 1.8 OR NEWER WHEN CREATING A RELEASE            //
+    ////////////////////////////////////////////////////////////////////////
+
     ========================================================================
     === This is the build script building the Flaka project from scratch ===
     ========================================================================
-
-    Hint:
-    You need to compile Flaka against Ant 1.8.0 or newer. Compiling against an
-    older version will not work. However, you can and you also should test 
-    Flaka against Ant 1.7.1.
 
     Use option -p to see a list of targets. By  default, Flaka gets compiled
     and packaged as
@@ -73,7 +72,7 @@
 
   <property
       name="version"
-      value="1.02.00"
+      value="1.02.01"
       />
   <property 
       name="src.dir" 
@@ -118,8 +117,19 @@
       file="${lib.dir}/fetched/README.txt" 
       property="libs.fetched"/>
 
+  <!--///////////////////////////////////////////////////////////////////////-->
+  <!-- Java compiler settings                                                -->
+  <!--                                                                       -->
+  <!-- Make sure to be backward compatible with Java 1.5                     -->
+  <!--///////////////////////////////////////////////////////////////////////-->
+
   <presetdef name="javac">
-    <javac includeantruntime="true" />
+    <javac 
+        includeantruntime = "true" 
+        source            = "1.5"
+        target            = "1.5"
+        verbose           = "true"
+        />
   </presetdef>
 
     
@@ -279,7 +289,7 @@
 
   <target name="compile" depends="init">
     <sequential>
-      <!-- Todo: use M2 names -->
+      <!-- TODO: use M2 names -->
       <mkdir dir="${obj.dir}"/>
       <javac srcdir="src" destdir="${obj.dir}">
         <classpath>
@@ -438,7 +448,8 @@
     </sequential>
   </macrodef>
 
-  <target name="package" depends="compile">
+  <target name="package" depends="compile"
+          description=">> use me to create jar packages">
     <sequential>
       <package />
     </sequential>
@@ -542,10 +553,10 @@
   </target>
 
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
-  <!--                    P A C K A G E - D I S T                  -->
+  <!--                    P A C K A G E - R E B U I L D            -->
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <macrodef name="package-dist-exec" >
+  <macrodef name="package-rebuild-exec" >
     <attribute name="prefix" default="flaka-${version}/" />
     <sequential>
       <!-- create dist folder directory -->
@@ -573,8 +584,8 @@
 
 
   
-  <target name="package-dist" depends="package">
-    <package-dist-exec />
+  <target name="package-rebuild" depends="package">
+    <package-rebuild-exec />
   </target>
 
 
@@ -582,10 +593,31 @@
   <!--                    P A C K A G E - A L L                    -->
   <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
 
-  <target name="package-all" depends="package">
+  <target name="package-all" depends="package" 
+          description=">> use me for packaging each and everything">
     <package-javadoc />
     <package-sources-exec />
-    <package-dist-exec />
+    <package-rebuild-exec />
   </target>
+
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <!--                    P A C K A G E - D I S T                  -->
+  <!--:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  <target name="-ensure180" unless="ant-gte-180">
+    <echo>
+      ////////////////////////////////////////////////////////////////
+      You are supposed to use ANT 1.8 or newer when building a release
+                       meant for distribution.
+      ////////////////////////////////////////////////////////////////
+    </echo>
+    <fail>
+      unsupported Ant version used for building a release: ${ant.version}
+    </fail>
+  </target>
+  
+  <target name="package-dist" depends="-ensure180,package-all" 
+          description=">> use me when building a release - requires 1.8 or newer">
+  </target>
+
 
 </project>
