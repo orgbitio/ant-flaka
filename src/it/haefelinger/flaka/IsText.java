@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-
 import org.apache.tools.ant.types.selectors.BaseSelector;
 
 /**
@@ -33,8 +32,7 @@ import org.apache.tools.ant.types.selectors.BaseSelector;
  * @author merzedes
  * @since 1.0
  */
-public class IsText extends BaseSelector
-{
+public class IsText extends BaseSelector {
   /** upper limit of characters to investige. */
   protected long limit = -1;
 
@@ -42,18 +40,15 @@ public class IsText extends BaseSelector
   protected boolean invert = false;
 
   /** set limit */
-  public void setLimit(long n)
-  {
+  public void setLimit(long n) {
     this.limit = n;
   }
 
-  public void setInvertMatch(boolean b)
-  {
+  public void setInvertMatch(boolean b) {
     this.invert = b;
   }
 
-  public void setInvert(boolean b)
-  {
+  public void setInvert(boolean b) {
     this.invert = b;
   }
 
@@ -62,74 +57,61 @@ public class IsText extends BaseSelector
    * files only. * *
    */
 
-  public boolean isSelected(File basedir, String filename, File file)
-  {
+  public boolean isSelected(File basedir, String filename, File file) {
     String path;
     InputStream S;
     boolean retv = false;
 
-    if (file == null || basedir == null || filename == null)
-    {
+    if (file == null || basedir == null || filename == null) {
       debug("isText: some `nil' arguments seen, return `false'");
       return false;
     }
 
     path = file.getAbsolutePath();
 
-    if (file.isDirectory())
-    {
+    if (file.isDirectory()) {
       debug("`" + path + "` is a directory, return `false'");
       return false;
     }
 
-    if (!file.canRead())
-    {
+    if (!file.canRead()) {
       debug("`" + path + "` is not readable, return `false'");
       return false;
     }
 
     S = open(file);
-    if (S == null)
-    {
+    if (S == null) {
       debug("unable to open `" + path + "`, return `false'");
       return false;
     }
 
-    try
-    {
+    try {
       retv = istext(S, this.limit);
       debug("istext('" + path + "') = " + retv);
       retv = this.invert ? !retv : retv;
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       debug("error while reading from `" + path + "`", e);
-    } finally
-    {
+    } finally {
       if (!close(S))
         debug("unable to close `" + path + "` (error ignored).");
     }
     return retv;
   }
 
-  protected boolean istext(InputStream S, long max) throws Exception
-  {
+  protected boolean istext(InputStream S, long max) throws Exception {
     int c;
     boolean b;
 
     c = S.read();
     b = true;
 
-    if (max < 0)
-    {
-      while (b && c != -1)
-      {
+    if (max < 0) {
+      while (b && c != -1) {
         b = Static.istext((char) c);
         c = S.read();
       }
-    } else
-    {
-      for (long i = 0; b && i < max; ++i)
-      {
+    } else {
+      for (long i = 0; b && i < max; ++i) {
         b = Static.istext((char) c);
         c = S.read();
       }
@@ -137,46 +119,37 @@ public class IsText extends BaseSelector
     return b;
   }
 
-  protected boolean isbinary(InputStream S, long max) throws Exception
-  {
+  protected boolean isbinary(InputStream S, long max) throws Exception {
     return istext(S, max) ? false : true;
   }
 
-  protected InputStream open(File file)
-  {
+  protected InputStream open(File file) {
     InputStream retv = null;
-    try
-    {
+    try {
       retv = new FileInputStream(file);
       retv = new BufferedInputStream(retv);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       /* ignore */
     }
     return retv;
   }
 
-  protected boolean close(InputStream S)
-  {
+  protected boolean close(InputStream S) {
     boolean b = true;
-    try
-    {
+    try {
       if (S != null)
         S.close();
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       b = false;
     }
     return b;
   }
 
-  protected void debug(String msg)
-  {
+  protected void debug(String msg) {
     Static.debug(getProject(), "istext: " + msg);
   }
 
-  protected void debug(String msg, Exception e)
-  {
+  protected void debug(String msg, Exception e) {
     Static.debug(getProject(), "istext: " + msg, e);
   }
 }

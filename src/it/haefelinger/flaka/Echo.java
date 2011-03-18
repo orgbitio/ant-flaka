@@ -32,13 +32,11 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Echo extends org.apache.tools.ant.taskdefs.Echo
-{
+public class Echo extends org.apache.tools.ant.taskdefs.Echo {
   protected boolean debug = true;
   protected TextReader tr;
 
-  public Echo()
-  {
+  public Echo() {
     super();
     this.tr = new TextReader();
     this.tr.setSkipEmpty(false);
@@ -46,8 +44,7 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
     this.tr.setSkipws(true);
   }
 
-  public void setDebug(boolean b)
-  {
+  public void setDebug(boolean b) {
     this.debug = b;
   }
 
@@ -62,30 +59,28 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
    * @param s
    *          not null
    */
-  public void setComment(String s)
-  {
+  public void setComment(String s) {
     this.tr.setCL(s);
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     this.tr.setCL(s);
   }
-  
-  public void setIcs(String s)
-  {
+
+  public void setIcs(String s) {
     this.tr.setIC(s);
   }
-  
+
   public void setWs(boolean b) {
     // TODO: document me
     this.tr.setSkipws(b);
   }
-  
+
   public void setCl(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
+
   /**
    * Set the shift attribute.
    * 
@@ -100,21 +95,18 @@ public class Echo extends org.apache.tools.ant.taskdefs.Echo
    * 
    * @param s
    */
-  public void setShift(String s)
-  {
+  public void setShift(String s) {
     this.tr.setShift(s);
   }
-  
-  public void execute() throws BuildException
-  {
+
+  public void execute() throws BuildException {
     String t;
     Project p;
 
     t = this.message;
     p = this.getProject();
 
-    if (t != null)
-    {
+    if (t != null) {
       t = this.tr.setText(t).read();
 
       /* resolve all Ant properties ${ } */

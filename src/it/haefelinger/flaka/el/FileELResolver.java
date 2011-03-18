@@ -30,114 +30,97 @@ import javax.el.ELResolver;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
 
-public class FileELResolver extends ELResolver
-{
-  public FileELResolver()
-  {
+public class FileELResolver extends ELResolver {
+  public FileELResolver() {
     super();
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     return Object.class;
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     return null;
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return Object.class;
   }
 
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     Object r = null;
     String k = null;
     File b = null;
 
-    if (base == null || context == null || property == null || !(base instanceof File))
+    if (base == null || context == null || property == null
+        || !(base instanceof File))
       return null;
 
-    try
-    {
+    try {
       k = (String) property;
       b = (File) base;
-      if (k.equals("toabs"))
-      {
+      if (k.equals("toabs")) {
         r = b.getAbsoluteFile();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("parent"))
-      {
+      if (k.equals("parent")) {
         r = b.getParentFile();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("exists"))
-      {
+      if (k.equals("exists")) {
         r = new Boolean(b.exists());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("isfile"))
-      {
+      if (k.equals("isfile")) {
         r = new Boolean(b.isFile());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("isdir"))
-      {
+      if (k.equals("isdir")) {
         r = new Boolean(b.isDirectory());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("ishidden"))
-      {
+      if (k.equals("ishidden")) {
         r = new Boolean(b.isHidden());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("isread"))
-      {
+      if (k.equals("isread")) {
         r = new Boolean(b.canRead());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("iswrite"))
-      {
+      if (k.equals("iswrite")) {
         r = new Boolean(b.canWrite());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("delete"))
-      {
+      if (k.equals("delete")) {
         r = new Boolean(b.delete());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("mkdir"))
-      {
+      if (k.equals("mkdir")) {
         r = new Boolean(b.mkdirs());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("length") || k.equals("size"))
-      {
+      if (k.equals("length") || k.equals("size")) {
         r = new Long(b.length());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("list"))
-      {
+      if (k.equals("list")) {
         File[] A = b.listFiles();
         ArrayList L = new ArrayList();
         for (int i = 0; i < A.length; ++i)
@@ -145,32 +128,27 @@ public class FileELResolver extends ELResolver
         context.setPropertyResolved(true);
         return L;
       }
-      if (k.equals("mtime"))
-      {
+      if (k.equals("mtime")) {
         r = new Date(b.lastModified());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("touri"))
-      {
+      if (k.equals("touri")) {
         r = b.toURI();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tourl"))
-      {
+      if (k.equals("tourl")) {
         r = b.toURI().toURL();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tostr"))
-      {
+      if (k.equals("tostr")) {
         r = b.toString();
         context.setPropertyResolved(true);
         return r;
       }
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
 
@@ -179,16 +157,14 @@ public class FileELResolver extends ELResolver
 
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return true;
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
     /* we do nothing here */
   }
 

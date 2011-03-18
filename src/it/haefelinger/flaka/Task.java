@@ -22,7 +22,6 @@ import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
 
-
 import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 
@@ -30,18 +29,15 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Task extends org.apache.tools.ant.Task
-{
+public class Task extends org.apache.tools.ant.Task {
   public boolean el = true;
   public boolean debug = false;
 
-  public void setEl(boolean b)
-  {
+  public void setEl(boolean b) {
     this.el = b;
   }
 
-  public void setDebug(boolean b)
-  {
+  public void setDebug(boolean b) {
     this.debug = b;
   }
 
@@ -56,8 +52,7 @@ public class Task extends org.apache.tools.ant.Task
    *          may be null
    * @return object denoted by <code>s</code> or null if not existing.
    */
-  final public Object getref(String s)
-  {
+  final public Object getref(String s) {
     return s == null ? null : getProject().getReference(s);
   }
 
@@ -69,71 +64,56 @@ public class Task extends org.apache.tools.ant.Task
    * @return value of property <code>s</code> or null if such a property does
    *         not exist or if no project is associated with this task.
    */
-  final public String getProperty(String s)
-  {
+  final public String getProperty(String s) {
     Project P = getProject();
     return P != null ? P.getProperty(s) : null;
   }
 
-  final protected void throwbx(String s)
-  {
+  final protected void throwbx(String s) {
     Static.throwbx(s);
   }
 
-  final public File toFile(String s)
-  {
+  final public File toFile(String s) {
     return Static.toFile(this.getProject(), s);
   }
 
-  final protected void throwbx(String s, Exception e)
-  {
+  final protected void throwbx(String s, Exception e) {
     Static.throwbx(s, e);
   }
 
-  final public void log(String msg)
-  {
-    if (msg != null)
-    {
+  final public void log(String msg) {
+    if (msg != null) {
       Static.log(getProject(), msg);
     }
   }
 
-  final public void debug(String msg)
-  {
-    if (this.debug)
-    {
+  final public void debug(String msg) {
+    if (this.debug) {
       System.err.println(msg);
       return;
     }
-    if (msg != null)
-    {
+    if (msg != null) {
       Static.debug(getProject(), msg);
     }
   }
 
-  final public void debug(String msg, Exception e)
-  {
-    if (msg != null)
-    {
+  final public void debug(String msg, Exception e) {
+    if (msg != null) {
       Static.debug(getProject(), msg, e);
     }
   }
 
-  final public void verbose(String msg)
-  {
-    if (msg != null)
-    {
+  final public void verbose(String msg) {
+    if (msg != null) {
       Static.verbose(getProject(), msg);
     }
   }
 
   @SuppressWarnings("boxing")
-  final public void warn(String msg)
-  {
-    if (msg != null)
-    {
+  final public void warn(String msg) {
+    if (msg != null) {
       Location where;
-      String bname,tname;
+      String bname, tname;
       String buf;
       int line;
       int col;
@@ -143,39 +123,33 @@ public class Task extends org.apache.tools.ant.Task
       tname = this.getTaskName();
       line = where.getLineNumber();
       col = where.getColumnNumber();
-      buf = String.format("%s:%s:%s[%s]: %s",bname,line,col,tname,msg);
+      buf = String.format("%s:%s:%s[%s]: %s", bname, line, col, tname, msg);
       Static._log_(getProject(), buf.toString(), Project.MSG_WARN);
     }
   }
 
-  public void warn(String msg, Exception e)
-  {
-    if (msg != null && e != null)
-    {
-      Static._log_(getProject(), msg + ", got " + e.getMessage(), Project.MSG_WARN);
+  public void warn(String msg, Exception e) {
+    if (msg != null && e != null) {
+      Static._log_(getProject(), msg + ", got " + e.getMessage(),
+          Project.MSG_WARN);
     }
   }
 
-  final public void error(String msg)
-  {
-    if (msg != null)
-    {
+  final public void error(String msg) {
+    if (msg != null) {
       Static._log_(getProject(), msg, Project.MSG_ERR);
     }
   }
 
-  final public void error(String msg, Exception e)
-  {
-    if (msg != null && e != null)
-    {
-      Static._log_(getProject(), msg + ", got " + e.getMessage(), Project.MSG_ERR);
+  final public void error(String msg, Exception e) {
+    if (msg != null && e != null) {
+      Static._log_(getProject(), msg + ", got " + e.getMessage(),
+          Project.MSG_ERR);
     }
   }
 
-  final public void info(String msg)
-  {
-    if (msg != null)
-    {
+  final public void info(String msg) {
+    if (msg != null) {
       super.log(msg, Project.MSG_INFO);
     }
   }

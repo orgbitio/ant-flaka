@@ -25,22 +25,18 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class RegexTest extends TestCase
-{
+public class RegexTest extends TestCase {
   Pattern p = Pattern.compile("^\\s*[^#\\s]", Pattern.MULTILINE);
 
-  public RegexTest(String name)
-  {
+  public RegexTest(String name) {
     super(name);
   }
 
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     junit.textui.TestRunner.run(suite());
   }
 
-  public static Test suite()
-  {
+  public static Test suite() {
     /*
      * using reflection to setup test cases, i.e. each method matching pattern
      * "test*" will be a test case.
@@ -48,50 +44,43 @@ public class RegexTest extends TestCase
     return new TestSuite(RegexTest.class);
   }
 
-  public void testFind01()
-  {
+  public void testFind01() {
     String t1 = "L";
     Matcher m1 = this.p.matcher(t1);
     assertTrue(m1.find());
   }
 
-  public void testFind02()
-  {
+  public void testFind02() {
     String t2 = "\nL";
     Matcher m2 = this.p.matcher(t2);
     assertTrue(m2.find());
   }
 
-  public void testFind03()
-  {
+  public void testFind03() {
     String t3 = "\n# comment\nL";
     Matcher m3 = this.p.matcher(t3);
     assertTrue(m3.find());
   }
 
-  public void testFind04()
-  {
+  public void testFind04() {
     String t4 = "\n# comment\n\tL";
     Matcher m4 = this.p.matcher(t4);
     assertTrue(m4.find());
   }
 
-  static boolean refind(String text)
-  {
+  static boolean refind(String text) {
     Pattern T = Pattern.compile("\\n([^\\n]*)$");
     Matcher t = T.matcher(text);
     boolean b = t.find();
     return b;
   }
 
-  public void testMatcher01()
-  {
+  public void testMatcher01() {
     boolean b = refind("\n \n   \n;\n\n");
     assertTrue(b);
   }
 
-  static String prettyfy(String text)
-  {
+  static String prettyfy(String text) {
     // Match all ws at input's begin (includes \n)
     Pattern S = Pattern.compile("^\\s*");
     // Match everthing after last \n (which must exist)
@@ -104,13 +93,10 @@ public class RegexTest extends TestCase
     String prefix = s.group();
     int n = -1;
     Matcher t = T.matcher(prefix);
-    if (t.find())
-    {
+    if (t.find()) {
       n = t.end(1) - t.start(1);
       assertTrue(n >= 0);
-    }
-    else
-    {
+    } else {
       n = s.end() - s.start();
       assertTrue(n == prefix.length());
     }
@@ -118,8 +104,7 @@ public class RegexTest extends TestCase
     String out;
     // Remove leading whitespace characters.
     out = s.replaceFirst("");
-    if (n > 0)
-    {
+    if (n > 0) {
       // Compile a pattern on the fly.
       // Matches a newline followed by {1,n} characters. Such a character
       // must a whitespace character except a newline.
@@ -134,9 +119,9 @@ public class RegexTest extends TestCase
     return out;
   }
 
-  public void testRE01()
-  {
-    String text = "\n" + "\n" + "  ;a \\\n" + " b \\\n" + "   c \\\n" + "    d \\";
+  public void testRE01() {
+    String text = "\n" + "\n" + "  ;a \\\n" + " b \\\n" + "   c \\\n"
+        + "    d \\";
 
     String expect = ";a \\\n" + "b \\\n" + " c \\\n" + "  d \\";
 
@@ -144,8 +129,7 @@ public class RegexTest extends TestCase
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE02()
-  {
+  public void testRE02() {
     String text = "  ;a \\\n" + " b \\\n" + "   c \\\n" + "    d \\";
 
     String expect = ";a \\\n" + "b \\\n" + " c \\\n" + "  d \\";
@@ -154,40 +138,35 @@ public class RegexTest extends TestCase
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE03()
-  {
+  public void testRE03() {
     String text = "    \n  ;a\n b\n   c";
     String expect = ";a\nb\n c";
     String out = prettyfy(text);
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE04()
-  {
+  public void testRE04() {
     String text = " \n   \n  ;a\n b\n   c";
     String expect = ";a\nb\n c";
     String out = prettyfy(text);
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE05()
-  {
+  public void testRE05() {
     String text = "";
     String expect = "";
     String out = prettyfy(text);
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE06()
-  {
+  public void testRE06() {
     String text = "\n\n";
     String expect = "";
     String out = prettyfy(text);
     assertTrue(out.contentEquals(expect));
   }
 
-  public void testRE07()
-  {
+  public void testRE07() {
     String text = "\n \n \n \n      ;\n\n";
     String expect = ";\n\n";
     String out = prettyfy(text);
@@ -198,9 +177,9 @@ public class RegexTest extends TestCase
    * Test resolving of continuation lines using regular expressions.
    */
 
-  public void testCont01()
-  {
-    String text = "\n" + "\n" + "  ;a \\\n" + " b \\\n" + "   c \\\n" + "    d \\";
+  public void testCont01() {
+    String text = "\n" + "\n" + "  ;a \\\n" + " b \\\n" + "   c \\\n"
+        + "    d \\";
 
     String expect = "\n\n  ;a  b    c     d ";
 
@@ -218,8 +197,7 @@ public class RegexTest extends TestCase
   /**
    * 
    */
-  public void testDollar()
-  {
+  public void testDollar() {
     Pattern P;
     Matcher m;
     String s;
@@ -236,8 +214,7 @@ public class RegexTest extends TestCase
     s = "";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -246,8 +223,7 @@ public class RegexTest extends TestCase
     s = "foobar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -256,19 +232,17 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(7, m.end());
-          break;
-        case 2:
-          // The \eof
-          assertEquals(8, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(7, m.end());
+        break;
+      case 2:
+        // The \eof
+        assertEquals(8, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -279,20 +253,18 @@ public class RegexTest extends TestCase
     s = "\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // matches position before \eol, well that must then be
-          // \begin-of-input. How can this be?
-          assertEquals(0, m.end());
-          break;
-        case 2:
-          // matches before \eof
-          assertEquals(1, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // matches position before \eol, well that must then be
+        // \begin-of-input. How can this be?
+        assertEquals(0, m.end());
+        break;
+      case 2:
+        // matches before \eof
+        assertEquals(1, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -300,8 +272,7 @@ public class RegexTest extends TestCase
     s = "foo\r\nbar";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -310,8 +281,7 @@ public class RegexTest extends TestCase
   /**
    * 
    */
-  public void testMultilineDollar()
-  {
+  public void testMultilineDollar() {
     Pattern P;
     Matcher m;
     String s;
@@ -319,22 +289,20 @@ public class RegexTest extends TestCase
 
     // Multiline Dollar matches indeed any newline sequence
     // in addition to \eof. See below.
-    
+
     P = Pattern.compile("(?m)$");
 
     // Matches \eof
     s = "";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(0, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(0, m.end());
+        break;
       }
     }
     assertEquals(1, c);
@@ -343,19 +311,17 @@ public class RegexTest extends TestCase
     s = "foobar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(6, m.end());
-          break;
-        case 2:
-          // The last \eol
-          assertEquals(7, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(6, m.end());
+        break;
+      case 2:
+        // The last \eol
+        assertEquals(7, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -364,45 +330,40 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(3, m.end());
-          break;
-        case 2:
-          // The \eof
-          assertEquals(7, m.end());
-          break;
-        case 3:
-          // The \eof
-          assertEquals(8, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(3, m.end());
+        break;
+      case 2:
+        // The \eof
+        assertEquals(7, m.end());
+        break;
+      case 3:
+        // The \eof
+        assertEquals(8, m.end());
+        break;
       }
     }
     assertEquals(3, c);
 
- 
     s = "\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // matches before first \eol -> how is that possible
-          // given that ^ can't match *after* the last \eol???
-          assertEquals(0, m.end());
-          break;
-        case 2:
-          // matches before \eof 
-          assertEquals(1, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // matches before first \eol -> how is that possible
+        // given that ^ can't match *after* the last \eol???
+        assertEquals(0, m.end());
+        break;
+      case 2:
+        // matches before \eof
+        assertEquals(1, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -410,29 +371,25 @@ public class RegexTest extends TestCase
     s = "a\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // matches the position *before* first \eol
-          assertEquals(1, m.end());
-          break;
-        case 2:
-          // matches the position *before* \eof
-          assertEquals(2, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // matches the position *before* first \eol
+        assertEquals(1, m.end());
+        break;
+      case 2:
+        // matches the position *before* \eof
+        assertEquals(2, m.end());
+        break;
       }
     }
     assertEquals(2, c);
-    
-    
+
     s = "foo\r\nbar";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -442,8 +399,7 @@ public class RegexTest extends TestCase
    * Test caret's (^) behaviour in a Regex.
    * 
    */
-  public void testCaret()
-  {
+  public void testCaret() {
     Pattern P;
     Matcher m;
     String s;
@@ -460,8 +416,7 @@ public class RegexTest extends TestCase
     s = "foobar";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -470,8 +425,7 @@ public class RegexTest extends TestCase
     s = "foo\nbar";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -479,8 +433,7 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -506,8 +459,7 @@ public class RegexTest extends TestCase
     s = "foobar";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -518,8 +470,7 @@ public class RegexTest extends TestCase
     s = "foobar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -530,8 +481,7 @@ public class RegexTest extends TestCase
     s = "foobar\n ";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -540,8 +490,7 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -550,15 +499,13 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n ";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(3, c);
   }
 
-  public void testZ()
-  {
+  public void testZ() {
     Pattern P;
     Matcher m;
     String s;
@@ -572,8 +519,7 @@ public class RegexTest extends TestCase
     s = "";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -582,8 +528,7 @@ public class RegexTest extends TestCase
     s = "foobar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -592,19 +537,17 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(7, m.end());
-          break;
-        case 2:
-          // The \eof
-          assertEquals(8, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(7, m.end());
+        break;
+      case 2:
+        // The \eof
+        assertEquals(8, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -615,28 +558,25 @@ public class RegexTest extends TestCase
     s = "\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // matches begin-of-input
-          assertEquals(0, m.end());
-          break;
-        case 2:
-          // matches the position *before* \eol (that would then
-          // be -1 according to me) plus one (from end()) should
-          // give '0' while we end up in '1'. Why? no clue.
-          assertEquals(1, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // matches begin-of-input
+        assertEquals(0, m.end());
+        break;
+      case 2:
+        // matches the position *before* \eol (that would then
+        // be -1 according to me) plus one (from end()) should
+        // give '0' while we end up in '1'. Why? no clue.
+        assertEquals(1, m.end());
+        break;
       }
     }
     assertEquals(2, c);
   }
 
-  public void testMultilineZ()
-  {
+  public void testMultilineZ() {
     Pattern P;
     Matcher m;
     String s;
@@ -649,8 +589,7 @@ public class RegexTest extends TestCase
     s = "";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(1, c);
@@ -659,8 +598,7 @@ public class RegexTest extends TestCase
     s = "foobar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
     }
     assertEquals(2, c);
@@ -669,19 +607,17 @@ public class RegexTest extends TestCase
     s = "foo\nbar\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // The last \eol
-          assertEquals(7, m.end());
-          break;
-        case 2:
-          // The \eof
-          assertEquals(8, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // The last \eol
+        assertEquals(7, m.end());
+        break;
+      case 2:
+        // The \eof
+        assertEquals(8, m.end());
+        break;
       }
     }
     assertEquals(2, c);
@@ -692,21 +628,19 @@ public class RegexTest extends TestCase
     s = "\n";
     m = P.matcher(s);
     c = 0;
-    while (m.find())
-    {
+    while (m.find()) {
       c = c + 1;
-      switch (c)
-      {
-        case 1:
-          // matches begin-of-input
-          assertEquals(0, m.end());
-          break;
-        case 2:
-          // matches the position *before* \eol (that would then
-          // be -1 according to me) plus one (from end()) should
-          // give '0' while we end up in '1'. Why? no clue.
-          assertEquals(1, m.end());
-          break;
+      switch (c) {
+      case 1:
+        // matches begin-of-input
+        assertEquals(0, m.end());
+        break;
+      case 2:
+        // matches the position *before* \eol (that would then
+        // be -1 according to me) plus one (from end()) should
+        // give '0' while we end up in '1'. Why? no clue.
+        assertEquals(1, m.end());
+        break;
       }
     }
     assertEquals(2, c);

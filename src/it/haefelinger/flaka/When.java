@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.TaskContainer;
@@ -35,21 +34,18 @@ import org.apache.tools.ant.TaskContainer;
  * @author merzedes
  * @since 1.0
  */
-public class When extends Task implements TaskContainer
-{
+public class When extends Task implements TaskContainer {
   protected String test = null;
   protected List tasklist = null;
 
   /**
    * The test that must evaluate to true in order to execute the body.
    */
-  public void setTest(String s)
-  {
+  public void setTest(String s) {
     this.test = Static.elresolve(this.getProject(), s);
   }
 
-  public void addTask(org.apache.tools.ant.Task task)
-  {
+  public void addTask(org.apache.tools.ant.Task task) {
     if (this.tasklist == null)
       this.tasklist = new ArrayList();
     this.tasklist.add(task);
@@ -61,11 +57,10 @@ public class When extends Task implements TaskContainer
    * @return true if the condition evalutes to true of if no condition is given.
    * @throws BuildException
    */
-  protected boolean eval() throws BuildException
-  {
+  protected boolean eval() throws BuildException {
     Project p;
     p = this.getProject();
-    return Static.el2bool(p,this.test);
+    return Static.el2bool(p, this.test);
   }
 
   /**
@@ -73,16 +68,13 @@ public class When extends Task implements TaskContainer
    * 
    * @throws BuildException
    */
-  public void exec() throws BuildException
-  {
-    if (this.tasklist != null)
-    {
+  public void exec() throws BuildException {
+    if (this.tasklist != null) {
       Iterator i;
       org.apache.tools.ant.Task task;
       i = this.tasklist.iterator();
 
-      while (i.hasNext())
-      {
+      while (i.hasNext()) {
         task = (org.apache.tools.ant.Task) i.next();
         task.perform();
       }
@@ -94,8 +86,7 @@ public class When extends Task implements TaskContainer
    * 
    * @see org.apache.tools.ant.taskdefs.Sequential#execute()
    */
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     if (eval())
       exec();
   }

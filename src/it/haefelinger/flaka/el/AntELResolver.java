@@ -41,53 +41,45 @@ import javax.el.PropertyNotWritableException;
  * @author geronimo
  * 
  */
-public class AntELResolver extends ELResolver
-{
+public class AntELResolver extends ELResolver {
   protected ELResolver resolver = new BeanELResolver(false);
 
-  public AntELResolver()
-  {
+  public AntELResolver() {
     super();
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     return Object.class;
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     return null;
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return Object.class;
   }
 
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     Object r = null;
     String k = null;
 
     if (base == null || context == null || property == null)
       return null;
 
-    try
-    {
+    try {
       k = (String) property;
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
 
-    if (base instanceof Resolver.Wrapper)
-    {
+    if (base instanceof Resolver.Wrapper) {
       return ((Resolver.Wrapper) base).lookup(context, k);
     }
     return r;
@@ -95,16 +87,14 @@ public class AntELResolver extends ELResolver
 
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return true;
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
     /* we do nothing here */
   }
 

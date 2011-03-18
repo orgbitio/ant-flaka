@@ -48,24 +48,21 @@ import org.apache.tools.ant.PropertyHelper;
  * @since Flaka 1.2
  */
 
-public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
-{
+public class PropertyHelper12 extends PropertyHelper implements
+    IFPropertyHelper {
   protected boolean enabled = true;
 
-  public PropertyHelper12()
-  {
+  public PropertyHelper12() {
     super();
   }
 
-  public boolean enable(boolean b)
-  {
+  public boolean enable(boolean b) {
     boolean c = this.enabled;
     this.enabled = b;
     return c;
   }
 
-  protected void copyProperties(PropertyHelper ph)
-  {
+  protected void copyProperties(PropertyHelper ph) {
     // copy over all properties.
     Hashtable p;
     Enumeration e;
@@ -73,8 +70,7 @@ public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
 
     p = ph.getProperties();
     e = p.keys();
-    while (e.hasMoreElements())
-    {
+    while (e.hasMoreElements()) {
       k = e.nextElement();
       v = p.get(k);
       this.setProperty((String) k, v, false);
@@ -82,8 +78,7 @@ public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
 
     p = ph.getInheritedProperties();
     e = p.keys();
-    while (e.hasMoreElements())
-    {
+    while (e.hasMoreElements()) {
       k = e.nextElement();
       v = p.get(k);
       this.setInheritedProperty((String) k, v);
@@ -91,8 +86,7 @@ public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
 
     p = ph.getUserProperties();
     e = p.keys();
-    while (e.hasMoreElements())
-    {
+    while (e.hasMoreElements()) {
       k = e.nextElement();
       v = p.get(k);
       this.setUserProperty((String) k, v);
@@ -100,13 +94,11 @@ public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
 
   }
 
-  public void setProject(Project project)
-  {
+  public void setProject(Project project) {
     PropertyHelper otherhelper;
     super.setProject(project);
     otherhelper = PropertyHelper.getPropertyHelper(project);
-    if (otherhelper == this)
-    {
+    if (otherhelper == this) {
       throw new BuildException("uups, Ant's interface changed again.");
     }
     copyProperties(otherhelper);
@@ -128,14 +120,12 @@ public class PropertyHelper12 extends PropertyHelper implements IFPropertyHelper
    * @return the original string with the properties replaced, or
    *         <code>null</code> if the original string is <code>null</code>.
    */
-  public Object parseProperties(String value) throws BuildException
-  {
+  public Object parseProperties(String value) throws BuildException {
     Object obj;
     // Ask the original handler to resolve ${..} references for me.
     obj = super.parseProperties(value);
 
-    if (this.enabled && obj != null && obj instanceof String)
-    {
+    if (this.enabled && obj != null && obj instanceof String) {
       // Resolve EL References #{..}
       String text = obj.toString();
       Project p = this.getProject();

@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
@@ -36,8 +35,7 @@ import org.apache.tools.ant.types.FileSet;
  * @author merzedes
  * @since 1.0
  */
-public class HttpUploadTask extends Task
-{
+public class HttpUploadTask extends Task {
   protected File rcfile;
   protected HttpUpload uploader;
   protected List filesets;
@@ -45,72 +43,59 @@ public class HttpUploadTask extends Task
   protected String acceptpat;
   protected String errorpat;
 
-  public HttpUploadTask()
-  {
+  public HttpUploadTask() {
     this.uploader = new HttpUpload();
     this.filesets = new ArrayList();
     this.logdir = null;
   }
 
-  public void setAcceptIf(String s)
-  {
+  public void setAcceptIf(String s) {
     this.acceptpat = Static.trim2(s, this.acceptpat);
   }
 
-  public void setErrorIf(String s)
-  {
+  public void setErrorIf(String s) {
     this.errorpat = Static.trim2(s, this.errorpat);
   }
 
-  public void setLogdir(File logdir)
-  {
+  public void setLogdir(File logdir) {
     this.logdir = logdir;
   }
 
-  public void setEndpoint(String S)
-  {
+  public void setEndpoint(String S) {
     String s = Static.trim2(S, null);
     if (s != null)
       this.uploader.set("endpoint", s);
   }
 
-  public void setTest(boolean b)
-  {
+  public void setTest(boolean b) {
     this.uploader.set("testonly", b ? "true" : "false");
   }
 
-  public void setCategory(String S)
-  {
+  public void setCategory(String S) {
     String s = Static.trim2(S, null);
     if (s != null)
       this.uploader.set("category", s);
   }
 
-  public void setRcFile(File file)
-  {
+  public void setRcFile(File file) {
     this.rcfile = file;
   }
 
-  public void setDebug(boolean b)
-  {
+  public void setDebug(boolean b) {
     this.uploader.setDebug(b);
   }
 
-  public void addFileset(FileSet set)
-  {
-    if (set != null)
-    {
+  public void addFileset(FileSet set) {
+    if (set != null) {
       this.filesets.add(set);
     }
   }
 
-  public boolean isTest()
-  {
+  public boolean isTest() {
     return this.uploader.get("testonly", "").matches("\\s*true\\s*");
   }
 
-  public String[] eval(FileSet fs) throws BuildException
-  {
+  public String[] eval(FileSet fs) throws BuildException {
     DirectoryScanner ds;
     File dir;
     String[] files;
@@ -122,8 +107,7 @@ public class HttpUploadTask extends Task
     dir = fs.getDir(getProject());
     files = ds.getIncludedFiles();
 
-    for (int i = 0; i < files.length; ++i)
-    {
+    for (int i = 0; i < files.length; ++i) {
       String s;
 
       s = files[i];
@@ -134,35 +118,29 @@ public class HttpUploadTask extends Task
   }
 
   // The method executing the task
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     String s;
 
-    if (this.debug)
-    {
+    if (this.debug) {
       /* enable debug output */
-      //HttpUpload.debug(true);
+      // HttpUpload.debug(true);
     }
 
-    if (this.filesets == null)
-    {
+    if (this.filesets == null) {
       throwbx("this task must be used with at least on <fileset>.");
     }
 
     /* read username and password from a hidden RC loc */
-    if (this.rcfile != null)
-    {
+    if (this.rcfile != null) {
       String[] words;
 
       s = this.rcfile.getAbsolutePath();
-      if (!this.rcfile.exists())
-      {
+      if (!this.rcfile.exists()) {
         throwbx("loc `" + s + "' does not exist.");
       }
       /* read username and password from this loc */
       s = Static.readlines(this.rcfile);
-      if (s == null)
-      {
+      if (s == null) {
         throwbx("unable to read from loc `" + s + "'.");
         return;
       }
@@ -170,8 +148,7 @@ public class HttpUploadTask extends Task
       /* split into words */
       words = s.split("\\s+");
 
-      if (words == null || words.length < 2)
-      {
+      if (words == null || words.length < 2) {
         throwbx("syntax error while parsing loc `" + s + "' -  too few words.");
         return;
       }
@@ -186,8 +163,7 @@ public class HttpUploadTask extends Task
     /* TODO: not used right now .. */
     this.uploader.set("accept-if", this.acceptpat);
 
-    for (int i = 0; i < this.filesets.size(); ++i)
-    {
+    for (int i = 0; i < this.filesets.size(); ++i) {
       String[] files;
 
       files = eval((FileSet) this.filesets.get(i));
@@ -195,8 +171,7 @@ public class HttpUploadTask extends Task
       if (files == null)
         continue;
 
-      for (int j = 0; j < files.length; ++j)
-      {
+      for (int j = 0; j < files.length; ++j) {
         File f;
         boolean rc;
 
@@ -204,8 +179,7 @@ public class HttpUploadTask extends Task
         this.uploader.set("filepath", f.getPath());
         rc = this.uploader.upload();
 
-        if (this.logdir != null)
-        {
+        if (this.logdir != null) {
           String buf;
           String name = f.getPath().replaceAll("/|\\.\\.|\\\\|:|\\.", "_");
           buf = this.uploader.get("xmlbuf", null);
@@ -213,8 +187,7 @@ public class HttpUploadTask extends Task
           buf = this.uploader.get("resbuf", null);
           savebuf(buf, "upload-" + name + ".txt");
         }
-        if (!rc)
-        {
+        if (!rc) {
           String errmsg;
 
           errorseen = true;
@@ -223,14 +196,12 @@ public class HttpUploadTask extends Task
             info(errmsg);
           else
             throwbx(errmsg);
-        } else
-        {
+        } else {
           info("loc `" + this.uploader.get("filepath", "") + "' uploaded.");
         }
       }
     }
-    if (errorseen)
-    {
+    if (errorseen) {
       throwbx("error(s) seen while uploading files.");
     }
   }
@@ -242,26 +213,21 @@ public class HttpUploadTask extends Task
    * @param fname
    * @return true if no error occured
    */
-  private boolean savebuf(String buf, String fname)
-  {
+  private boolean savebuf(String buf, String fname) {
     boolean good = true;
     FileOutputStream fo = null;
     File u;
 
-    if (this.logdir != null && buf != null && fname != null)
-    {
+    if (this.logdir != null && buf != null && fname != null) {
       u = new File(this.logdir, fname);
       this.debug("writing upload log report: " + u.getAbsolutePath());
-      try
-      {
+      try {
         fo = new FileOutputStream(u);
         fo.write(buf.getBytes());
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         good = false;
         this.error("unable to write upload log report: ", e);
-      } finally
-      {
+      } finally {
         Static.close(fo);
       }
     }

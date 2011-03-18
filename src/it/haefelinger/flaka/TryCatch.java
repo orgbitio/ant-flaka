@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Sequential;
@@ -141,8 +140,7 @@ import org.apache.tools.ant.taskdefs.Sequential;
  * @since 1.0
  */
 
-public class TryCatch extends Task
-{
+public class TryCatch extends Task {
   final static public String REFERENCE = "trycatch.object";
   protected List trylist = new ArrayList();
   protected List catchlist = new ArrayList();
@@ -160,13 +158,11 @@ public class TryCatch extends Task
    * @author wh81752
    * 
    */
-  public static final class CatchBlock extends Sequential
-  {
+  public static final class CatchBlock extends Sequential {
     protected Pattern match = null;
     protected Pattern type = null;
 
-    public CatchBlock()
-    {
+    public CatchBlock() {
       super();
       setMatch("*");
       setType("*.BuildException");
@@ -177,8 +173,7 @@ public class TryCatch extends Task
      * 
      * By default, only exceptions of type BuildException are caught.
      */
-    public void setType(String type)
-    {
+    public void setType(String type) {
       String s = Static.trim2(type, null);
       if (s != null)
         this.type = Static.patterncompile(s, 0);
@@ -187,28 +182,23 @@ public class TryCatch extends Task
     /**
      * The pattern expession to use to select a particular exception.
      */
-    public void setMatch(String match)
-    {
+    public void setMatch(String match) {
       String s = Static.trim2(match, null);
       if (s != null)
         this.match = Static.patterncompile(s, Pattern.DOTALL);
     }
 
-    public Class loadClass(String s)
-    {
+    public Class loadClass(String s) {
       Class c = null;
-      try
-      {
+      try {
         c = Thread.currentThread().getContextClassLoader().loadClass(s);
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         /* ignore */
       }
       return c;
     }
 
-    public boolean match(Throwable t)
-    {
+    public boolean match(Throwable t) {
       boolean r = false;
       String clazz = t.getClass().getName();
       String mesg = t.getMessage();
@@ -228,13 +218,11 @@ public class TryCatch extends Task
    * 
    * @param seq
    */
-  public void addTry(Sequential seq)
-  {
+  public void addTry(Sequential seq) {
     this.trylist.add(seq);
   }
-  
-  public void addElse(Sequential seq)
-  {
+
+  public void addElse(Sequential seq) {
     this.elselist.add(seq);
   }
 
@@ -243,8 +231,7 @@ public class TryCatch extends Task
    * 
    * @param cb
    */
-  public void addCatch(CatchBlock cb)
-  {
+  public void addCatch(CatchBlock cb) {
     this.catchlist.add(cb);
   }
 
@@ -253,93 +240,73 @@ public class TryCatch extends Task
    * 
    * @param seq
    */
-  public void addFinally(Sequential seq)
-  {
+  public void addFinally(Sequential seq) {
     this.finallylist.add(seq);
   }
 
   /**
    * Sets the property attribute.
    */
-  public void setProperty(String p)
-  {
+  public void setProperty(String p) {
     this.property = Static.trim2(p, this.property);
   }
 
   /**
    * Sets the reference attribute.
    */
-  public void setReference(String r)
-  {
+  public void setReference(String r) {
     this.reference = Static.trim2(r, this.reference);
   }
 
-  protected void saveit(Throwable e)
-  {
-    if (this.property != null)
-    {
+  protected void saveit(Throwable e) {
+    if (this.property != null) {
       getProject().setProperty(this.property, e.getMessage());
     }
-    if (this.reference != null)
-    {
+    if (this.reference != null) {
       getProject().addReference(this.reference, e);
     }
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Throwable thrown = null;
     Iterator it;
     Sequential S;
 
     it = this.trylist.iterator();
-    while (it.hasNext())
-    {
+    while (it.hasNext()) {
       S = (Sequential) it.next();
-      try
-      {
+      try {
         S.perform();
-      } catch (Throwable e)
-      {
+      } catch (Throwable e) {
         thrown = e;
         /* save exception for usage */
         saveit(e);
         break;
       }
     }
-    if (thrown != null)
-    {
+    if (thrown != null) {
       boolean executed = false;
       it = this.catchlist.iterator();
-      while (it.hasNext() && !executed)
-      {
+      while (it.hasNext() && !executed) {
         CatchBlock cb = (CatchBlock) it.next();
-        if (cb.match(thrown))
-        {
-          try
-          {
+        if (cb.match(thrown)) {
+          try {
             executed = true;
             thrown = null;
             cb.perform();
-          } catch (Throwable e)
-          {
+          } catch (Throwable e) {
             thrown = e;
             break;
           }
         }
       }
-    }
-    else
-    {
+    } else {
       it = this.elselist.iterator();
-      while (it.hasNext())
-      {
+      while (it.hasNext()) {
         S = (Sequential) it.next();
-        try
-        {
+        try {
           S.perform();
-        } catch (Throwable e)
-        {
+        } catch (Throwable e) {
           thrown = e;
           break;
         }
@@ -347,48 +314,38 @@ public class TryCatch extends Task
     }
 
     it = this.finallylist.iterator();
-    while (it.hasNext())
-    {
+    while (it.hasNext()) {
       S = (Sequential) it.next();
-      try
-      {
+      try {
         S.perform();
-      } catch (Throwable e)
-      {
-        // TODO: document, that any exception thrown in finally overrides
+      } catch (Throwable e) {
+        // TODO: document, that any exception thrown in finally
+        // overrides
         // any previous exception thrown!!
         thrown = e;
         break;
       }
     }
 
-    if (thrown != null)
-    {
+    if (thrown != null) {
       throw new BuildException(thrown);
     }
   }
 
-  static public void main(String[] args)
-  {
-    try
-    {
-      try
-      {
+  static public void main(String[] args) {
+    try {
+      try {
         throw new NullPointerException();
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         System.err.println("throwing catch ..");
         throw new BuildException("catch");
-      } finally
-      {
-        if (true)
-        {
+      } finally {
+        if (true) {
           System.err.println("throwing fianlly ..");
           throw new BuildException("finally");
         }
       }
-    } catch (Exception ex)
-    {
+    } catch (Exception ex) {
       System.err.println(ex);
     }
 

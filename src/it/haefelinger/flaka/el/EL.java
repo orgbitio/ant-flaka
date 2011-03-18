@@ -56,40 +56,33 @@ import de.odysseus.el.tree.impl.ast.AstText;
  * @author geronimo
  * 
  */
-public final class EL
-{
+public final class EL {
   Context context = null;
   ExpressionFactory factory = null;
   boolean debug = false;
   Project project = null; // TODO: remove me
 
   @SuppressWarnings("unused")
-  private EL()
-  {/* unused */
+  private EL() {/* unused */
   }
 
-  public EL(Project project)
-  {
+  public EL(Project project) {
     init(project);
   }
 
-  static public class MyParser extends Parser
-  {
+  static public class MyParser extends Parser {
     protected List<AstNode> list = new ArrayList<AstNode>();
     protected List<Exception> errors = new ArrayList<Exception>();
 
-    public MyParser(Builder builder, String expression)
-    {
+    public MyParser(Builder builder, String expression) {
       super(builder, expression);
     }
 
-    protected Scanner createScanner(String expression)
-    {
+    protected Scanner createScanner(String expression) {
       return new MyScanner(expression);
     }
 
-    protected boolean sym(Symbol s)
-    {
+    protected boolean sym(Symbol s) {
       return getToken().getSymbol() == s;
     }
 
@@ -109,31 +102,29 @@ public final class EL
      * 
      * @see de.odysseus.el.tree.impl.Parser#eval(boolean, boolean)
      */
-    protected void exprref()
-    {
+    protected void exprref() {
       int start;
 
       // remember where we are
       start = this.scanner.getPosition();
 
-      try
-      {
-        if (sym(Symbol.START_EVAL_DYNAMIC))
-        {
+      try {
+        if (sym(Symbol.START_EVAL_DYNAMIC)) {
           /*
            * Eat up everything till and inclusive '}'. We have to do this via
            * consumeToken() to advance the scanner's position.
            */
           trytoken();
 
-          if (sym(Symbol.EOF) || sym(Symbol.END_EVAL))
-          {
+          if (sym(Symbol.EOF) || sym(Symbol.END_EVAL)) {
             int len, end, delta, size;
             String text;
 
-            // We have do do some math here to calculate the position of '}'.
+            // We have do do some math here to calculate the
+            // position of '}'.
             len = this.scanner.getInput().length();
-            // This is how much the scanner may have advanced meanwhile ..
+            // This is how much the scanner may have advanced
+            // meanwhile ..
             delta = this.scanner.getPosition() - start;
             // This token's size (don't use length of image)
             size = getToken().getSize();
@@ -152,8 +143,7 @@ public final class EL
           return;
         }
 
-        if (sym(Symbol.START_EVAL_DEFERRED))
-        {
+        if (sym(Symbol.START_EVAL_DEFERRED)) {
           AstNode node;
           trytoken();
 
@@ -161,8 +151,7 @@ public final class EL
            * If the next token is "}", then we have found an empty #{} reference
            * and we simply ignore this empty reference.
            */
-          if (sym(Symbol.END_EVAL))
-          {
+          if (sym(Symbol.END_EVAL)) {
             return;
           }
 
@@ -170,19 +159,15 @@ public final class EL
            * Otherwise we are at the start of an expression and we are going to
            * consume it now.
            */
-          try
-          {
+          try {
             node = new AstEval(expr(true), true);
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             handleEx(e);
             recover();
             return;
           }
 
-          if (!sym(Symbol.END_EVAL))
-          {
+          if (!sym(Symbol.END_EVAL)) {
             /* we should have seen this by now .. */
             syntaxerror("expected " + q("}"), start);
             recover();
@@ -196,9 +181,7 @@ public final class EL
         /* serious error here, cause we expect here "#{..}" or "${..}" */
         syntaxerror("expected " + q("${}") + " or " + q("#{}"), start);
         recover();
-      }
-      finally
-      {
+      } finally {
         trytoken();
       }
     }
@@ -210,8 +193,7 @@ public final class EL
      * this mode, the scanner will simply move forward until character '}' is
      * seen.
      */
-    protected void recover()
-    {
+    protected void recover() {
       MyScanner scanner;
 
       scanner = (MyScanner) this.scanner;
@@ -220,13 +202,11 @@ public final class EL
         trytoken();
     }
 
-    protected String q(String s)
-    {
+    protected String q(String s) {
       return "`" + (s == null ? "" : s) + "'";
     }
 
-    protected void syntaxerror(String expected, int start)
-    {
+    protected void syntaxerror(String expected, int start) {
       String input, substring, near;
       int end;
       final int history = 5;
@@ -242,12 +222,12 @@ public final class EL
       near = input.substring(start, Math.min(start + 3, input.length()));
 
       TreeBuilderException tbe;
-      tbe = new TreeBuilderException(substring, 0, "", "", expected + " near " + q(near));
+      tbe = new TreeBuilderException(substring, 0, "", "", expected + " near "
+          + q(near));
       this.errors.add(tbe);
     }
 
-    protected Tree maketree(AstNode node, boolean deferred)
-    {
+    protected Tree maketree(AstNode node, boolean deferred) {
       return new Tree(node, getFunctions(), getIdentifiers(), deferred);
     }
 
@@ -261,16 +241,12 @@ public final class EL
      * the internal node list. In addition, the next token will be consumed from
      * the stream.
      */
-    protected void trytext()
-    {
-      try
-      {
+    protected void trytext() {
+      try {
         AstNode node = null;
         if ((node = text()) != null)
           this.list.add(node);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         handleEx(e);
       }
     }
@@ -284,35 +260,25 @@ public final class EL
      * is not supposed to throw any exceptions at all. Instead the scanner is
      * supposed to create a EOF token in case of problems.
      */
-    protected void trytoken()
-    {
-      try
-      {
+    protected void trytoken() {
+      try {
         consumeToken();
-      }
-      catch (ScanException se)
-      {
+      } catch (ScanException se) {
         // this is a serious error!!
         System.err.println("serious internal error");
         System.exit(1);
-      }
-      catch (ParseException pe)
-      {
+      } catch (ParseException pe) {
         handleEx(pe);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         handleEx(e);
       }
     }
 
-    protected void handleEx(Exception e)
-    {
+    protected void handleEx(Exception e) {
       this.errors.add(e);
     }
 
-    public Tree maketree()
-    {
+    public Tree maketree() {
 
       Tree tree;
       int sz;
@@ -327,57 +293,48 @@ public final class EL
       trytext();
 
       /* (expr text?) */
-      while (!sym(Symbol.EOF))
-      {
+      while (!sym(Symbol.EOF)) {
         exprref();
         trytext();
       }
 
       sz = this.list.size();
-      switch (sz)
-      {
-        case 0:
-        {
-          AstNode t;
-          t = new AstNull();
-          tree = maketree(t, false);
-          break;
-        }
-        case 1:
-        {
-          AstNode e;
-          e = this.list.get(0);
-          tree = maketree(e, true);
-          break;
-        }
-        default:
-        {
-          AstComposite composite = createAstComposite(this.list);
-          tree = maketree(composite, true);
-        }
+      switch (sz) {
+      case 0: {
+        AstNode t;
+        t = new AstNull();
+        tree = maketree(t, false);
+        break;
+      }
+      case 1: {
+        AstNode e;
+        e = this.list.get(0);
+        tree = maketree(e, true);
+        break;
+      }
+      default: {
+        AstComposite composite = createAstComposite(this.list);
+        tree = maketree(composite, true);
+      }
       }
       return tree;
     }
 
   }
 
-  static public class MyScanner extends Scanner
-  {
+  static public class MyScanner extends Scanner {
     public boolean recover = false;
 
-    public MyScanner(String expression)
-    {
+    public MyScanner(String expression) {
       super(expression);
     }
 
-    public String substring(int pos)
-    {
+    public String substring(int pos) {
       String input = this.getInput();
       return input.substring(pos);
     }
 
-    protected int forward()
-    {
+    protected int forward() {
       int p, l;
 
       p = this.getPosition();
@@ -389,13 +346,11 @@ public final class EL
        * or not. We are in a string if we have seen either ' or " once and not
        * \' or \".
        */
-      while (p < l && ('}' != this.getInput().charAt(p)))
-      {
+      while (p < l && ('}' != this.getInput().charAt(p))) {
         p += 1;
         /* counting, that's all I want */
       }
-      if (p < l)
-      {
+      if (p < l) {
         // eat '}'
         p += 1;
       }
@@ -405,8 +360,7 @@ public final class EL
     /**
      * string token
      */
-    protected Token nextString() throws ScanException
-    {
+    protected Token nextString() throws ScanException {
       int i, l, pos;
       char quote, c;
       Token token;
@@ -418,25 +372,22 @@ public final class EL
       l = this.getInput().length();
       token = null;
 
-      while (i < l)
-      {
+      while (i < l) {
         c = this.getInput().charAt(i++);
-        if (c == '\\')
-        {
+        if (c == '\\') {
           if (i == l)
-            throw new ScanException(pos, "unterminated string", quote + " or \\");
+            throw new ScanException(pos, "unterminated string", quote
+                + " or \\");
           c = this.getInput().charAt(i++);
           if (c == '\\' || c == quote)
             this.builder.append(c);
-          else
-          {
+          else {
             this.builder.append('\\');
             this.builder.append(c);
           }
           continue;
         }
-        if (c == quote)
-        {
+        if (c == quote) {
           token = token(Symbol.STRING, this.builder.toString(), i - pos);
           break;
         }
@@ -445,108 +396,112 @@ public final class EL
       }
 
       if (token == null)
-        throw new ScanException(pos, "unterminated string", String.valueOf(quote));
+        throw new ScanException(pos, "unterminated string",
+            String.valueOf(quote));
       return token;
     }
 
-    protected Token nextText() throws ScanException
-    {
+    protected Token nextText() throws ScanException {
       this.builder.setLength(0);
       int i = this.getPosition();
       int l = this.getInput().length();
       boolean escaped = false;
-      while (i < l)
-      {
+      while (i < l) {
         char c = this.getInput().charAt(i);
-        switch (c)
-        {
-          case '\\':
-            // If we are in state 'escaped' then take the previous character,
-            // which must be '\\' literally while staying in state 'escaped'.
-            // Otherwise:
-            // Just consume character '\' but do not take a decision what to
-            // do by now. It depends on the next character: being `#` or `$`,
-            // then there is good chance that it starts an eval-expr. See
-            // handling of those two chars below.
-            if (escaped)
-            {
-              this.builder.append('\\');
-            }
-            else
-            {
-              escaped = true;
-            }
-            break;
-          case '#':
-            // case '$':
-            // Let's first handle the regular case where we at the start of '#{'
-            // or '${'. If the current character is escaped, then add '#{' and
-            // '${' as literal-expr. Since the escape character is meaningfull
-            // for us here, we *consume* it, i.e. it will *not* be part of the
-            // literal-expr. If we are not escaped, then our current
-            // literal-expr ends before the current character.
-            if (i + 1 < l && this.getInput().charAt(i + 1) == '{')
-            {
-              if (escaped)
-              {
-                this.builder.append(c);
-                escaped = false;
-                break;
-              }
-              // we reached the end of the current literal-expr. Bail out ..
-              return makeText(i - this.getPosition());
-            }
-            // Handle the case where we have '#c' or '$c' and c is any other
-            // character than '{' or c is the EOF (or more appropriate, EOI, the
-            // end-of-input). Now, if we have '\#c' then we leave this as it is
-            // cause the escape char is not meaningful for us.
-            if (escaped)
-            {
-              this.builder.append('\\');
+        switch (c) {
+        case '\\':
+          // If we are in state 'escaped' then take the previous
+          // character,
+          // which must be '\\' literally while staying in state
+          // 'escaped'.
+          // Otherwise:
+          // Just consume character '\' but do not take a decision
+          // what to
+          // do by now. It depends on the next character: being `#` or
+          // `$`,
+          // then there is good chance that it starts an eval-expr.
+          // See
+          // handling of those two chars below.
+          if (escaped) {
+            this.builder.append('\\');
+          } else {
+            escaped = true;
+          }
+          break;
+        case '#':
+          // case '$':
+          // Let's first handle the regular case where we at the start
+          // of '#{'
+          // or '${'. If the current character is escaped, then add
+          // '#{' and
+          // '${' as literal-expr. Since the escape character is
+          // meaningfull
+          // for us here, we *consume* it, i.e. it will *not* be part
+          // of the
+          // literal-expr. If we are not escaped, then our current
+          // literal-expr ends before the current character.
+          if (i + 1 < l && this.getInput().charAt(i + 1) == '{') {
+            if (escaped) {
+              this.builder.append(c);
               escaped = false;
+              break;
             }
-            this.builder.append(c);
-            break;
-          default:
-            // Handle '\c', where c stands for any character except '\'. Then,
-            // append oth characters and mark the next character on the stream
-            // as not escaped.
-            if (escaped)
-            {
-              this.builder.append('\\');
-              escaped = false;
-            }
-            // Append character in any case.
-            this.builder.append(c);
+            // we reached the end of the current literal-expr. Bail
+            // out ..
+            return makeText(i - this.getPosition());
+          }
+          // Handle the case where we have '#c' or '$c' and c is any
+          // other
+          // character than '{' or c is the EOF (or more appropriate,
+          // EOI, the
+          // end-of-input). Now, if we have '\#c' then we leave this
+          // as it is
+          // cause the escape char is not meaningful for us.
+          if (escaped) {
+            this.builder.append('\\');
+            escaped = false;
+          }
+          this.builder.append(c);
+          break;
+        default:
+          // Handle '\c', where c stands for any character except '\'.
+          // Then,
+          // append oth characters and mark the next character on the
+          // stream
+          // as not escaped.
+          if (escaped) {
+            this.builder.append('\\');
+            escaped = false;
+          }
+          // Append character in any case.
+          this.builder.append(c);
         }
         i++;
       }
-      // Handle situation '\<EOF>`. Here we have seen '\' so far and marked it
-      // as escaped. Then we consumed EOF which terminates the loop. In that
+      // Handle situation '\<EOF>`. Here we have seen '\' so far and
+      // marked it
+      // as escaped. Then we consumed EOF which terminates the loop. In
+      // that
       // case we need to make sure that our character will made it.
-      if (escaped)
-      {
+      if (escaped) {
         this.builder.append('\\');
       }
       return makeText(i - this.getPosition());
     }
 
-    protected Token makeText(int length)
-    {
+    protected Token makeText(int length) {
       String buf = this.builder.toString();
       return token(Symbol.TEXT, buf, length);
     }
 
-    protected Token nextToken() throws ScanException
-    {
+    protected Token nextToken() throws ScanException {
       String text;
       Token token;
       token = getToken();
 
-      try
-      {
-        if (this.recover || (token != null && token.getSymbol() == Symbol.START_EVAL_DYNAMIC))
-        {
+      try {
+        if (this.recover
+            || (token != null && token.getSymbol() == Symbol.START_EVAL_DYNAMIC)) {
           int p, l;
           Symbol s;
 
@@ -557,49 +512,42 @@ public final class EL
           text = this.getInput().substring(this.getPosition(), Math.min(p, l));
           token = this.token(s, text, text.length());
           this.recover = false;
-        }
-        else
-        {
+        } else {
           token = super.nextToken();
         }
-      }
-      catch (ScanException se)
-      {
-        // Scan exceptions abort scanning. Rather than throwing an exception, we
-        // generate the EOF token. This allows the caller to consume tokens
+      } catch (ScanException se) {
+        // Scan exceptions abort scanning. Rather than throwing an
+        // exception, we
+        // generate the EOF token. This allows the caller to consume
+        // tokens
         // until EOF is seen.
         token = this.token(Symbol.EOF, "", 0);
         // TODO: print scan exception on log screen?
-        // 
+        //
       }
       return token;
     }
   }
 
-  static public class MyBuilder extends Builder
-  {
+  static public class MyBuilder extends Builder {
     private static final long serialVersionUID = 6510509119020544874L;
 
-    public MyBuilder()
-    {
+    public MyBuilder() {
       super(Builder.Feature.VARARGS);
     }
 
     /**
      * Parse expression.
      */
-    public Tree build(String expression)
-    {
+    public Tree build(String expression) {
       Tree tree = null;
       MyParser parser;
 
       parser = new MyParser(this, expression);
       tree = parser.maketree();
-      if (!parser.errors.isEmpty())
-      {
+      if (!parser.errors.isEmpty()) {
         for (@SuppressWarnings("unused")
-        Exception ex : parser.errors)
-        {
+        Exception ex : parser.errors) {
           // TODO: print on debug stream ..
           // System.err.println(ex.getMessage());
         }
@@ -609,8 +557,7 @@ public final class EL
 
   }
 
-  ExpressionFactory makefactory()
-  {
+  ExpressionFactory makefactory() {
     final String tc_key = "de.odysseus.el.misc.TypeConverter";
     final String tc_val = "it.haefelinger.flaka.el.TypeConverter";
     ExpressionFactory ef = null;
@@ -624,16 +571,14 @@ public final class EL
     return ef;
   }
 
-  Context makecontext()
-  {
+  Context makecontext() {
     Resolver res;
     res = new Resolver(this.project);
     res.debug = this.debug;
     return new Context(res);
   }
 
-  protected void init(Project project)
-  {
+  protected void init(Project project) {
     this.project = project; // TODO: remove me
     this.factory = makefactory();
     this.context = makecontext();
@@ -685,79 +630,58 @@ public final class EL
     funcdef("q", Functions.class, "quote", String.class);
   }
 
-  void vardef(String name, Object obj, Class clazz)
-  {
+  void vardef(String name, Object obj, Class clazz) {
     ValueExpression ve;
     ve = this.factory.createValueExpression(obj, clazz);
     this.context.setVariable(name, ve);
   }
 
-  void funcdef0(String name, Class clazz, String func)
-  {
-    try
-    {
+  void funcdef0(String name, Class clazz, String func) {
+    try {
       Method method;
       method = clazz.getMethod(func);
       this.context.setFunction("", name, method);
-    }
-    catch (NoSuchMethodException nsm)
-    {
+    } catch (NoSuchMethodException nsm) {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
 
-  void funcdef(String name, Class clazz, String func, Class arg)
-  {
-    try
-    {
+  void funcdef(String name, Class clazz, String func, Class arg) {
+    try {
       Method method;
       method = clazz.getMethod(func, arg);
       this.context.setFunction("", name, method);
-    }
-    catch (NoSuchMethodException nsm)
-    {
+    } catch (NoSuchMethodException nsm) {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
 
-  void funcdef2(String name, Class clazz, String func, Class arg1, Class arg2)
-  {
-    try
-    {
+  void funcdef2(String name, Class clazz, String func, Class arg1, Class arg2) {
+    try {
       Method method;
       method = clazz.getMethod(func, arg1, arg2);
       this.context.setFunction("", name, method);
-    }
-    catch (NoSuchMethodException nsm)
-    {
+    } catch (NoSuchMethodException nsm) {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
 
-  void funcdefv(String name, Class clazz, String func, Class arg)
-  {
-    try
-    {
+  void funcdefv(String name, Class clazz, String func, Class arg) {
+    try {
       Method method;
       method = clazz.getMethod(func, new Class[] { arg });
       this.context.setFunction("", name, method);
-    }
-    catch (NoSuchMethodException nsm)
-    {
+    } catch (NoSuchMethodException nsm) {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
 
-  void funcdef1v(String name, Class clazz, String func, Class arg)
-  {
-    try
-    {
+  void funcdef1v(String name, Class clazz, String func, Class arg) {
+    try {
       Method method;
       method = clazz.getMethod(func, new Class[] { arg, Object[].class });
       this.context.setFunction("", name, method);
-    }
-    catch (NoSuchMethodException nsm)
-    {
+    } catch (NoSuchMethodException nsm) {
       Static.error(this.project, "no such method:" + nsm);
     }
   }
@@ -772,84 +696,69 @@ public final class EL
    * step and finally stringizing and concatening all objects into the final
    * string.
    */
-  Object eval(String expr, Class clazz)
-  {
+  Object eval(String expr, Class clazz) {
     Object obj = null;
     ValueExpression ve = null;
     // TODO: necessary?
     if (expr == null || expr.matches("\\s*"))
       return null;
-    try
-    {
+    try {
       ve = this.factory.createValueExpression(this.context, expr, clazz);
       obj = ve.getValue(this.context);
-    }
-    catch (TreeBuilderException tbe)
-    {
+    } catch (TreeBuilderException tbe) {
       // TODO: error handling
       // System.err.println(tbe.getMessage());
-    }
-    catch (ELException ele)
-    {
+    } catch (ELException ele) {
       // System.err.println(ele.getMessage());
     }
     return obj;
   }
 
-  public Object toobj(String expr)
-  {
+  public Object toobj(String expr) {
     return eval(expr, Object.class);
   }
 
-  public File tofile(String expr)
-  {
+  public File tofile(String expr) {
     Object obj;
     obj = eval(expr, File.class);
     return (File) obj;
   }
 
-  public String tostr(String expr)
-  {
+  public String tostr(String expr) {
     Object obj;
     obj = eval(expr, String.class);
     if (obj == null)
       return "";
     if (!(obj instanceof String))
       return obj.toString();
-    if (obj.getClass().isArray())
-    {
+    if (obj.getClass().isArray()) {
       String[] arr = (String[]) obj;
       return Arrays.toString(arr);
     }
     return (String) obj;
   }
 
-  public boolean tobool(String expr)
-  {
+  public boolean tobool(String expr) {
     Object obj;
     obj = eval(expr, Boolean.class);
     return obj instanceof Boolean ? ((Boolean) obj).booleanValue() : false;
   }
 
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
-    try
-    {
+    try {
       Method method;
-      method = Functions.class.getMethod("list", new Class[] { Object[].class });
+      method = Functions.class
+          .getMethod("list", new Class[] { Object[].class });
       Object obj;
       Object[] argv = { new Object[] { "foo", "bar" } };
       obj = method.invoke(null, argv);
       List L = (List) obj;
       Iterator I = L.iterator();
-      while (I.hasNext())
-      {
+      while (I.hasNext()) {
         // System.err.println("=>" + I.next());
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       // System.err.println("error: " + e);
     }
   }

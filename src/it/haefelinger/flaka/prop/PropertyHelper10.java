@@ -8,20 +8,18 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 
-public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper implements IFPropertyHelper
-{
+public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper
+    implements IFPropertyHelper {
   protected Project project;
   protected boolean enabled = true;
-  
+
   @SuppressWarnings("deprecation")
-  public void setProject(Project project)
-  {
+  public void setProject(Project project) {
     PropertyHelper otherhelper;
     super.setProject(project);
     this.project = project;
     otherhelper = PropertyHelper.getPropertyHelper(project);
-    if (otherhelper == this)
-    {
+    if (otherhelper == this) {
       throw new BuildException("uups, Ant's interface changed again.");
     }
     this.setNext(otherhelper);
@@ -30,101 +28,88 @@ public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper implem
   public Project getProject() {
     return this.project;
   }
-  
+
   public boolean enable(boolean b) {
     boolean c = this.enabled;
     this.enabled = b;
     return c;
   }
-  
-  protected Hashtable getInternalInheritedProperties()
-  {
+
+  protected Hashtable getInternalInheritedProperties() {
     /* should not be called */
     return null;
   }
 
-  protected Hashtable getInternalProperties()
-  {
+  protected Hashtable getInternalProperties() {
     /* should not be called */
     return null;
   }
 
-  protected Hashtable getInternalUserProperties()
-  {
+  protected Hashtable getInternalUserProperties() {
     /* should not be called */
     return null;
   }
 
   @SuppressWarnings("deprecation")
-  public void copyInheritedProperties(Project other)
-  {
+  public void copyInheritedProperties(Project other) {
     getNext().copyInheritedProperties(other);
   }
 
   @SuppressWarnings("deprecation")
-  public void copyUserProperties(Project other)
-  {
+  public void copyUserProperties(Project other) {
     getNext().copyUserProperties(other);
   }
 
   @SuppressWarnings("deprecation")
-  public Hashtable getProperties()
-  {
+  public Hashtable getProperties() {
     return getNext().getProperties();
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized Object getProperty(String ns, String name)
-  {
+  public synchronized Object getProperty(String ns, String name) {
     return getNext().getProperty(ns, name);
   }
 
   @SuppressWarnings("deprecation")
-  public Object getPropertyHook(String ns, String name, boolean user)
-  {
+  public Object getPropertyHook(String ns, String name, boolean user) {
     return getNext().getPropertyHook(ns, name, user);
   }
 
   @SuppressWarnings("deprecation")
-  public Hashtable getUserProperties()
-  {
+  public Hashtable getUserProperties() {
     return getNext().getUserProperties();
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized Object getUserProperty(String ns, String name)
-  {
+  public synchronized Object getUserProperty(String ns, String name) {
     return getNext().getUserProperty(ns, name);
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized void setInheritedProperty(String ns, String name, Object value)
-  {
+  public synchronized void setInheritedProperty(String ns, String name,
+      Object value) {
     getNext().setInheritedProperty(ns, name, value);
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized void setNewProperty(String ns, String name, Object value)
-  {
+  public synchronized void setNewProperty(String ns, String name, Object value) {
     getNext().setNewProperty(ns, name, value);
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized boolean setProperty(String ns, String name, Object value, boolean verbose)
-  {
+  public synchronized boolean setProperty(String ns, String name, Object value,
+      boolean verbose) {
     return getNext().setProperty(ns, name, value, verbose);
   }
 
   @SuppressWarnings("deprecation")
-  public boolean setPropertyHook(String ns, String name, Object value, boolean inherited,
-      boolean user, boolean isNew)
-  {
+  public boolean setPropertyHook(String ns, String name, Object value,
+      boolean inherited, boolean user, boolean isNew) {
     return getNext().setPropertyHook(ns, name, value, inherited, user, isNew);
   }
 
   @SuppressWarnings("deprecation")
-  public synchronized void setUserProperty(String ns, String name, Object value)
-  {
+  public synchronized void setUserProperty(String ns, String name, Object value) {
     this.getNext().setUserProperty(ns, name, value);
   }
 
@@ -135,8 +120,8 @@ public class PropertyHelper10 extends org.apache.tools.ant.PropertyHelper implem
    *      java.lang.String, java.util.Hashtable)
    */
   @SuppressWarnings("deprecation")
-  public String replaceProperties(String ns, String text, Hashtable keys) throws BuildException
-  {
+  public String replaceProperties(String ns, String text, Hashtable keys)
+      throws BuildException {
     PropertyHelper next;
     Project project;
 

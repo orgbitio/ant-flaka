@@ -28,46 +28,38 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Unset extends Task
-{
+public class Unset extends Task {
   protected TextReader tr = new TextReader();
 
-  public void setComment(String comment)
-  {
+  public void setComment(String comment) {
     this.tr.setCL(comment);
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIcs(String s)
-  {
+  public void setIcs(String s) {
     // TODO: document me
     this.tr.setIC(s);
   }
 
-  public void setCL(boolean b)
-  {
+  public void setCL(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
-  
-  public void addText(String text)
-  {
+
+  public void addText(String text) {
     this.tr.setText(text);
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
     String line;
 
     project = getProject();
-    while ((line = this.tr.readLine()) != null)
-    {
+    while ((line = this.tr.readLine()) != null) {
       line = line.trim();
       line = project.replaceProperties(line);
 

@@ -33,14 +33,12 @@ import org.apache.tools.ant.taskdefs.condition.ConditionBase;
  * @author merzedes
  * @since 1.0
  */
-public class Fail extends Exit
-{
+public class Fail extends Exit {
   protected String test;
   protected boolean havemsg = false;
   protected boolean dosuper = false;
 
-  public void setMessage(String msg)
-  {
+  public void setMessage(String msg) {
     Project project = getProject();
     msg = project.replaceProperties(msg);
     msg = Static.elresolve(project, msg);
@@ -48,8 +46,7 @@ public class Fail extends Exit
     this.havemsg = true;
   }
 
-  public void addText(String msg)
-  {
+  public void addText(String msg) {
     Project project = getProject();
     msg = project.replaceProperties(msg);
     msg = Static.elresolve(project, msg);
@@ -57,46 +54,38 @@ public class Fail extends Exit
     this.havemsg = true;
   }
 
-  public void setTest(String expr)
-  {
+  public void setTest(String expr) {
     this.test = Static.elresolve(getProject(), expr);
   }
 
-  public void setIf(String s)
-  {
+  public void setIf(String s) {
     this.dosuper = true;
     super.setIf(s);
   }
 
-  public void setUnless(String s)
-  {
+  public void setUnless(String s) {
     this.dosuper = true;
     super.setUnless(s);
   }
 
-  public ConditionBase createCondition()
-  {
+  public ConditionBase createCondition() {
     this.dosuper = true;
     return super.createCondition();
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
 
     /* standard behaviour */
-    if (this.test == null)
-    {
+    if (this.test == null) {
       super.execute();
       return;
     }
 
     project = getProject();
-    if (Static.el2bool(project,this.test))
-    {
+    if (Static.el2bool(project, this.test)) {
       /* Set a nice message if not set */
-      if (this.havemsg == false)
-      {
+      if (this.havemsg == false) {
         this.setMessage("test(\"" + this.test + "\") => true");
       }
       /*

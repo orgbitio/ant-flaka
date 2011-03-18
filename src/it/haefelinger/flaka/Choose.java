@@ -29,40 +29,32 @@ import org.apache.tools.ant.taskdefs.Sequential;
  * @author merzedes
  * @since 1.0
  */
-public class Choose extends Task
-{
+public class Choose extends Task {
   protected List whenlist;
   protected Sequential otherwise;
 
-  protected List caselist()
-  {
-    if (this.whenlist == null)
-    {
+  protected List caselist() {
+    if (this.whenlist == null) {
       this.whenlist = new ArrayList();
     }
     return this.whenlist;
   }
 
-  public void addWhen(When task)
-  {
+  public void addWhen(When task) {
     if (task != null)
       caselist().add(task);
   }
 
-  public void addUnless(Unless task)
-  {
+  public void addUnless(Unless task) {
     if (task != null)
       caselist().add(task);
   }
 
-  public void addOtherwise(Sequential task) throws BuildException
-  {
-    if (task == null)
-    {
+  public void addOtherwise(Sequential task) throws BuildException {
+    if (task == null) {
       return;
     }
-    if (this.otherwise != null)
-    {
+    if (this.otherwise != null) {
       throwbx("<otherwise/> clause already used.");
       return;
     }
@@ -70,14 +62,11 @@ public class Choose extends Task
     return;
   }
 
-  public void addDefault(Sequential task) throws BuildException
-  {
-    if (task == null)
-    {
+  public void addDefault(Sequential task) throws BuildException {
+    if (task == null) {
       return;
     }
-    if (this.otherwise != null)
-    {
+    if (this.otherwise != null) {
       throwbx("<otherwise/> clause already used.");
       return;
     }
@@ -85,36 +74,30 @@ public class Choose extends Task
     return;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     When when;
     /*
      * If we do not have some 'when' conditions but we have an otherwise we
      * execute the otherwise, otherwise we return silently.
      */
-    if (this.whenlist == null)
-    {
-      if (this.otherwise != null)
-      {
+    if (this.whenlist == null) {
+      if (this.otherwise != null) {
         this.otherwise.execute();
       }
       return;
     }
 
     /* execute the very fist 'when' that evaluates to 'true' */
-    for (int i = 0; i < this.whenlist.size(); ++i)
-    {
+    for (int i = 0; i < this.whenlist.size(); ++i) {
       when = (When) this.whenlist.get(i);
-      if (when.eval())
-      {
+      if (when.eval()) {
         when.exec();
         return;
       }
     }
 
     /* otherwise execute the otherwise task */
-    if (this.otherwise != null)
-    {
+    if (this.otherwise != null) {
       this.otherwise.execute();
     }
     return;

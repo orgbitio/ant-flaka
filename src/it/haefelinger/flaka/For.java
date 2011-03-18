@@ -36,24 +36,21 @@ import org.apache.tools.ant.TaskContainer;
  * @author merzedes
  * @since 1.0
  */
-public class For extends it.haefelinger.flaka.Task implements TaskContainer
-{
+public class For extends it.haefelinger.flaka.Task implements TaskContainer {
   protected String expr;
   protected String var;
   /** Optional Vector holding the nested tasks */
   protected Vector tasks = new Vector();
   protected Object saved = null;
 
-  public For()
-  {
+  public For() {
     super();
   }
 
   /**
    * The argument list to be iterated over.
    */
-  public void setIn(String expr)
-  {
+  public void setIn(String expr) {
     this.expr = Static.trim3(getProject(), expr, this.expr);
   }
 
@@ -61,50 +58,43 @@ public class For extends it.haefelinger.flaka.Task implements TaskContainer
    * Set the var attribute. This is the name of the macrodef attribute that gets
    * set for each iterator of the sequential element.
    */
-  public void setVar(String var)
-  {
+  public void setVar(String var) {
     this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void addTask(Task nestedTask)
-  {
+  public void addTask(Task nestedTask) {
     this.tasks.add(nestedTask);
   }
 
-  protected void rescue()
-  {
+  protected void rescue() {
     /* save variable (if existing) */
     // TODO: variables are not references
     this.saved = getProject().getReference(this.var);
   }
 
-  protected void restore()
-  {
+  protected void restore() {
     Static.assign(getProject(), this.var, this.saved, Static.VARREF);
   }
 
-  protected void exectasks(Object val) throws BuildException
-  {
+  protected void exectasks(Object val) throws BuildException {
     Iterator iter;
     Task task;
 
     Static.assign(getProject(), this.var, val, Static.VARREF);
     iter = this.tasks.iterator();
-    while (iter.hasNext())
-    {
+    while (iter.hasNext()) {
       task = (Task) iter.next();
       task.perform();
     }
   }
 
-  protected Iterator iterator()
-  {
+  protected Iterator iterator() {
     Iterator iter = null;
     Project project;
     Object obj;
 
     project = getProject();
-    obj = Static.el2obj(project,this.expr);
+    obj = Static.el2obj(project, this.expr);
 
     if (obj == null)
       return null;
@@ -115,7 +105,7 @@ public class For extends it.haefelinger.flaka.Task implements TaskContainer
     }
     // If we are a map, then we iterate over the keys.
     if (obj instanceof Map) {
-      Set keys = ((Map)obj).keySet();
+      Set keys = ((Map) obj).keySet();
       // Do not use `keys.iterator()` here otherwise we end up in
       // an concurrent modification exception.
       iter = Arrays.asList(keys.toArray()).iterator();
@@ -127,31 +117,25 @@ public class For extends it.haefelinger.flaka.Task implements TaskContainer
     return iter;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Iterator iter;
 
-    if (this.expr == null || this.var == null)
-    {
+    if (this.expr == null || this.var == null) {
       // TODO: debug message
       return;
     }
 
-    try
-    {
+    try {
       /* rescue variable `var` */
       rescue();
 
       /* iterate over each list item */
       iter = iterator();
-      while (iter != null && iter.hasNext())
-      {
-        try
-        {
+      while (iter != null && iter.hasNext()) {
+        try {
           /* exec all tasks using on current list item */
           exectasks(iter.next());
-        } catch (BuildException bx)
-        {
+        } catch (BuildException bx) {
           String s;
           s = bx.getMessage();
           /* we are looking for a special designed message */
@@ -167,8 +151,7 @@ public class For extends it.haefelinger.flaka.Task implements TaskContainer
           throw bx;
         }
       }
-    } finally
-    {
+    } finally {
       /* restore variable */
       restore();
     }

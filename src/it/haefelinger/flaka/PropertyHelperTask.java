@@ -32,22 +32,19 @@ import org.apache.tools.ant.PropertyHelper;
  * @since 1.0
  * 
  */
-public class PropertyHelperTask extends Task
-{
+public class PropertyHelperTask extends Task {
   protected String clazzname = "Helper10";
 
-  public void setClassname(String clazzname)
-  {
+  public void setClassname(String clazzname) {
     this.clazzname = Static.trim3(getProject(), clazzname, this.clazzname);
   }
 
   @SuppressWarnings("deprecation")
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Class clazz;
     Project project;
-    PropertyHelper ph,current;
- 
+    PropertyHelper ph, current;
+
     /* get my project */
     project = getProject();
 
@@ -59,8 +56,7 @@ public class PropertyHelperTask extends Task
       ph = (PropertyHelper) clazz.newInstance();
       ph.setProject(project);
       ph.setNext(current);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw new BuildException(e);
     }
 

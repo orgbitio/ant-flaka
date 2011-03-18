@@ -50,7 +50,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-
 import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
@@ -66,8 +65,7 @@ import org.w3c.dom.NodeList;
  * 
  */
 
-final public class Static
-{
+final public class Static {
   static final public String EL = "ant.el";
 
   static final public int VARREF = 0x1;
@@ -90,49 +88,41 @@ final public class Static
    *          must be either Static.VARREF, Static.PROPTY or Static.WRITEPROPTY
    * @return project
    */
-  final public static Project assign(Project project, String key, Object obj, int type)
-  {
+  final public static Project assign(Project project, String key, Object obj,
+      int type) {
     /* need a proper key */
     if (key == null || (key = key.trim()).equalsIgnoreCase(""))
       return project;
 
-    switch (type)
-    {
-      case Static.VARREF:
-      {
-        Map refs = project.getReferences();
-        if (obj != null)
-          refs.put(key, obj);
-        else
-          refs.remove(key);
-        break;
+    switch (type) {
+    case Static.VARREF: {
+      Map refs = project.getReferences();
+      if (obj != null)
+        refs.put(key, obj);
+      else
+        refs.remove(key);
+      break;
+    }
+    case Static.PROPTY: {
+      if (obj != null) {
+        String val = obj instanceof String ? (String) obj : obj.toString();
+        project.setNewProperty(key, val);
       }
-      case Static.PROPTY:
-      {
-        if (obj != null)
-        {
-          String val = obj instanceof String ? (String) obj : obj.toString();
-          project.setNewProperty(key, val);
-        }
-        break;
+      break;
+    }
+    case Static.WRITEPROPTY: {
+      if (obj != null) {
+        String val = obj instanceof String ? (String) obj : obj.toString();
+        project.setProperty(key, val);
+      } else {
+        Static.unset(project, key);
       }
-      case Static.WRITEPROPTY:
-      {
-        if (obj != null)
-        {
-          String val = obj instanceof String ? (String) obj : obj.toString();
-          project.setProperty(key, val);
-        } else
-        {
-          Static.unset(project, key);
-        }
-      }
+    }
     }
     return project;
   }
 
-  final public static void _log_(Project P, String msg, int type)
-  {
+  final public static void _log_(Project P, String msg, int type) {
     Project p = P;
     if (msg == null)
       return;
@@ -142,8 +132,7 @@ final public class Static
      * is used for the 'just-in-case' case. *
      **************************************************************************/
 
-    if (p == null)
-    {
+    if (p == null) {
       System.err.println(">> " + msg);
       return;
     }
@@ -152,207 +141,167 @@ final public class Static
     p.log(msg, type);
   }
 
-  final public static void log(Project P, String msg, Exception e)
-  {
+  final public static void log(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_INFO);
   }
 
-  final public static void log(Project P, String msg)
-  {
+  final public static void log(Project P, String msg) {
     log(P, msg, null);
   }
 
-  final public static void info(Project P, String msg, Exception e)
-  {
+  final public static void info(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_INFO);
   }
 
-  final public static void info(Project P, String msg)
-  {
+  final public static void info(Project P, String msg) {
     log(P, msg, null);
   }
 
-  final public static void verbose(Project P, String msg, Exception e)
-  {
+  final public static void verbose(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_VERBOSE);
   }
 
-  final public static void verbose(Project P, String msg)
-  {
+  final public static void verbose(Project P, String msg) {
     verbose(P, msg, null);
   }
 
-  final public static void debug(Project P, String msg, Exception e)
-  {
+  final public static void debug(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_DEBUG);
   }
 
-  final public static void debug(Project P, String msg)
-  {
+  final public static void debug(Project P, String msg) {
     debug(P, msg, null);
   }
 
-  final public static void error(Project P, String msg, Exception e)
-  {
+  final public static void error(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_ERR);
   }
 
-  final public static void error(Project P, String msg)
-  {
+  final public static void error(Project P, String msg) {
     error(P, msg, null);
   }
 
-  final public static void warning(Project P, String msg, Exception e)
-  {
+  final public static void warning(Project P, String msg, Exception e) {
     String m = msg;
     if (e != null)
       m += ": " + e.getMessage();
     _log_(P, m, Project.MSG_WARN);
   }
 
-  final public static void warning(Project P, String msg)
-  {
+  final public static void warning(Project P, String msg) {
     warning(P, msg, null);
   }
 
-  final public static void writex(File f, String buf, boolean append) throws IOException
-  {
+  final public static void writex(File f, String buf, boolean append)
+      throws IOException {
     FileWriter out = null;
-    try
-    {
+    try {
       out = new FileWriter(f, append);
       out.write(buf, 0, buf.length());
       out.flush();
-    } catch (IOException ioe)
-    {
+    } catch (IOException ioe) {
       String path = f.getAbsolutePath();
       debug(null, path + ": " + ioe.getMessage());
       throw ioe;
-    } finally
-    {
+    } finally {
       close(out);
     }
   }
 
-  final public static void close(Writer w)
-  {
+  final public static void close(Writer w) {
     /* silently close a writer */
-    if (w != null)
-    {
-      try
-      {
+    if (w != null) {
+      try {
         w.close();
-      } catch (IOException ioex)
-      {
+      } catch (IOException ioex) {
         // ignore
       }
     }
   }
 
-  final public static void close(OutputStream os)
-  {
+  final public static void close(OutputStream os) {
     if (os != null)
-      try
-      {
+      try {
         os.close();
-      } catch (IOException e)
-      {
+      } catch (IOException e) {
         /* ignored */
       }
   }
 
-  final public static void close(InputStream is)
-  {
+  final public static void close(InputStream is) {
     if (is != null)
-      try
-      {
+      try {
         is.close();
-      } catch (IOException e)
-      {
+      } catch (IOException e) {
         /* ignored */
       }
   }
 
-  final public static void close(Reader r)
-  {
+  final public static void close(Reader r) {
     if (r != null)
-      try
-      {
+      try {
         r.close();
-      } catch (IOException e)
-      {
+      } catch (IOException e) {
         /* ignored */
       }
   }
 
-  final public static int write(File name, String s, boolean mode)
-  {
+  final public static int write(File name, String s, boolean mode) {
     int r = 1;
-    try
-    {
+    try {
       writex(name, s, mode);
       r = 0;
-    } catch (Exception e)
-    { /* not used */
+    } catch (Exception e) { /* not used */
     }
     return r;
   }
 
-  final public static void writex(InputStream cin, String fname, boolean mode) throws IOException
-  {
+  final public static void writex(InputStream cin, String fname, boolean mode)
+      throws IOException {
     FileOutputStream out = null;
     byte[] buf = new byte[4098];
     int sz;
-    try
-    {
+    try {
       File f = new File(fname);
       out = new FileOutputStream(f.getAbsolutePath(), mode);
       sz = cin.read(buf);
-      while (sz >= 0)
-      {
+      while (sz >= 0) {
         out.write(buf, 0, sz);
         sz = cin.read(buf);
       }
-    } catch (IOException ioe)
-    {
+    } catch (IOException ioe) {
       throw ioe;
-    } finally
-    {
-      if (out != null)
-      {
-        try
-        {
+    } finally {
+      if (out != null) {
+        try {
           out.close();
-        } catch (IOException ioex)
-        {
+        } catch (IOException ioex) {
           // ignore
         }
       }
     }
   }
 
-  public static String readlines(Reader reader)
-  {
+  public static String readlines(Reader reader) {
     String r;
     StringBuilder b;
 
-    try
-    {
+    try {
       BufferedReader R;
       String L;
 
@@ -360,67 +309,55 @@ final public class Static
       R = new BufferedReader(reader);
       L = R.readLine();
 
-      while (L != null)
-      {
+      while (L != null) {
         b.append(L).append("\n");
         L = R.readLine();
       }
 
       R.close();
       r = b.toString();
-    } catch (IOException e)
-    {
+    } catch (IOException e) {
       r = null;
     }
     return r;
   }
 
-  final public static String readlines(InputStream src)
-  {
+  final public static String readlines(InputStream src) {
     String r = null;
     if (src != null)
       r = readlines(new InputStreamReader(src));
     return r;
   }
 
-  final public static String readlines(String src)
-  {
+  final public static String readlines(String src) {
     String r = null;
-    if (src != null)
-    {
-      try
-      {
+    if (src != null) {
+      try {
         r = readlines(new FileReader(src));
-      } catch (Exception e)
-      { /* not used */
+      } catch (Exception e) { /* not used */
       }
     }
     return r;
   }
 
-  final public static String readlines(File src)
-  {
+  final public static String readlines(File src) {
     String r = null;
     if (src != null)
       r = readlines(src.getPath());
     return r;
   }
 
-  final public static String[] bufread(String buf)
-  {
+  final public static String[] bufread(String buf) {
     if (buf != null)
       return split(buf, "\n");
     return null;
   }
 
-  final public static String[] bufread(File fname)
-  {
+  final public static String[] bufread(File fname) {
     return bufread(readlines(fname));
   }
 
- 
-  final static public String[] split(String v, String c)
-  {
+  final static public String[] split(String v, String c) {
     if (v == null)
       return null;
 
@@ -431,67 +368,54 @@ final public class Static
     j = 0;
     e = v.length();
 
-    while (i < e)
-    {
+    while (i < e) {
       j = v.indexOf(c, i);
-      if (j >= 0)
-      {
+      if (j >= 0) {
         L.addLast(v.substring(i, j));
         i = j + 1;
-      } else
-      {
+      } else {
         L.addLast(v.substring(i, e));
         i = e;
       }
     }
     String[] str = new String[L.size()];
-    for (i = 0; i < str.length; i++)
-    {
+    for (i = 0; i < str.length; i++) {
       str[i] = (String) L.get(i);
     }
     return str;
   }
 
- 
-
-  final static public String trimNonDigit(String V)
-  {
+  final static public String trimNonDigit(String V) {
     int i, e;
     char c;
     String v = V;
     i = 0;
     e = v.length();
-    while (i < e)
-    {
+    while (i < e) {
       c = v.charAt(i);
       if (Character.isDigit(c))
         break;
       i += 1;
     }
-    if (i < e)
-    {
+    if (i < e) {
       v = v.substring(i, e);
     }
     return v;
   }
 
-  final static public int contains(String v, char c)
-  {
+  final static public int contains(String v, char c) {
     int i, j, e, n;
 
     n = 0;
     i = 0;
     e = 0;
-    if (v != null)
-    {
+    if (v != null) {
       e = v.length();
-      while (i < e)
-      {
+      while (i < e) {
         j = v.indexOf(c, i);
         if (j < 0)
           i = e;
-        else
-        {
+        else {
           i = j + 1;
           n = n + 1;
         }
@@ -500,30 +424,25 @@ final public class Static
     return n;
   }
 
-  final static public String tag2ver(String V)
-  {
+  final static public String tag2ver(String V) {
     /* tag is given - derive `project.version' */
     // strip everything till first digit.
     String v = V;
     v = trimNonDigit(v);
 
-    if (contains(v, '-') >= 2)
-    {
+    if (contains(v, '-') >= 2) {
       return v.replace('-', '.');
     }
 
-    if (contains(v, '_') >= 2)
-    {
+    if (contains(v, '_') >= 2) {
       return v.replace('_', '.');
     }
 
-    if (contains(v, '-') >= 1)
-    {
+    if (contains(v, '-') >= 1) {
       return v.replace('-', '.');
     }
 
-    if (contains(v, '_') >= 1)
-    {
+    if (contains(v, '_') >= 1) {
       return v.replace('_', '.');
     }
 
@@ -534,8 +453,7 @@ final public class Static
   /**
    * Translates a given loc name in it's official dependency name.
    */
-  final static public String jar2var(String V)
-  {
+  final static public String jar2var(String V) {
     char c;
     String s;
     String v = V;
@@ -552,14 +470,11 @@ final public class Static
       return "";
 
     s = "";
-    for (int i = 0; i < v.length(); ++i)
-    {
+    for (int i = 0; i < v.length(); ++i) {
       c = v.charAt(i);
-      if (Character.isLetterOrDigit(c))
-      {
+      if (Character.isLetterOrDigit(c)) {
         s += Character.toUpperCase(c);
-      } else
-      {
+      } else {
         /* everything else gets mapped to '_' */
         s += '_';
       }
@@ -567,8 +482,7 @@ final public class Static
     return s;
   }
 
-  final public static String mkchrseq(String c, int n)
-  {
+  final public static String mkchrseq(String c, int n) {
     String s = "";
     /* terrible inefficient */
     for (int i = 0; i < n; ++i)
@@ -576,17 +490,14 @@ final public class Static
     return s;
   }
 
-  final public static String center(String S, int width, String chr)
-  {
+  final public static String center(String S, int width, String chr) {
     int w;
     String s = S;
     w = s.length();
 
-    if (w > width)
-    {
+    if (w > width) {
       s = s.substring(0, width);
-    } else
-    {
+    } else {
       int w1, w2;
       w1 = (width - w) / 2;
       w2 = width - w1 - w;
@@ -595,12 +506,11 @@ final public class Static
     return s;
   }
 
-  final public static String logo(String msg, int width)
-  {
+  final public static String logo(String msg, int width) {
     String s = "";
     String h;
 
-    h = (msg == null ? "Hello, Flaka" : msg );
+    h = (msg == null ? "Hello, Flaka" : msg);
 
     s += mkchrseq(":", width);
     s += '\n';
@@ -613,26 +523,21 @@ final public class Static
     return s;
   }
 
-  final public static String logo(String msg)
-  {
+  final public static String logo(String msg) {
     return logo(msg, 65);
   }
 
-  final public static void throwbx(String S)
-  {
+  final public static void throwbx(String S) {
     String s = S;
-    if (s == null)
-    {
+    if (s == null) {
       s = "(no reason given)";
     }
     throw new BuildException(s);
   }
 
-  final public static void throwbx(String S, Exception e)
-  {
+  final public static void throwbx(String S, Exception e) {
     String s = S;
-    if (s == null)
-    {
+    if (s == null) {
       s = "(no reason given)";
     }
     throw new BuildException(s + "," + e.getMessage(), e);
@@ -645,8 +550,7 @@ final public class Static
    * 1.1,1.0.9 => -1 1.0,1.1 => 1 1.1,1.1.0.1 => 1
    */
 
-  final public static int vercmp(String va, String vb)
-  {
+  final public static int vercmp(String va, String vb) {
     int i, na, nb;
     int a_i, b_i;
     String a_s, b_s;
@@ -670,8 +574,7 @@ final public class Static
     nb = b.length;
 
     // get the shortest length
-    if (na < nb)
-    {
+    if (na < nb) {
       // fill up a ..
       String[] y = new String[nb];
       String zero = "0";
@@ -683,8 +586,7 @@ final public class Static
         y[i] = zero;
       a = y;
     }
-    if (nb < na)
-    {
+    if (nb < na) {
       // fill up a ..
       String[] y = new String[na];
       String zero = "0";
@@ -699,37 +601,30 @@ final public class Static
     na = a.length;
     nb = b.length;
 
-    for (i = 0; i < na; ++i)
-    {
+    for (i = 0; i < na; ++i) {
       a_s = a[i];
       b_s = b[i];
 
-      try
-      {
+      try {
         a_i = Integer.parseInt(a_s);
         b_i = Integer.parseInt(b_s);
 
-        if (a_i < b_i)
-        {
+        if (a_i < b_i) {
           return -(i + 1);
         }
-        if (a_i > b_i)
-        {
+        if (a_i > b_i) {
           return (i + 1);
         }
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         /***********************************************************************
          * at least one section is not a integral number, so let's compare
          * lexicographically .. *
          **********************************************************************/
         int c = a_s.compareTo(b_s);
-        if (c < 0)
-        {
+        if (c < 0) {
           return -(i + 1);
         }
-        if (c > 0)
-        {
+        if (c > 0) {
           return (i + 1);
         }
       }
@@ -755,21 +650,18 @@ final public class Static
    * stem.
    */
 
-  final public static String getstem(String S) throws BuildException
-  {
+  final public static String getstem(String S) throws BuildException {
     String s = S;
     int i, j;
     char c;
 
     /* we need an argument at least to generate something */
-    if (s == null)
-    {
+    if (s == null) {
       return null;
     }
 
     j = s.lastIndexOf('/');
-    if (j >= 0)
-    {
+    if (j >= 0) {
       s = s.substring(j + 1);
     }
 
@@ -777,22 +669,19 @@ final public class Static
     s = s.trim();
 
     /* can't make a stem out of nothing either .. */
-    if (s.equals(""))
-    {
+    if (s.equals("")) {
       return null;
     }
 
     /* get index of first '.' */
     j = s.indexOf('.');
-    if (j < 0)
-    {
+    if (j < 0) {
       /* if there's no dot then we return argument as stem */
       /* example: 'abc_jar' => 'abc_jar' */
       return s;
     }
 
-    if (j == 0)
-    {
+    if (j == 0) {
       /* i.e. ".jar" */
       return null;
     }
@@ -800,23 +689,20 @@ final public class Static
     /* just to make javac happy */
     c = 'c';
 
-    for (i = j - 1; i >= 0; i--)
-    {
+    for (i = j - 1; i >= 0; i--) {
       c = s.charAt(i);
       if (!Character.isDigit(c))
         break;
     }
 
-    if (i < 0)
-    {
+    if (i < 0) {
       /* only digits left from "." */
       /* example: '123.jar' -> '123' */
       return s.substring(0, j);
     }
 
     /* have there been any digits at all ? */
-    if (i == (j - 1))
-    {
+    if (i == (j - 1)) {
       /* no digits found */
       /* example: 'a-.jar' -> 'a-' */
       return s.substring(0, j);
@@ -824,16 +710,14 @@ final public class Static
 
     /* ok, there a r e digits left of '.' */
     /* s[i] is not a digit and i>=0 */
-    if (c != '-')
-    {
+    if (c != '-') {
       /* (i+1) exists because there's a dot in "s" */
       /* 'a1.2.jar' -> 'a1' */
       return s.substring(0, (i + 1));
     }
 
     /* s[i] is a '-' and i>=0 */
-    if (i == 0)
-    {
+    if (i == 0) {
       /* '-1.jar' -> '-1' */
       return s.substring(0, j);
     }
@@ -842,14 +726,12 @@ final public class Static
     return s.substring(0, i);
   }
 
-  final public static void fcopy(File src, File dst) throws Exception
-  {
+  final public static void fcopy(File src, File dst) throws Exception {
     byte[] buffer = new byte[512];
     InputStream in = new FileInputStream(src);
     OutputStream out = new FileOutputStream(dst);
     int bytesRead = 0;
-    while ((bytesRead = in.read(buffer)) > 0)
-    {
+    while ((bytesRead = in.read(buffer)) > 0) {
       out.write(buffer, 0, bytesRead);
     }
     out.flush();
@@ -857,30 +739,27 @@ final public class Static
     out.close();
   }
 
-  final public static void copy(InputStream src, OutputStream dst) throws Exception
-  {
+  final public static void copy(InputStream src, OutputStream dst)
+      throws Exception {
     byte[] buffer;
     int n;
 
-    if (src == null)
-    {
+    if (src == null) {
       return;
     }
-    if (dst == null)
-    {
+    if (dst == null) {
       return;
     }
 
     buffer = new byte[5124];
-    while ((n = src.read(buffer)) > 0)
-    {
+    while ((n = src.read(buffer)) > 0) {
       dst.write(buffer, 0, n);
     }
     dst.flush();
   }
 
-  final public static String[] grep(Project project, String regexpr) throws Exception
-  {
+  final public static String[] grep(Project project, String regexpr)
+      throws Exception {
     String[] R;
     Pattern P;
     Matcher M;
@@ -894,40 +773,35 @@ final public class Static
 
     verbose(project, "grepping properties matching `" + regexpr + "' ..");
 
-    while (E.hasMoreElements())
-    {
+    while (E.hasMoreElements()) {
       String k, v;
 
       k = (String) E.nextElement();
       M = P.matcher(k);
 
-      if (M.matches() == false)
-      {
+      if (M.matches() == false) {
         // verbose("key `" + k + "' does not match ..");
         continue;
       }
 
       v = project.getProperty(k);
-      if (v == null)
-      {
+      if (v == null) {
         debug(project, "undefined property `" + k + "' skipped.");
         continue;
       }
       v = v.trim();
-      if (v.equals(""))
-      {
+      if (v.equals("")) {
         debug(project, "empty property `" + k + "' skipped.");
         continue;
       }
       /* check on unresolved references */
-      if (v.contains("${"))
-      {
+      if (v.contains("${")) {
         debug(project, "unresolved property `" + k + "' skipped.");
         continue;
       }
       // finally!
-      verbose(project, "property `" + k + "' matches regexpr `" + regexpr + "', grepping `" + v
-          + "'.");
+      verbose(project, "property `" + k + "' matches regexpr `" + regexpr
+          + "', grepping `" + v + "'.");
       L.add(k + "=" + v);
     }
 
@@ -940,52 +814,46 @@ final public class Static
   }
 
   final static public Method methodbyname(Class C, String name, Class[] type)
-      throws NoSuchMethodException, SecurityException
-  {
+      throws NoSuchMethodException, SecurityException {
     return C.getDeclaredMethod(name, type);
   }
 
-  final static public Object invoke(Object obj, String name, Class type[], Object[] args)
-      throws Exception
-  {
+  final static public Object invoke(Object obj, String name, Class type[],
+      Object[] args) throws Exception {
     Method M;
     M = methodbyname(obj.getClass(), name, type);
     return M.invoke(obj, args);
   }
 
-  final static public Field fieldbyname(Class clazz, String name)
-  {
+  final static public Field fieldbyname(Class clazz, String name) {
     Field F = null;
     Class C = clazz;
-    while ((C != null) && (F == null))
-    {
-      try
-      {
+    while ((C != null) && (F == null)) {
+      try {
         F = C.getDeclaredField(name);
-      } catch (NoSuchFieldException e)
-      {
+      } catch (NoSuchFieldException e) {
         C = C.getSuperclass();
       }
     }
     return F;
   }
 
-  final static public Object getattr(Object obj, String name) throws IllegalAccessException
-  {
+  final static public Object getattr(Object obj, String name)
+      throws IllegalAccessException {
     Field F;
     F = fieldbyname(obj.getClass(), name);
     return F.get(obj);
   }
 
-  final static public void setattr(Object obj, String name, Object val) throws IllegalAccessException
-  {
+  final static public void setattr(Object obj, String name, Object val)
+      throws IllegalAccessException {
     Field F;
     F = fieldbyname(obj.getClass(), name);
     F.set(obj, val);
   }
 
-  final static public Object valueof(Object obj, String name) throws IllegalAccessException
-  {
+  final static public Object valueof(Object obj, String name)
+      throws IllegalAccessException {
     Field F;
     F = fieldbyname(obj.getClass(), name);
     F.setAccessible(true);
@@ -1008,22 +876,18 @@ final public class Static
    * @return true in case key could be removed from Hashtable denoted * by
    *         attribute <code>att</code>.
    */
-  final static public boolean htabremove(org.apache.tools.ant.PropertyHelper obj, String att, String key)
-  {
+  final static public boolean htabremove(
+      org.apache.tools.ant.PropertyHelper obj, String att, String key) {
     boolean b = false;
-    if (obj != null)
-    {
+    if (obj != null) {
       Hashtable tab;
-      try
-      {
+      try {
         tab = (Hashtable) Static.valueof(obj, att);
-        if (tab != null)
-        {
+        if (tab != null) {
           tab.remove(key);
           b = true;
         }
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         /* don't care */
       }
     }
@@ -1032,56 +896,46 @@ final public class Static
 
   /**
    * tests whether class <code>obj</code> is a subclass of <code>
-   ** base</code>. * *
+   * * base</code>. * *
    * 
    * @return true if clazz is a subclass of base (or equals base).
    */
 
-  static final public boolean issubclass(Class clazz, Class base)
-  {
+  static final public boolean issubclass(Class clazz, Class base) {
     return clazz != null && base != null && base.isAssignableFrom(clazz);
   }
 
-  static final public ComponentHelper comphelper(Project P)
-  {
+  static final public ComponentHelper comphelper(Project P) {
     return ComponentHelper.getComponentHelper(P);
   }
 
-  static final public AntTypeDefinition compdef(Project project,String property) {
+  static final public AntTypeDefinition compdef(Project project, String property) {
     return Static.comphelper(project).getDefinition(property);
   }
-  
+
   /** shortcut to create a component */
-  static final public Object makecomp(Project P, String s)
-  {
+  static final public Object makecomp(Project P, String s) {
     return comphelper(P).createComponent(s);
   }
 
   /** shortcut to get a component's class */
-  static final public Class getclass(Project P, String s)
-  {
+  static final public Class getclass(Project P, String s) {
     return comphelper(P).getComponentClass(s);
   }
 
+  static final public boolean isproperty(Project P, String property) {
+    return property(P, property) == null ? false : true;
+  }
 
-  static final public boolean isproperty(Project P, String property)
-  {
-    return property(P,property) == null ? false : true;
+  static final public boolean isreference(Project P, String id) {
+    return reference(P, id) == null ? false : true;
   }
-  
-  
-  static final public boolean isreference(Project P, String id)
-  {
-    return reference(P,id) == null ? false : true;
-  }
-  
-  static final public boolean istarget(Project P, String s)
-  {
+
+  static final public boolean istarget(Project P, String s) {
     return P.getTargets().containsKey(s);
   }
 
-  static final public boolean istask(Project P, String s)
-  {
+  static final public boolean istask(Project P, String s) {
     Class clazz;
     boolean b = false;
     /** check whether we are a macro or a task */
@@ -1090,10 +944,9 @@ final public class Static
     return b;
   }
 
-  final static public boolean istaskdef(Project P, String s)
-  {
+  final static public boolean istaskdef(Project P, String s) {
     boolean b = false;
-    /** check whether we are a taskdef but not a macrodef  */
+    /** check whether we are a taskdef but not a macrodef */
     Class C = getclass(P, s);
     boolean b1, b2;
     b1 = issubclass(C, org.apache.tools.ant.taskdefs.MacroInstance.class);
@@ -1101,9 +954,8 @@ final public class Static
     b = b2 && !b1;
     return b;
   }
-  
-  final static public boolean ismacrodef(Project P, String s)
-  {
+
+  final static public boolean ismacrodef(Project P, String s) {
     boolean b = false;
     /** check whether we are a macrodef */
     Class C = getclass(P, s);
@@ -1111,54 +963,44 @@ final public class Static
     return b;
   }
 
-  
-  static final public String property(Project P, String property)
-  {
+  static final public String property(Project P, String property) {
     return P.getProperty(property);
   }
-  
-  static final public Object reference(Project P, String id)
-  {
+
+  static final public Object reference(Project P, String id) {
     return P.getReference(id);
   }
 
-  static final public Object target(Project project,String property)
-  {
+  static final public Object target(Project project, String property) {
     return project.getTargets().get(property);
   }
- 
-  static final public AntTypeDefinition taskdef(Project project,String property)
-  {
-    return istaskdef(project,property) ? compdef(project, property) : null;
+
+  static final public AntTypeDefinition taskdef(Project project, String property) {
+    return istaskdef(project, property) ? compdef(project, property) : null;
   }
-  
-  static final public AntTypeDefinition macrodef(Project project,String property)
-  {
-    return ismacrodef(project,property) ? compdef(project, property) : null;
+
+  static final public AntTypeDefinition macrodef(Project project,
+      String property) {
+    return ismacrodef(project, property) ? compdef(project, property) : null;
   }
-  
-  static final public AntTypeDefinition task(Project project,String property)
-  {
-    return istask(project,property) ? compdef(project, property) : null;
+
+  static final public AntTypeDefinition task(Project project, String property) {
+    return istask(project, property) ? compdef(project, property) : null;
   }
-  
-  static final public Object type(Project project,String property)
-  {
+
+  static final public Object type(Project project, String property) {
     Object obj = null;
     obj = project.getDataTypeDefinitions().get(property);
     return obj;
   }
-  
-  static final public Object filter(Project project,String property)
-  {
+
+  static final public Object filter(Project project, String property) {
     Object obj = null;
     obj = project.getGlobalFilterSet().getFilterHash().get(property);
     return obj;
   }
-  
- 
-  final static public String patternAsRegex(String glob)
-  {
+
+  final static public String patternAsRegex(String glob) {
     char c;
     int i, j, n;
     String r;
@@ -1167,49 +1009,45 @@ final public class Static
     n = glob.length();
     r = "";
 
-    while (i < n)
-    {
+    while (i < n) {
       c = glob.charAt(i++);
-      switch (c)
-      {
-        case '*':
-          r += ".*";
-          break;
-        case '?':
-          r += '.';
-          break;
-        case '[':
-          j = i;
-          if (j < n && glob.charAt(j) == '!')
-            j = j + 1;
-          if (j < n && glob.charAt(j) == ']')
-            j = j + 1;
-          while (j < n && glob.charAt(j) != ']')
-            j = j + 1;
+      switch (c) {
+      case '*':
+        r += ".*";
+        break;
+      case '?':
+        r += '.';
+        break;
+      case '[':
+        j = i;
+        if (j < n && glob.charAt(j) == '!')
+          j = j + 1;
+        if (j < n && glob.charAt(j) == ']')
+          j = j + 1;
+        while (j < n && glob.charAt(j) != ']')
+          j = j + 1;
 
-          if (j >= n)
-            r = r + "\\[";
-          else
-          {
-            String s;
-            s = substring(glob, i, j);
-            s = replace(s, '\\', "\\\\");
-            switch (s.charAt(0))
-            {
-              case '!':
-                s = "^" + substring(s, i, j);
-                break;
-              case '^':
-                s = '\\' + s;
-                break;
-            }
-            r = r + "[" + s + "]";
-            i = j + 1;
+        if (j >= n)
+          r = r + "\\[";
+        else {
+          String s;
+          s = substring(glob, i, j);
+          s = replace(s, '\\', "\\\\");
+          switch (s.charAt(0)) {
+          case '!':
+            s = "^" + substring(s, i, j);
+            break;
+          case '^':
+            s = '\\' + s;
+            break;
           }
-          break;
-        default:
-          r = r + escape("" + c, '\\');
-          break;
+          r = r + "[" + s + "]";
+          i = j + 1;
+        }
+        break;
+      default:
+        r = r + escape("" + c, '\\');
+        break;
       }
     }
     return r;
@@ -1222,13 +1060,11 @@ final public class Static
    * @param s
    *          not null
    */
-  final static protected String escape(String s, char esc)
-  {
+  final static protected String escape(String s, char esc) {
     String r = "";
     char c;
 
-    for (int i = 0; i < s.length(); ++i)
-    {
+    for (int i = 0; i < s.length(); ++i) {
       c = s.charAt(i);
       if (Character.isLetterOrDigit(c) == false)
         r += esc;
@@ -1249,8 +1085,7 @@ final public class Static
    * @return <code>c</code> if <code>c</code> is alpanumeric character otherwise
    *         return <code>esc</code>.
    */
-  final static protected String escape(char c, char esc)
-  {
+  final static protected String escape(char c, char esc) {
     return "" + (Character.isLetterOrDigit(c) ? c : esc);
   }
 
@@ -1261,12 +1096,10 @@ final public class Static
    * @param s
    *          not null
    */
-  final static protected String replace(String s, char c, String sub)
-  {
+  final static protected String replace(String s, char c, String sub) {
     char x;
     String r = "";
-    for (int i = 0; i < s.length(); ++i)
-    {
+    for (int i = 0; i < s.length(); ++i) {
       x = s.charAt(i);
       if (x == c)
         r += sub;
@@ -1285,18 +1118,15 @@ final public class Static
    * @param s
    *          not null
    */
-  final static protected String substring(String s, int i, int J)
-  {
+  final static protected String substring(String s, int i, int J) {
     String r = null;
     int L;
     int j = J;
-    try
-    {
+    try {
       L = s.length();
       j = (j <= i) ? i : (j > L) ? L : j;
       r = s.substring(i, j);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       System.err.println("this should never happen ..");
     }
     return r;
@@ -1309,35 +1139,33 @@ final public class Static
    *          character to test *
    * @return true if printable
    */
-  final public static boolean isprintable(char c)
-  {
+  final public static boolean isprintable(char c) {
     int type;
     boolean retv;
 
     retv = false;
     type = Character.getType(c);
 
-    switch (type)
-    {
-      case Character.COMBINING_SPACING_MARK:
-      case Character.CONNECTOR_PUNCTUATION:
-      case Character.CURRENCY_SYMBOL:
-      case Character.DASH_PUNCTUATION:
-      case Character.DECIMAL_DIGIT_NUMBER:
-      case Character.ENCLOSING_MARK:
-      case Character.END_PUNCTUATION:
-      case Character.LOWERCASE_LETTER:
-      case Character.MATH_SYMBOL:
-      case Character.MODIFIER_SYMBOL:
-      case Character.NON_SPACING_MARK:
-      case Character.OTHER_LETTER:
-      case Character.OTHER_PUNCTUATION:
-      case Character.OTHER_SYMBOL:
-      case Character.SPACE_SEPARATOR:
-      case Character.START_PUNCTUATION:
-      case Character.TITLECASE_LETTER:
-      case Character.UPPERCASE_LETTER:
-        retv = true;
+    switch (type) {
+    case Character.COMBINING_SPACING_MARK:
+    case Character.CONNECTOR_PUNCTUATION:
+    case Character.CURRENCY_SYMBOL:
+    case Character.DASH_PUNCTUATION:
+    case Character.DECIMAL_DIGIT_NUMBER:
+    case Character.ENCLOSING_MARK:
+    case Character.END_PUNCTUATION:
+    case Character.LOWERCASE_LETTER:
+    case Character.MATH_SYMBOL:
+    case Character.MODIFIER_SYMBOL:
+    case Character.NON_SPACING_MARK:
+    case Character.OTHER_LETTER:
+    case Character.OTHER_PUNCTUATION:
+    case Character.OTHER_SYMBOL:
+    case Character.SPACE_SEPARATOR:
+    case Character.START_PUNCTUATION:
+    case Character.TITLECASE_LETTER:
+    case Character.UPPERCASE_LETTER:
+      retv = true;
     }
     return retv;
   }
@@ -1351,8 +1179,7 @@ final public class Static
    * @return true if non-binary character.
    */
 
-  final public static boolean istext(char c)
-  {
+  final public static boolean istext(char c) {
     return isprintable(c) || Character.isWhitespace(c);
   }
 
@@ -1365,13 +1192,11 @@ final public class Static
    * @return true if non-binary character.
    */
 
-  final public static boolean isbinary(char c)
-  {
+  final public static boolean isbinary(char c) {
     return !istext(c);
   }
 
-  final static public String trim3(Project project, String s, String otherwise)
-  {
+  final static public String trim3(Project project, String s, String otherwise) {
     if (s != null && s.indexOf('#') >= 0)
       s = Static.elresolve(project, s);
     return trim2(s, otherwise);
@@ -1385,21 +1210,18 @@ final public class Static
    * would be returned after trimming down, the alternative
    */
 
-  final static public String trim2(String s, String otherwise)
-  {
+  final static public String trim2(String s, String otherwise) {
     String r;
     /* assign default return value */
     r = otherwise;
-    if (s != null && s.length() > 0)
-    {
+    if (s != null && s.length() > 0) {
       char c1, c2;
 
       c1 = s.charAt(0);
       c2 = s.charAt(s.length() - 1);
       r = s;
       /* trim if there is something to trim down */
-      if (Character.isWhitespace(c1) || Character.isWhitespace(c2))
-      {
+      if (Character.isWhitespace(c1) || Character.isWhitespace(c2)) {
         r = s.trim();
         /* trimming down may have lead to an empty string */
         if (r.length() <= 0)
@@ -1409,21 +1231,17 @@ final public class Static
     return r;
   }
 
-  final static public boolean empty(String s)
-  {
+  final static public boolean empty(String s) {
     return s == null ? true : s.length() <= 0;
   }
 
-  final static public boolean isEmpty(String s)
-  {
+  final static public boolean isEmpty(String s) {
     return (s == null) || s.matches("\\s*");
   }
 
-  final static public String cat(Project P, File file)
-  {
+  final static public String cat(Project P, File file) {
     String buf = null;
-    if (P != null && file != null)
-    {
+    if (P != null && file != null) {
       buf = Static.readlines(file);
       if (buf != null)
         P.log(buf);
@@ -1431,35 +1249,28 @@ final public class Static
     return buf;
   }
 
-  final static public Document xmldoc(File file) throws Exception
-  {
+  final static public Document xmldoc(File file) throws Exception {
     return Static.getxmldoc(new FileInputStream(file));
   }
 
-  final static public Element loadxml(Project P, File file)
-  {
+  final static public Element loadxml(Project P, File file) {
     Element r = null;
-    try
-    {
+    try {
       Document d;
       d = xmldoc(file);
       r = d.getDocumentElement();
-    } catch (IOException e)
-    {
+    } catch (IOException e) {
       String path = file.getAbsolutePath();
-      if (file.exists() == false)
-      {
+      if (file.exists() == false) {
         Static.debug(P, path + " does not exist.");
         return null;
       }
-      if (file.isFile() == false)
-      {
+      if (file.isFile() == false) {
         Static.debug(P, path + " not a loc.");
         return null;
       }
       Static.debug(P, path + ": " + e.getMessage());
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       String path = file.getAbsolutePath();
       String mesg = path + ": " + e.getMessage();
       Static.debug(P, mesg);
@@ -1468,8 +1279,7 @@ final public class Static
     return r;
   }
 
-  final static public String stripEmptyLines(String buf)
-  {
+  final static public String stripEmptyLines(String buf) {
     final Pattern p = Pattern.compile("\\s*$", Pattern.MULTILINE);
     Matcher m = p.matcher(buf);
     return m.replaceAll("");
@@ -1480,8 +1290,7 @@ final public class Static
    * 
    * @param source
    */
-  final protected static void tidyxml(DOMSource source)
-  {
+  final protected static void tidyxml(DOMSource source) {
     Node current = null;
     String cv = null;
     Node next = null;
@@ -1491,29 +1300,23 @@ final public class Static
     NodeList nlist = root.getChildNodes().item(0).getChildNodes();
 
     int i = 0;
-    while (i < nlist.getLength() - 1)
-    {
+    while (i < nlist.getLength() - 1) {
       current = nlist.item(i);
       cv = current.getNodeValue();
       next = nlist.item(i + 1);
       nv = next.getNodeValue();
-      if (cv != null && cv.equals("\n\t") && nv != null && nv.equals("\n\t"))
-      {
+      if (cv != null && cv.equals("\n\t") && nv != null && nv.equals("\n\t")) {
         root.getChildNodes().item(0).removeChild(next);
-      } else
-      {
+      } else {
         i++;
       }
     }
   }
 
-  final static public String flushxml(Project P, Element root, StringBuilder buf)
-  {
+  final static public String flushxml(Project P, Element root, StringBuilder buf) {
     String s = null;
-    if (P != null && root != null)
-    {
-      try
-      {
+    if (P != null && root != null) {
+      try {
         DOMSource source = new DOMSource(root.getOwnerDocument());
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer tr = tf.newTransformer();
@@ -1525,8 +1328,7 @@ final public class Static
         s = stripEmptyLines(sw.toString());
         if (buf != null)
           buf.append(s);
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         s = null;
         Static.debug(P, "error transforming XML document: " + e.getMessage());
       }
@@ -1534,27 +1336,23 @@ final public class Static
     return s;
   }
 
-  final static public String flushxml(Project P, Element root, File file)
-  {
+  final static public String flushxml(Project P, Element root, File file) {
     String s = null;
-    if (P != null && root != null && file != null)
-    {
+    if (P != null && root != null && file != null) {
       s = flushxml(P, root, (StringBuilder) null);
 
       /* create loc */
-      try
-      {
+      try {
         Static.writex(file, s, false);
-      } catch (IOException e)
-      {
+      } catch (IOException e) {
         throw new BuildException(e);
       }
     }
     return s;
   }
 
-  final static public String nodeattribute(Node node, String name, String otherwise)
-  {
+  final static public String nodeattribute(Node node, String name,
+      String otherwise) {
     NamedNodeMap attributes;
 
     if (node == null || name == null)
@@ -1564,23 +1362,19 @@ final public class Static
     if (attributes == null)
       return otherwise;
 
-    for (int i = 0; i < attributes.getLength(); ++i)
-    {
+    for (int i = 0; i < attributes.getLength(); ++i) {
       String s;
       Node attr;
 
       attr = attributes.item(i);
-      if (attr == null)
-      {
+      if (attr == null) {
         continue;
       }
       s = attr.getNodeName();
-      if (s == null)
-      {
+      if (s == null) {
         continue;
       }
-      if (s.equalsIgnoreCase(name))
-      {
+      if (s.equalsIgnoreCase(name)) {
         s = attr.getNodeValue();
         if (s != null)
           s = s.trim();
@@ -1590,8 +1384,7 @@ final public class Static
     return otherwise;
   }
 
-  final static public Document getxmldoc(InputStream stream) throws Exception
-  {
+  final static public Document getxmldoc(InputStream stream) throws Exception {
     Document doc = null;
     DocumentBuilderFactory dbf = null;
     DocumentBuilder db = null;
@@ -1604,13 +1397,11 @@ final public class Static
     return doc;
   }
 
-  final static public boolean isregexchar(char c)
-  {
+  final static public boolean isregexchar(char c) {
     return c == '/';
   }
 
-  final static public boolean ispatternchar(char c)
-  {
+  final static public boolean ispatternchar(char c) {
     return c == '%';
   }
 
@@ -1628,15 +1419,13 @@ final public class Static
    * characters above, then a pattern expression is assumed.</li>
    * </ul>
    */
-  final static public Pattern patterncompile(String S, int f)
-  {
+  final static public Pattern patterncompile(String S, int f) {
     char c1, c2;
     Pattern P = null;
     String s = S;
     int sz = s.length();
 
-    if (sz > 1)
-    {
+    if (sz > 1) {
       c1 = s.charAt(0);
       c2 = s.charAt(sz - 1);
 
@@ -1646,91 +1435,82 @@ final public class Static
       if (c1 != c2 || ispatternchar(c1))
         s = Static.patternAsRegex(s);
     }
-    try
-    {
+    try {
       P = Pattern.compile(s, f);
-    } catch (Exception e)
-    {
-      try
-      {
+    } catch (Exception e) {
+      try {
         P = Pattern.compile(Static.patternAsRegex(s), f);
-      } catch (Exception ex)
-      {
+      } catch (Exception ex) {
         System.err.println("** exception: " + ex);
       }
     }
     return P;
   }
 
-//  /**
-//   * Checks whether EL is enabled on project.
-//   * 
-//   * To disable EL, property (not reference) "ant.el" must be explicitly set to
-//   * <code>false</code>.
-//   */
-//  final static public boolean shaveEL(Project project)
-//  {
-//    String p = project.getProperty(Static.EL);
-//    return p == null ? true : (p.matches("false") ? false : true);
-//  }
+  // /**
+  // * Checks whether EL is enabled on project.
+  // *
+  // * To disable EL, property (not reference) "ant.el" must be explicitly set
+  // to
+  // * <code>false</code>.
+  // */
+  // final static public boolean shaveEL(Project project)
+  // {
+  // String p = project.getProperty(Static.EL);
+  // return p == null ? true : (p.matches("false") ? false : true);
+  // }
 
   /**
    * Resolve embedded EL references in <code>text</code>.
    * 
-   * Text can be an arbitrary text containing one or more references
-   * to EL expressions {@code #{..}}. Resolving a reference means 
-   * that the embedded EL expression is evaluated into an object and
-   * stringized in a second step. 
+   * Text can be an arbitrary text containing one or more references to EL
+   * expressions {@code # ..} . Resolving a reference means that the embedded EL
+   * expression is evaluated into an object and stringized in a second step.
    */
-  final static public String elresolve(Project project, String text)
-  {
+  final static public String elresolve(Project project, String text) {
     EL ctxref = el(project);
     return ctxref == null ? text : ctxref.tostr(text);
   }
-  
+
   /**
    * Evaluate EL expression in a string context.
    * 
    * The given expression is evaluated and in a second step stringized.
    */
-  final static public String el2str(Project project, String expr)
-  {
+  final static public String el2str(Project project, String expr) {
     EL ctxref = el(project);
-    return ctxref == null ? expr : ctxref.tostr("#{"+expr+"}");
+    return ctxref == null ? expr : ctxref.tostr("#{" + expr + "}");
   }
 
   /**
-  * Evaluate EL expression.
-  * 
-  * The expression given must be a native EL expression not containing any
-  * embedded {@code #{}} references. The expression is simply evaluated and
-  * not coerced.
+   * Evaluate EL expression.
+   * 
+   * The expression given must be a native EL expression not containing any
+   * embedded {@code # references. The expression is simply evaluated and not
+   * coerced.
+
    */
-  final static public Object el2obj(Project project, String expr)
-  {
+  final static public Object el2obj(Project project, String expr) {
     EL ctxref = el(project);
-    return ctxref == null ? expr : ctxref.toobj("#{"+expr+"}");
+    return ctxref == null ? expr : ctxref.toobj("#{" + expr + "}");
   }
 
-  
-  final static public File el2file(Project project, String expr)
-  {
+  final static public File el2file(Project project, String expr) {
     EL ctxref = el(project);
-    expr = "#{" + (expr == null ? "''" : expr)+"}";
+    expr = "#{" + (expr == null ? "''" : expr) + "}";
     return ctxref == null ? null : ctxref.tofile(expr);
   }
-  
+
   /**
    * Evaluate a EL expression in a boolean context.
    * 
-   * Important: The expr given is evaluated as true EL expression. Thus 
-   * it may not contain EL references like {@code #{..}}.
+   * Important: The expr given is evaluated as true EL expression. Thus it may
+   * not contain EL references like {@code # ..} .
    */
-  final static public boolean el2bool(Project project, String expr)
-  {
+  final static public boolean el2bool(Project project, String expr) {
     EL ctxref = el(project);
     // TODO: match expr for 'true/false' if ctxref == null?
-    expr = "#{" + (expr == null ? "false" : expr)+"}";
+    expr = "#{" + (expr == null ? "false" : expr) + "}";
     return ctxref == null ? false : ctxref.tobool(expr);
   }
 
@@ -1742,40 +1522,32 @@ final public class Static
    * function <code>haveEL(project)</code> returns true. Otherwise the behaviour
    * is undefined.
    */
-  final static private EL el(Project project)
-  {
+  final static private EL el(Project project) {
     EL ctxref = null;
 
-    try
-    {
+    try {
       ctxref = (EL) project.getReference(Static.EL);
-      if (ctxref == null)
-      {
+      if (ctxref == null) {
         ctxref = new EL(project);
         project.addReference(Static.EL, ctxref);
         ctxref = (EL) project.getReference(Static.EL);
       }
-    } catch (NullPointerException npe)
-    {
+    } catch (NullPointerException npe) {
       System.err.println("internal error, el(null) called.");
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       error(project, q(Static.EL) + " references unexpected object");
     }
     return ctxref;
   }
 
-  final static public String q(String s)
-  {
-    if (s != null)
-    {
+  final static public String q(String s) {
+    if (s != null) {
       s = "\"" + s + "\"";
     }
     return s;
   }
 
-  static final public File toFile(Project project, String s)
-  {
+  static final public File toFile(Project project, String s) {
     File f;
 
     if (s != null)
@@ -1783,37 +1555,31 @@ final public class Static
     if (s == null || s.matches("\\s*"))
       return project.getBaseDir();
 
-    if (s.matches("\\.\\.?"))
-    {
+    if (s.matches("\\.\\.?")) {
       return new File(s);
     }
 
     f = new File(s);
-    if (f.isAbsolute() == false)
-    {
+    if (f.isAbsolute() == false) {
       f = project.getBaseDir();
       f = new File(f, s);
     }
     return f;
   }
 
-  
   @SuppressWarnings("deprecation")
-  static final public Project unset(Project project, String... properties)
-  {
+  static final public Project unset(Project project, String... properties) {
     Object obj;
     org.apache.tools.ant.PropertyHelper ph;
-   
+
     obj = project.getReference("ant.PropertyHelper");
-    ph = (org.apache.tools.ant.PropertyHelper)obj;
-    
-    /* ID #1, loop over all property handlers when removing
-     * a property. 
+    ph = (org.apache.tools.ant.PropertyHelper) obj;
+
+    /*
+     * ID #1, loop over all property handlers when removing a property.
      */
-    while (ph != null)
-    {
-      for (String name : properties)
-      {
+    while (ph != null) {
+      for (String name : properties) {
         Static.htabremove(ph, "properties", name);
         Static.htabremove(ph, "userProperties", name);
       }
@@ -1821,16 +1587,14 @@ final public class Static
     }
     return project;
   }
-  
-  static final public int bitset(int bitset,int bit,boolean on)
-  {
+
+  static final public int bitset(int bitset, int bit, boolean on) {
     if (on) {
       bitset |= bit;
-    }
-    else {
+    } else {
       bitset &= (~bit);
     }
     return bitset;
   }
-  
+
 }

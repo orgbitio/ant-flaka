@@ -34,13 +34,11 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class Continue extends Break
-{
+public class Continue extends Break {
   final static public String TOKEN = "%%cOnT1NuE%%";
   final static protected BuildException EXCEPTION = new BuildException(TOKEN);
 
-  protected void fail()
-  {
+  protected void fail() {
     throw EXCEPTION;
   }
 }

@@ -3,16 +3,14 @@ package it.haefelinger.flaka.el;
 import java.util.regex.Matcher;
 
 /**
- * The sole purpose of this class is to answer questions on
- * <em>properties</em> asked by a resolver, usually a bean resolver (hence the
- * name BeanMatcher).
+ * The sole purpose of this class is to answer questions on <em>properties</em>
+ * asked by a resolver, usually a bean resolver (hence the name BeanMatcher).
  * 
  * 
  * @author merzedes
  * @since 1.0
  */
-public class MatcherBean
-{
+public class MatcherBean {
   final Matcher m;
   final int index;
 
@@ -21,9 +19,8 @@ public class MatcherBean
     this.m = null;
     this.index = 0;
   }
-  
-  public MatcherBean(Matcher m,int index)
-  {
+
+  public MatcherBean(Matcher m, int index) {
     this.m = m;
     this.index = index;
   }
@@ -31,52 +28,47 @@ public class MatcherBean
   public Matcher getMatcher() {
     return this.m;
   }
-  
-  public int getStart()
-  {
+
+  public int getStart() {
     return this.m.start(this.index);
   }
-  public int getS()
-  {
+
+  public int getS() {
     return getStart();
   }
-  public int getEnd()
-  {
+
+  public int getEnd() {
     return this.m.end(this.index);
   }
-  public int getE()
-  {
+
+  public int getE() {
     return getEnd();
   }
-  public String getPattern()
-  {
+
+  public String getPattern() {
     return this.m.pattern().pattern();
   }
-  public String getP()
-  {
+
+  public String getP() {
     return getPattern();
   }
 
-  public int getGroups()
-  {
+  public int getGroups() {
     return this.m.groupCount();
   }
 
-  public int getN()
-  {
+  public int getN() {
     return getGroups();
   }
 
-  public int getLength()
-  {
+  public int getLength() {
     return getGroups();
   }
 
-  public int getSize()
-  {
+  public int getSize() {
     return getGroups();
   }
-  
+
   public String toString() {
     return this.m.group(this.index);
   }

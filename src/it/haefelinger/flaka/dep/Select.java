@@ -23,11 +23,9 @@ import it.haefelinger.flaka.util.Static;
 import java.io.File;
 import java.util.regex.Pattern;
 
-
 import org.apache.tools.ant.types.selectors.BaseSelector;
 
-public class Select extends BaseSelector
-{
+public class Select extends BaseSelector {
   final static protected short GLOB = 1;
   final static protected short REGEX = 2;
 
@@ -63,8 +61,7 @@ public class Select extends BaseSelector
    * 
    * @param s
    */
-  public void setRefid(String s)
-  {
+  public void setRefid(String s) {
     this.refid = Static.trim2(s, this.refid);
   }
 
@@ -74,91 +71,73 @@ public class Select extends BaseSelector
    * 
    * @param s
    */
-  public void setRef(String s)
-  {
+  public void setRef(String s) {
     setRefid(s);
   }
 
-  public void setGlob(boolean b)
-  {
+  public void setGlob(boolean b) {
     this.glob = b;
   }
 
-  public void setInvert(boolean b)
-  {
+  public void setInvert(boolean b) {
     this.invert = b;
   }
 
-  public void setCaseSensitive(boolean b)
-  {
-    if (b)
-    {
+  public void setCaseSensitive(boolean b) {
+    if (b) {
       // turn CASE_INSENSITIVE off
       this.flags &= ~Pattern.CASE_INSENSITIVE;
-    } else
-    {
+    } else {
       // turn CASE_INSENSITIVE on
       this.flags |= Pattern.CASE_INSENSITIVE;
     }
   }
 
-  public void setIgnore(boolean b)
-  {
+  public void setIgnore(boolean b) {
     setCaseSensitive(!b);
   }
 
-  public void setIgnoreCase(boolean b)
-  {
+  public void setIgnoreCase(boolean b) {
     setIgnore(b);
   }
 
-  public void setAlias(String s)
-  {
+  public void setAlias(String s) {
     this.alias_regex = Static.trim2(s, this.alias_regex);
   }
 
-  public void setName(String s)
-  {
+  public void setName(String s) {
     setAlias(s);
   }
 
-  public void setScope(String s)
-  {
+  public void setScope(String s) {
     this.scope_regex = Static.trim2(s, this.scope_regex);
   }
 
-  public void setBasename(String s)
-  {
+  public void setBasename(String s) {
     this.bname_regex = Static.trim2(s, this.bname_regex);
   }
 
-  public void setType(String s)
-  {
+  public void setType(String s) {
     this.type_regex = Static.trim2(s, this.type_regex);
   }
 
-  public void setGroupid(String s)
-  {
+  public void setGroupid(String s) {
     this.gid_regex = Static.trim2(s, this.gid_regex);
   }
 
-  public void setGroup(String s)
-  {
+  public void setGroup(String s) {
     setGroupid(s);
   }
 
-  public void setGroupname(String s)
-  {
+  public void setGroupname(String s) {
     setGroupid(s);
   }
 
-  public void setPath(String s)
-  {
+  public void setPath(String s) {
     this.path_regex = s;
   }
 
-  public void setVersion(String s)
-  {
+  public void setVersion(String s) {
     this.version_regex = Static.trim2(s, this.version_regex);
   }
 
@@ -170,10 +149,8 @@ public class Select extends BaseSelector
    * pattern objects.
    */
 
-  protected void init()
-  {
-    if (this.needsinit)
-    {
+  protected void init() {
+    if (this.needsinit) {
       /* precompile regular expressions */
       this.alias = compile(this.alias_regex);
       this.scope = compile(this.scope_regex);
@@ -191,13 +168,11 @@ public class Select extends BaseSelector
    * return <code>s</code> as reference.
    */
 
-  protected Object getref(String s)
-  {
+  protected Object getref(String s) {
     return getProject().getReference(s);
   }
 
-  protected Object getref()
-  {
+  protected Object getref() {
     return getref(this.refid);
   }
 
@@ -208,59 +183,47 @@ public class Select extends BaseSelector
    * @return nil if <code>s</code> can't be translated.
    */
 
-  final protected Pattern compile(String S)
-  {
+  final protected Pattern compile(String S) {
     String s = S;
     Pattern P = null;
-    if (s != null && s.trim().length() > 0)
-    {
-      try
-      {
-        if (this.glob)
-        {
+    if (s != null && s.trim().length() > 0) {
+      try {
+        if (this.glob) {
           s = Static.patternAsRegex(s);
           P = Pattern.compile(s, this.flags);
-        } else
-        {
+        } else {
           P = Static.patterncompile(s, this.flags);
         }
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         this.errmsg = e.toString();
       }
     }
     return P;
   }
 
-  final protected Dependency[] getdeps()
-  {
+  final protected Dependency[] getdeps() {
     Object ref;
     /* lookup reference */
     ref = getref();
 
-    if (ref == null)
-    {
+    if (ref == null) {
       return null;
     }
 
-    if (!(ref instanceof Dependency[]))
-    {
+    if (!(ref instanceof Dependency[])) {
       return null;
     }
 
     return (Dependency[]) ref;
   }
 
-  final protected Dependency haveDependency(String filename)
-  {
+  final protected Dependency haveDependency(String filename) {
     Dependency[] deps = getdeps();
 
-    if (deps != null && filename != null)
-    {
+    if (deps != null && filename != null) {
       String fname;
 
-      for (int i = 0; i < deps.length; ++i)
-      {
+      for (int i = 0; i < deps.length; ++i) {
         fname = deps[i].basename();
         if (fname.equals(filename))
           return deps[i];
@@ -282,8 +245,7 @@ public class Select extends BaseSelector
    * 
    */
 
-  final protected boolean match(Pattern regex, String s)
-  {
+  final protected boolean match(Pattern regex, String s) {
     boolean b;
 
     b = true;
@@ -309,8 +271,7 @@ public class Select extends BaseSelector
    * dependency, then the matching dependency must also match that regular
    * expression.
    */
-  public boolean isSelected(File basedir, String filename, File file)
-  {
+  public boolean isSelected(File basedir, String filename, File file) {
     Dependency d;
     boolean r;
     if (this.needsinit)
@@ -321,8 +282,7 @@ public class Select extends BaseSelector
     return this.invert ? !r : r;
   }
 
-  public boolean hasattribs()
-  {
+  public boolean hasattribs() {
     if (this.alias != null)
       return true;
 
@@ -348,8 +308,7 @@ public class Select extends BaseSelector
    * @param d
    *          not null
    */
-  protected boolean match(Dependency d)
-  {
+  protected boolean match(Dependency d) {
     boolean r = true;
 
     /* match if not attributes given */
@@ -359,8 +318,7 @@ public class Select extends BaseSelector
     if (r && this.alias != null)
       r = match(this.alias, d.getAlias());
 
-    if (r && this.scope != null)
-    {
+    if (r && this.scope != null) {
       String[] scope;
       scope = d.getScope();
       r = false;

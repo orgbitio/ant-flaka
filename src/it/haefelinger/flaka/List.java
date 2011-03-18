@@ -31,80 +31,67 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class List extends Task
-{
+public class List extends Task {
   protected String var;
   protected java.util.List list = new ArrayList();
   protected TextReader tr = new TextReader();
 
-  public void setComment(String s)
-  {
+  public void setComment(String s) {
     this.tr.setCL(s);
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIcs(String s)
-  {
+  public void setIcs(String s) {
     // TODO: document me
     this.tr.setIC(s);
   }
 
-  public void setCL(boolean b)
-  {
+  public void setCL(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
 
-  public void setVar(String var)
-  {
+  public void setVar(String var) {
     this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void addText(String text)
-  {
+  public void addText(String text) {
     this.tr.setText(text);
   }
 
-  protected void append(Object obj)
-  {
+  protected void append(Object obj) {
     this.list.add(obj);
   }
 
-  public java.util.List eval() throws BuildException
-  {
+  public java.util.List eval() throws BuildException {
     Project project;
     String line;
     Object obj;
 
-    if (this.tr.getText() != null)
-    {
+    if (this.tr.getText() != null) {
       /* start evaluation text */
       project = this.getProject();
 
       /* read line by line */
-      while ((line = this.tr.readLine()) != null)
-      {
+      while ((line = this.tr.readLine()) != null) {
         line = project.replaceProperties(line);
 
         /* resolve all EL references #{ ..} */
         line = Static.elresolve(project, line);
 
-        try
-        {
+        try {
           if (this.el)
             obj = Static.el2obj(project, line);
           else
             obj = line.trim();
           append(obj);
-        }
-        catch (Exception e)
-        {
-          String s = "line : error evaluating EL expression (ignored) in " + Static.q(line);
+        } catch (Exception e) {
+          String s = "line : error evaluating EL expression (ignored) in "
+              + Static.q(line);
           this.log(s);
         }
       }
@@ -113,8 +100,7 @@ public class List extends Task
     return this.list;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Static.assign(getProject(), this.var, eval(), Static.VARREF);
   }
 }

@@ -63,8 +63,7 @@ import java.util.regex.Pattern;
  * @author geronimo
  * 
  */
-public class TextReader
-{
+public class TextReader {
   static protected HashMap TheCache;
   protected String cs = ";";
   protected String ics = ";";
@@ -75,46 +74,38 @@ public class TextReader
   protected String shift;
   protected BufferedReader bufreader;
 
-  static
-  {
+  static {
     TheCache = new HashMap();
   }
 
-  public TextReader(String text)
-  {
+  public TextReader(String text) {
     this.setText(text);
   }
 
-  public TextReader()
-  {
+  public TextReader() {
     this.setText("");
   }
 
-  public TextReader setText(String text)
-  {
+  public TextReader setText(String text) {
     this.text = text == null ? "" : text;
     return this;
   }
 
-  public TextReader setSkipws(boolean b)
-  {
+  public TextReader setSkipws(boolean b) {
     this.ws = b;
     return this;
   }
 
-  public TextReader setShift(String s)
-  {
+  public TextReader setShift(String s) {
     this.shift = null;
-    if (s != null && s.matches("\\s*") == false)
-    {
+    if (s != null && s.matches("\\s*") == false) {
       Pattern P;
       Matcher p;
 
       P = makeregex("\\s*(\\d+)(.*)");
       p = P.matcher(s);
 
-      if (p.matches())
-      {
+      if (p.matches()) {
         int times = Integer.parseInt(p.group(1));
         String what = p.group(2);
         StringBuilder accu = new StringBuilder();
@@ -128,67 +119,52 @@ public class TextReader
     return this;
   }
 
-  public String getShift()
-  {
+  public String getShift() {
     return this.shift == null ? "" : this.shift;
   }
 
-  public String getText()
-  {
+  public String getText() {
     return this.text;
   }
 
-  public TextReader setCL(String s)
-  {
+  public TextReader setCL(String s) {
     String t = s.trim();
-    if (t.matches("\\s*") == false)
-    {
+    if (t.matches("\\s*") == false) {
       this.cs = t;
-    }
-    else
-    {
+    } else {
       this.cs = null;
     }
     return this;
   }
 
-  public TextReader setIC(String s)
-  {
+  public TextReader setIC(String s) {
     String t = s.trim();
-    if (t.matches("\\s*") == false)
-    {
+    if (t.matches("\\s*") == false) {
       this.ics = t;
-    }
-    else
-    {
+    } else {
       this.ics = null;
     }
     return this;
   }
 
-  public TextReader setResolveContLines(boolean b)
-  {
+  public TextReader setResolveContLines(boolean b) {
     this.cl = b;
     return this;
   }
 
-  public TextReader setSkipEmpty(boolean b)
-  {
+  public TextReader setSkipEmpty(boolean b) {
     this.skipempty = b;
     return this;
   }
 
-  protected boolean ignore(String line)
-  {
+  protected boolean ignore(String line) {
     return this.skipempty && line.matches("\\s*") ? true : false;
   }
 
-  static final protected Pattern makeregex(String regex)
-  {
+  static final protected Pattern makeregex(String regex) {
     Pattern P;
     P = (Pattern) TheCache.get(regex);
-    if (P == null)
-    {
+    if (P == null) {
       P = Pattern.compile(regex);
       TheCache.put(regex, P);
       P = (Pattern) TheCache.get(regex);
@@ -205,12 +181,11 @@ public class TextReader
    * @param text
    * @return not null
    */
-  final static public String stripws(String text)
-  {
+  final static public String stripws(String text) {
     Pattern P;
     Matcher m;
     String t;
-    int e,n;
+    int e, n;
 
     // Compile a regex matching all whitespace starting from the begin of
     // input till the first non-whitespace character. Note, that '\s'
@@ -222,8 +197,7 @@ public class TextReader
     // then there is no \eol between begin-of-input and first non-ws char -
     // in which case we do not strip any ws on purpose.
     m = P.matcher(text);
-    if (m.find() == false)
-    {
+    if (m.find() == false) {
       return text;
     }
 
@@ -233,24 +207,21 @@ public class TextReader
 
     e = m.end();
     n = 0;
-    while (e>0)
-    {
-      switch (text.charAt(--e))
-      {
-        case '\n':
-          break;
-        default:
-          n = n + 1;
+    while (e > 0) {
+      switch (text.charAt(--e)) {
+      case '\n':
+        break;
+      default:
+        n = n + 1;
       }
     }
 
     // Remove initial ws including \eol.
     t = m.replaceFirst("$1");
 
-    if (n > 0)
-    {
+    if (n > 0) {
       // Compile a pattern on the fly that matches a newline followed by
-      // at most n whitespace characters (but newline). 
+      // at most n whitespace characters (but newline).
       P = makeregex("(?m)(^|\\A)[ \\t\\f]{1," + n + "}");
       m = P.matcher(t);
       t = m.replaceAll("");
@@ -267,8 +238,7 @@ public class TextReader
     return t;
   }
 
-  final public static String resolvecontlines1(String text)
-  {
+  final public static String resolvecontlines1(String text) {
     String t;
     Pattern P1, P2;
     Matcher M1, M2;
@@ -281,24 +251,22 @@ public class TextReader
     return t;
   }
 
-  final protected String stripcomments()
-  {
+  final protected String stripcomments() {
     String s;
     String p;
     Pattern S;
     Matcher m;
 
     s = this.text;
-    if (this.cs != null)
-    {
-      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)", Pattern.quote(this.cs));
+    if (this.cs != null) {
+      p = String.format("(?m)^[ \\t\\f]*%s.*(\\r|\\r\\n|\\n|\\z)",
+          Pattern.quote(this.cs));
       S = makeregex(p);
       m = S.matcher(this.text);
       s = m.replaceAll("");
     }
 
-    if (this.ics != null)
-    {
+    if (this.ics != null) {
       // A naive approach to handle ';' as the begin of a comment. Test
       // '\;' and '\\;' ..
       // Step 1: remove all unescaped inline comments till \eol
@@ -317,10 +285,8 @@ public class TextReader
     return s;
   }
 
-  protected void init()
-  {
-    if (this.bufreader == null)
-    {
+  protected void init() {
+    if (this.bufreader == null) {
       // if resolve cl lines is on, merge cl lines
       if (this.cl)
         this.text = TextReader.resolvecontlines1(this.text);
@@ -342,62 +308,47 @@ public class TextReader
    * 
    * @see java.io.BufferedReader#readLine()
    */
-  public String readLine()
-  {
+  public String readLine() {
     String line;
 
     init();
-    try
-    {
+    try {
       line = this.bufreader.readLine();
-      while (line != null && this.ignore(line))
-      {
+      while (line != null && this.ignore(line)) {
         line = this.bufreader.readLine();
       }
-    }
-    catch (IOException e)
-    {
+    } catch (IOException e) {
       line = null;
     }
-    if (line != null && this.shift != null)
-    {
+    if (line != null && this.shift != null) {
       line = this.shift + line;
     }
     return line;
   }
 
-  public String read()
-  {
+  public String read() {
     String r;
     final char[] buf = new char[1024];
     final StringBuilder b = new StringBuilder();
     int n;
 
     init();
-    try
-    {
-      while ((n = this.bufreader.read(buf)) >= 0)
-      {
+    try {
+      while ((n = this.bufreader.read(buf)) >= 0) {
         b.append(buf, 0, n);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       /* can't happen */
     }
     r = b.toString();
-    if (this.shift != null)
-    {
+    if (this.shift != null) {
       // replace all but last \n ..
       Matcher m = makeregex("\n\\z").matcher(r);
-      if (m.find())
-      {
+      if (m.find()) {
         r = r.substring(0, m.start());
         r = r.replaceAll("\n", "\n" + this.shift);
         r = r + "\n";
-      }
-      else
-      {
+      } else {
         r = r.replaceAll("\n", "\n" + this.shift);
       }
       r = this.shift + r;

@@ -52,44 +52,34 @@ import org.apache.tools.ant.types.Reference;
  * @since 1.0
  */
 
-public class Throw extends Exit
-{
+public class Throw extends Exit {
   protected Reference reference = null;
 
-  public void setVar(Reference var)
-  {
+  public void setVar(Reference var) {
     this.reference = var;
   }
 
-  public void setReference(Reference var)
-  {
+  public void setReference(Reference var) {
     this.reference = var;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Object obj = null;
 
-    if (this.reference != null)
-    {
+    if (this.reference != null) {
       obj = this.reference.getReferencedObject(getProject());
-    } else
-    {
+    } else {
       obj = getProject().getReference(TryCatch.REFERENCE);
     }
 
-    if (obj != null)
-    {
-      if (obj instanceof BuildException)
-      {
+    if (obj != null) {
+      if (obj instanceof BuildException) {
         throw (BuildException) obj;
       }
-      if (obj instanceof Exception)
-      {
+      if (obj instanceof Exception) {
         throw new BuildException((Exception) obj);
       }
-      if (!(obj instanceof Throwable))
-      {
+      if (!(obj instanceof Throwable)) {
         throw new BuildException(obj.toString());
       }
     }

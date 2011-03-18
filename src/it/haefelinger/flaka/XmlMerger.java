@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-
 import org.apache.tools.ant.BuildException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -44,8 +43,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * @author merzedes
  * @since 1.0
  */
-public class XmlMerger extends Task
-{
+public class XmlMerger extends Task {
   protected String dst = null;
   protected String src = null;
   protected String pattern = "/.*\\.xml/";
@@ -57,85 +55,69 @@ public class XmlMerger extends Task
                                   */
   protected boolean doinit = true;
 
-  public void setDst(String s)
-  {
+  public void setDst(String s) {
     this.dst = Static.trim2(s, this.src);
   }
 
-  public void setSrc(String s)
-  {
+  public void setSrc(String s) {
     this.src = Static.trim2(s, this.src);
   }
 
-  public void setRoot(String s)
-  {
+  public void setRoot(String s) {
     String root = Static.trim2(s, null);
-    if (root != null)
-    {
+    if (root != null) {
       this.accu = new Element(s);
       this.accu.addContent("\n");
     }
   }
 
-  public void setPattern(String pattern)
-  {
+  public void setPattern(String pattern) {
     this.pattern = Static.trim2(pattern, this.pattern);
     this.doinit = true;
   }
 
-  public Pattern useFilter(Pattern filter)
-  {
+  public Pattern useFilter(Pattern filter) {
     Pattern r = this.filter;
     this.filter = filter;
     this.doinit = true;
     return r;
   }
 
-  public Pattern getFilter()
-  {
+  public Pattern getFilter() {
     return this.filter;
   }
 
-  public Element getAccu()
-  {
+  public Element getAccu() {
     return this.accu;
   }
 
-  public Element useAccu(Element e)
-  {
+  public Element useAccu(Element e) {
     Element r = this.accu;
     this.accu = e;
     return r;
   }
 
-  public void setRemoveProperties(boolean b)
-  {
+  public void setRemoveProperties(boolean b) {
     this.removeProperties = b;
   }
 
-  public void validate() throws BuildException
-  {
+  public void validate() throws BuildException {
     /* not used */
   }
 
-  public void initialize() throws BuildException
-  {
+  public void initialize() throws BuildException {
     this.doinit = false;
     initFilter();
   }
 
-  private void initFilter() throws BuildException
-  {
-    try
-    {
-      if (this.filter == null && this.pattern != null)
-      {
+  private void initFilter() throws BuildException {
+    try {
+      if (this.filter == null && this.pattern != null) {
         this.filter = Static.patterncompile(this.pattern, 0);
       }
 
       this.ffilter = new FileFilter() {
-        public boolean accept(File file)
-        {
+        public boolean accept(File file) {
           String s;
           if (file.isDirectory())
             return true;
@@ -147,124 +129,101 @@ public class XmlMerger extends Task
           return XmlMerger.this.filter.matcher(s).matches();
         }
       };
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new BuildException(e);
     }
   }
 
-  public class TagFilter extends XMLFilterImpl
-  {
+  public class TagFilter extends XMLFilterImpl {
     private final String tagName;
     private int depth = 0;
 
-    public TagFilter(String tagName)
-    {
+    public TagFilter(String tagName) {
       super();
       this.tagName = tagName;
     }
 
-    public TagFilter(String tagName, XMLReader arg0)
-    {
+    public TagFilter(String tagName, XMLReader arg0) {
       super(arg0);
       this.tagName = tagName;
     }
 
-    public void characters(char[] ch, int start, int length) throws SAXException
-    {
-      if (!isPruning())
-      {
+    public void characters(char[] ch, int start, int length)
+        throws SAXException {
+      if (!isPruning()) {
         super.characters(ch, start, length);
       }
     }
 
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
-    {
-      if (!isPruning())
-      {
+    public void ignorableWhitespace(char[] ch, int start, int length)
+        throws SAXException {
+      if (!isPruning()) {
         super.ignorableWhitespace(ch, start, length);
       }
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException
-    {
-      if (isPruning())
-      {
+    public void endElement(String uri, String localName, String qName)
+        throws SAXException {
+      if (isPruning()) {
         this.depth--;
-      } else
-      {
+      } else {
         super.endElement(uri, localName, qName);
       }
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes atts)
-        throws SAXException
-    {
-      if (!isPruning() && localName.equals(this.tagName))
-      {
+    public void startElement(String uri, String localName, String qName,
+        Attributes atts) throws SAXException {
+      if (!isPruning() && localName.equals(this.tagName)) {
         this.depth = 1;
         return;
       }
-      if (isPruning())
-      {
+      if (isPruning()) {
         this.depth++;
         return;
       }
       super.startElement(uri, localName, qName, atts);
     }
 
-    private boolean isPruning()
-    {
+    private boolean isPruning() {
       return this.depth > 0;
     }
   }
 
-  public SAXBuilder builder() throws Exception
-  {
+  public SAXBuilder builder() throws Exception {
     SAXBuilder builder = new SAXBuilder();
-    if (this.removeProperties)
-    {
+    if (this.removeProperties) {
       builder.setXMLFilter(new TagFilter("properties"));
     }
     return builder;
   }
 
-  public Element asElement(File file) throws BuildException
-  {
+  public Element asElement(File file) throws BuildException {
     Element r = null;
-    try
-    {
+    try {
       r = builder().build(file).getRootElement();
-    } catch (JDOMException e)
-    {
+    } catch (JDOMException e) {
       warn("Could not read loc " + file + ".  Skipping...", e);
-    } catch (IOException e)
-    {
+    } catch (IOException e) {
       warn("Could not read loc " + file + ".  Skipping...", e);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new BuildException(e);
     }
     return r;
   }
 
-  protected void merge(String[] args)
-  {
+  protected void merge(String[] args) {
     if (args != null)
       for (int i = 0; i < args.length; ++i)
         merge(new File(args[i]));
   }
 
-  protected void merge(String s)
-  {
-    if (s != null)
-    {
+  protected void merge(String s) {
+    if (s != null) {
       merge(new File(s));
     }
   }
 
-  protected void merge(File file)
-  {
+  protected void merge(File file) {
     File[] kids;
     Element e;
 
@@ -272,81 +231,65 @@ public class XmlMerger extends Task
       return;
 
     /* initialize filters */
-    if (this.doinit)
-    {
+    if (this.doinit) {
       initialize();
     }
 
-    if (!file.exists())
-    {
+    if (!file.exists()) {
       info(file.toString() + " does not exist. Skipping ...");
       return;
     }
-    if (file.isDirectory())
-    {
+    if (file.isDirectory()) {
       kids = file.listFiles(this.ffilter);
       Arrays.sort(kids);
-      for (int j = 0; j < kids.length; j++)
-      {
+      for (int j = 0; j < kids.length; j++) {
         merge(kids[j]);
       }
       return;
     }
-    if (!file.isFile())
-    {
+    if (!file.isFile()) {
       warn(file.toString() + " is not a directory or a loc. Skipping ...");
       return;
     }
-    if (file.length() == 0)
-    {
+    if (file.length() == 0) {
       warn(file.toString() + " is empty. Skipping ...");
       return;
     }
     e = asElement(file);
-    if (e == null)
-    {
+    if (e == null) {
       warn(file.toString() + " has no (wellformed) XML content. Skipping ...");
       return;
     }
 
-    if (this.accu == null)
-    {
+    if (this.accu == null) {
       e.detach();
       this.accu = e;
-    } else
-    {
+    } else {
       this.accu.addContent(e.detach());
       this.accu.addContent("\n");
     }
   }
 
-  public void execute() throws BuildException
-  {
-    try
-    {
+  public void execute() throws BuildException {
+    try {
       /* accumulate */
       merge(this.src);
       /* and dump */
       if (this.accu != null)
         writeTo(this.dst);
-    } catch (BuildException e)
-    {
+    } catch (BuildException e) {
       throw e;
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new BuildException(e);
     }
   }
 
-  protected void writeTo(OutputStream out) throws IOException
-  {
-    if (this.accu != null)
-    {
+  protected void writeTo(OutputStream out) throws IOException {
+    if (this.accu != null) {
       XMLOutputter sink;
       Document doc;
       OutputStream to = out;
-      if (to == null)
-      {
+      if (to == null) {
         to = System.out;
       }
       sink = new XMLOutputter();
@@ -356,18 +299,14 @@ public class XmlMerger extends Task
     }
   }
 
-  protected void writeTo(String s) throws IOException
-  {
+  protected void writeTo(String s) throws IOException {
     if (s == null || s.trim().length() < 1 || s.trim().equals("-"))
       writeTo(System.out);
-    else
-    {
+    else {
       File f = new File(s);
-      if (f.exists() == false)
-      {
+      if (f.exists() == false) {
         File p = f.getParentFile();
-        if (p.exists() == false)
-        {
+        if (p.exists() == false) {
           p.mkdirs();
         }
       }
@@ -375,10 +314,8 @@ public class XmlMerger extends Task
     }
   }
 
-  public static void main(String[] args)
-  {
-    try
-    {
+  public static void main(String[] args) {
+    try {
       XmlMerger M;
 
       M = new XmlMerger();
@@ -390,8 +327,7 @@ public class XmlMerger extends Task
 
       /* write accumulated XML stuff to .. */
       M.writeTo(System.out);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       System.err.println("error: " + e.getMessage());
       e.printStackTrace();
     }

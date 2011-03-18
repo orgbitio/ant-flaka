@@ -35,14 +35,11 @@ import org.apache.tools.ant.util.GlobPatternMapper;
  * @author merzedes
  * @since 1.0
  */
-public class GlobMap extends GlobPatternMapper
-{
-  public String[] mapFileName(String s)
-  {
+public class GlobMap extends GlobPatternMapper {
+  public String[] mapFileName(String s) {
     String[] r;
     r = super.mapFileName(s);
-    if (r == null)
-    {
+    if (r == null) {
       r = new String[] { s };
     }
     return r;

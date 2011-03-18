@@ -60,9 +60,9 @@ import org.apache.tools.ant.util.DateUtils;
  * @since 1.0
  * 
  */
-public class XmlLogger implements BuildLogger
-{
-  static protected Pattern pat = Pattern.compile("$", Pattern.MULTILINE | Pattern.UNIX_LINES);
+public class XmlLogger implements BuildLogger {
+  static protected Pattern pat = Pattern.compile("$", Pattern.MULTILINE
+      | Pattern.UNIX_LINES);
 
   protected int msgOutputLevel = Project.MSG_DEBUG;
   protected PrintStream outStream;
@@ -76,13 +76,10 @@ public class XmlLogger implements BuildLogger
    * 
    * @return a default DocumentBuilder instance.
    */
-  private static DocumentBuilder getDocumentBuilder()
-  {
-    try
-    {
+  private static DocumentBuilder getDocumentBuilder() {
+    try {
       return DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    } catch (Exception exc)
-    {
+    } catch (Exception exc) {
       throw new ExceptionInInitializerError(exc);
     }
   }
@@ -120,8 +117,7 @@ public class XmlLogger implements BuildLogger
   protected TimedElement buildElement = null;
 
   /** Utility class representing the time an element started. */
-  protected static class TimedElement
-  {
+  protected static class TimedElement {
     /**
      * Start time in milliseconds (as returned by
      * <code>System.currentTimeMillis()</code>).
@@ -130,14 +126,13 @@ public class XmlLogger implements BuildLogger
     /** Element created at the start time. */
     protected Element element;
 
-    public String toString()
-    {
-      return this.element.getTagName() + ":" + this.element.getAttribute("name");
+    public String toString() {
+      return this.element.getTagName() + ":"
+          + this.element.getAttribute("name");
     }
   }
 
-  static public String formatTime(long ms)
-  {
+  static public String formatTime(long ms) {
     return DateUtils.formatElapsedTime(ms);
   }
 
@@ -148,8 +143,7 @@ public class XmlLogger implements BuildLogger
    * @param event
    *          Ignored.
    */
-  public void buildStarted(BuildEvent event)
-  {
+  public void buildStarted(BuildEvent event) {
     this.buildElement = new XmlLogger.TimedElement();
     this.buildElement.startTime = System.currentTimeMillis();
     this.buildElement.element = this.doc.createElement(BUILD_TAG);
@@ -163,14 +157,13 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void buildFinished(BuildEvent event)
-  {
+  public void buildFinished(BuildEvent event) {
     long totalTime = System.currentTimeMillis() - this.buildElement.startTime;
     this.buildElement.element.setAttribute(TIME_ATTR, formatTime(totalTime));
 
-    if (event.getException() != null)
-    {
-      this.buildElement.element.setAttribute(ERROR_ATTR, event.getException().toString());
+    if (event.getException() != null) {
+      this.buildElement.element.setAttribute(ERROR_ATTR, event.getException()
+          .toString());
       // print the stacktrace in the build loc it is always useful...
       // better have too much info than not enough.
       Throwable t = event.getException();
@@ -181,45 +174,37 @@ public class XmlLogger implements BuildLogger
     }
 
     String outFilename = event.getProject().getProperty("XmlLogger.file");
-    if (outFilename == null)
-    {
+    if (outFilename == null) {
       outFilename = "log.xml";
     }
-    String xslUri = event.getProject().getProperty("ant.XmlLogger.stylesheet.uri");
-    if (xslUri == null)
-    {
+    String xslUri = event.getProject().getProperty(
+        "ant.XmlLogger.stylesheet.uri");
+    if (xslUri == null) {
       xslUri = "log.xsl";
     }
     Writer out = null;
-    try
-    {
+    try {
       // specify output in UTF8 otherwise accented characters will blow
       // up everything
       OutputStream stream = this.outStream;
-      if (stream == null)
-      {
+      if (stream == null) {
         stream = new FileOutputStream(outFilename);
       }
       out = new OutputStreamWriter(stream, "UTF8");
       out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-      if (xslUri.length() > 0)
-      {
-        out.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + xslUri + "\"?>\n\n");
+      if (xslUri.length() > 0) {
+        out.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + xslUri
+            + "\"?>\n\n");
       }
       (new DOMElementWriter()).write(this.buildElement.element, out, 0, "\t");
       out.flush();
-    } catch (IOException exc)
-    {
+    } catch (IOException exc) {
       throw new BuildException("Unable to write log loc", exc);
-    } finally
-    {
-      if (out != null)
-      {
-        try
-        {
+    } finally {
+      if (out != null) {
+        try {
           out.close();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
           // ignore
         }
       }
@@ -232,11 +217,9 @@ public class XmlLogger implements BuildLogger
    * 
    * @return the stack of timed elements for the current thread
    */
-  private Stack getStack()
-  {
+  private Stack getStack() {
     Stack threadStack = (Stack) this.threadStacks.get(Thread.currentThread());
-    if (threadStack == null)
-    {
+    if (threadStack == null) {
       threadStack = new Stack();
       this.threadStacks.put(Thread.currentThread(), threadStack);
     }
@@ -252,8 +235,7 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void targetStarted(BuildEvent event)
-  {
+  public void targetStarted(BuildEvent event) {
     Target target = event.getTarget();
     TimedElement targetElement = new TimedElement();
     targetElement.startTime = System.currentTimeMillis();
@@ -271,35 +253,28 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void targetFinished(BuildEvent event)
-  {
+  public void targetFinished(BuildEvent event) {
     Target target = event.getTarget();
     TimedElement targetElement = (TimedElement) this.targets.get(target);
-    if (targetElement != null)
-    {
+    if (targetElement != null) {
       long totalTime = System.currentTimeMillis() - targetElement.startTime;
       targetElement.element.setAttribute(TIME_ATTR, formatTime(totalTime));
 
       TimedElement parentElement = null;
       Stack threadStack = getStack();
-      if (!threadStack.empty())
-      {
+      if (!threadStack.empty()) {
         TimedElement poppedStack = (TimedElement) threadStack.pop();
-        if (poppedStack != targetElement)
-        {
-          throw new RuntimeException("Mismatch - popped element = " + poppedStack
-              + " finished target element = " + targetElement);
+        if (poppedStack != targetElement) {
+          throw new RuntimeException("Mismatch - popped element = "
+              + poppedStack + " finished target element = " + targetElement);
         }
-        if (!threadStack.empty())
-        {
+        if (!threadStack.empty()) {
           parentElement = (TimedElement) threadStack.peek();
         }
       }
-      if (parentElement == null)
-      {
+      if (parentElement == null) {
         this.buildElement.element.appendChild(targetElement.element);
-      } else
-      {
+      } else {
         parentElement.element.appendChild(targetElement.element);
       }
     }
@@ -315,8 +290,7 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void taskStarted(BuildEvent event)
-  { /* not used */
+  public void taskStarted(BuildEvent event) { /* not used */
 
   }
 
@@ -328,8 +302,7 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void taskFinished(BuildEvent event)
-  { /* not used */
+  public void taskFinished(BuildEvent event) { /* not used */
 
   }
 
@@ -339,21 +312,16 @@ public class XmlLogger implements BuildLogger
    * Where the task is not found directly, search for unknown elements which may
    * be hiding the real task
    */
-  private TimedElement getTaskElement(Task task)
-  {
+  private TimedElement getTaskElement(Task task) {
     TimedElement element = (TimedElement) this.tasks.get(task);
-    if (element != null)
-    {
+    if (element != null) {
       return element;
     }
 
-    for (Enumeration e = this.tasks.keys(); e.hasMoreElements();)
-    {
+    for (Enumeration e = this.tasks.keys(); e.hasMoreElements();) {
       Task key = (Task) e.nextElement();
-      if (key instanceof UnknownElement)
-      {
-        if (((UnknownElement) key).getTask() == task)
-        {
+      if (key instanceof UnknownElement) {
+        if (((UnknownElement) key).getTask() == task) {
           return (TimedElement) this.tasks.get(key);
         }
       }
@@ -371,8 +339,7 @@ public class XmlLogger implements BuildLogger
    *          An event with any relevant extra information. Will not be
    *          <code>null</code>.
    */
-  public void messageLogged(BuildEvent event)
-  {
+  public void messageLogged(BuildEvent event) {
     int priority;
     String name;
     Throwable ex;
@@ -381,30 +348,27 @@ public class XmlLogger implements BuildLogger
     Text text;
 
     priority = event.getPriority();
-    if (priority > this.msgOutputLevel)
-    {
+    if (priority > this.msgOutputLevel) {
       return;
     }
 
-    switch (priority)
-    {
-      case Project.MSG_ERR:
-        name = "error";
-        break;
-      case Project.MSG_WARN:
-        name = "warn";
-        break;
-      case Project.MSG_INFO:
-        name = "info";
-        break;
-      default:
-        name = "debug";
-        break;
+    switch (priority) {
+    case Project.MSG_ERR:
+      name = "error";
+      break;
+    case Project.MSG_WARN:
+      name = "warn";
+      break;
+    case Project.MSG_INFO:
+      name = "info";
+      break;
+    default:
+      name = "debug";
+      break;
     }
 
     ex = event.getException();
-    if (ex != null && Project.MSG_DEBUG <= this.msgOutputLevel)
-    {
+    if (ex != null && Project.MSG_DEBUG <= this.msgOutputLevel) {
       text = this.doc.createCDATASection(StringUtils.getStackTrace(ex));
       elem = this.doc.createElement(STACKTRACE_TAG);
       elem.appendChild(text);
@@ -415,8 +379,7 @@ public class XmlLogger implements BuildLogger
 
     String[] line = XmlLogger.pat.split(event.getMessage());
 
-    for (int i = 0; i < line.length; ++i)
-    {
+    for (int i = 0; i < line.length; ++i) {
       String s = line[i].replaceAll("\\n|\\r", " ");
       s = s.replaceAll("^\\s+", ""); /* strip leading ws */
       s = s.replaceAll("\\t", "  "); /* normalize tabs */
@@ -429,20 +392,16 @@ public class XmlLogger implements BuildLogger
 
   }
 
-  TimedElement getParentEL(BuildEvent event)
-  {
+  TimedElement getParentEL(BuildEvent event) {
     TimedElement p = null;
     Task task = event.getTask();
 
-    if (task != null)
-    {
+    if (task != null) {
       p = getTaskElement(task);
     }
-    if (p == null)
-    {
+    if (p == null) {
       Target target = event.getTarget();
-      if (target != null)
-      {
+      if (target != null) {
         p = (TimedElement) this.targets.get(target);
       }
     }
@@ -459,8 +418,7 @@ public class XmlLogger implements BuildLogger
    *          {@link org.apache.tools.ant.Project#MSG_ERR Project} class for
    *          level definitions
    */
-  public void setMessageOutputLevel(int level)
-  {
+  public void setMessageOutputLevel(int level) {
     this.msgOutputLevel = level;
   }
 
@@ -471,8 +429,7 @@ public class XmlLogger implements BuildLogger
    * @param output
    *          the output PrintStream.
    */
-  public void setOutputPrintStream(PrintStream output)
-  {
+  public void setOutputPrintStream(PrintStream output) {
     this.outStream = new PrintStream(output, true);
   }
 
@@ -482,8 +439,7 @@ public class XmlLogger implements BuildLogger
    * @param emacsMode
    *          true if logger should produce emacs compatible output
    */
-  public void setEmacsMode(boolean emacsMode)
-  { /* not used */
+  public void setEmacsMode(boolean emacsMode) { /* not used */
 
   }
 
@@ -494,8 +450,7 @@ public class XmlLogger implements BuildLogger
    * @param err
    *          the stream we are going to ignore.
    */
-  public void setErrorPrintStream(PrintStream err)
-  { /* not used */
+  public void setErrorPrintStream(PrintStream err) { /* not used */
 
   }
 

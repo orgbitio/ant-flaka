@@ -37,7 +37,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -51,94 +50,77 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class InitSSL extends Task
-{
+public class InitSSL extends Task {
   final String TRUSTSTORE = "javax.net.ssl.trustStore";
 
   protected File truststore = null;
   protected boolean verifycert = true;
   protected boolean quiet = false;
 
-  public void setTrustStore(File file)
-  {
+  public void setTrustStore(File file) {
     if (file != null)
       this.truststore = file;
   }
 
-  public void setVerifyCertificate(boolean b)
-  {
+  public void setVerifyCertificate(boolean b) {
     this.verifycert = b;
   }
 
-  public void setQuiet(boolean b)
-  {
+  public void setQuiet(boolean b) {
     this.quiet = b;
   }
 
-  static public class AntiX509TrustManager implements X509TrustManager
-  {
-    public X509Certificate[] getAcceptedIssuers()
-    {
+  static public class AntiX509TrustManager implements X509TrustManager {
+    public X509Certificate[] getAcceptedIssuers() {
       return null;
     }
 
     public void checkServerTrusted(X509Certificate[] certs, String authType)
-        throws CertificateException
-    {
+        throws CertificateException {
       return;
     }
 
     public void checkClientTrusted(X509Certificate[] certs, String authType)
-        throws CertificateException
-    {
+        throws CertificateException {
       return;
     }
   }
 
-  static public class SSLSocketFactory implements ProtocolSocketFactory
-  {
+  static public class SSLSocketFactory implements ProtocolSocketFactory {
     protected SSLContext sslcontext = null;
 
-    public SSLSocketFactory(SSLContext ctx)
-    {
+    public SSLSocketFactory(SSLContext ctx) {
       super();
       this.sslcontext = ctx;
     }
 
-    protected SSLContext getSSLContext()
-    {
+    protected SSLContext getSSLContext() {
       if (this.sslcontext == null)
-        try
-        {
+        try {
           this.sslcontext = SSLContext.getInstance("SSL");
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
           System.err.println("*** unable to get security instance 'SSL' ..");
         }
       return this.sslcontext;
     }
 
-    public Socket createSocket(String h, int p, InetAddress ch, int cp) throws IOException,
-        UnknownHostException
-    {
+    public Socket createSocket(String h, int p, InetAddress ch, int cp)
+        throws IOException, UnknownHostException {
       return getSSLContext().getSocketFactory().createSocket(h, p, ch, cp);
     }
 
-    public Socket createSocket(final String h, final int p, final InetAddress la, final int lp,
-        final HttpConnectionParams params) throws IOException, UnknownHostException,
-        ConnectTimeoutException
-    {
+    public Socket createSocket(final String h, final int p,
+        final InetAddress la, final int lp, final HttpConnectionParams params)
+        throws IOException, UnknownHostException, ConnectTimeoutException {
       Socket S = null;
-      if (params == null)
-      {
+      if (params == null) {
         throw new IllegalArgumentException("Parameters may not be null");
       }
       int timeout = params.getConnectionTimeout();
       SocketFactory socketfactory = getSSLContext().getSocketFactory();
       if (timeout == 0)
         S = socketfactory.createSocket(h, p, la, lp);
-      else
-      {
+      else {
         S = socketfactory.createSocket();
         SocketAddress localaddr = new InetSocketAddress(la, lp);
         SocketAddress remoteaddr = new InetSocketAddress(h, p);
@@ -148,50 +130,43 @@ public class InitSSL extends Task
       return S;
     }
 
-    public Socket createSocket(String h, int p) throws IOException, UnknownHostException
-    {
+    public Socket createSocket(String h, int p) throws IOException,
+        UnknownHostException {
       return getSSLContext().getSocketFactory().createSocket(h, p);
     }
 
     public Socket createSocket(Socket socket, String h, int p, boolean autoClose)
-        throws IOException, UnknownHostException
-    {
-      return getSSLContext().getSocketFactory().createSocket(socket, h, p, autoClose);
+        throws IOException, UnknownHostException {
+      return getSSLContext().getSocketFactory().createSocket(socket, h, p,
+          autoClose);
     }
 
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
       return ((obj != null) && obj.getClass().equals(SSLSocketFactory.class));
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
       return SSLSocketFactory.class.hashCode();
     }
   }
 
-  static public boolean isjava15()
-  {
+  static public boolean isjava15() {
     boolean r = false;
-    try
-    {
+    try {
       Class.forName("java.lang.annotation");
       r = true;
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       r = false;
     }
     return r;
   }
 
-  static public void install(TrustManager tm) throws Exception
-  {
+  static public void install(TrustManager tm) throws Exception {
     // There's a problem (bug?) in Java 1.4 causing sc.init() to take a
     // very long time. Disabling installation of new trustmanager if
     // not 1.5 or newer. That's just fine cause 1.4 trustmanger accepts
     // self signed certificates.
-    if (isjava15())
-    {
+    if (isjava15()) {
       SSLContext sc;
       sc = SSLContext.getInstance("SSL");
       sc.init(null, new TrustManager[] { tm }, null);
@@ -212,12 +187,10 @@ public class InitSSL extends Task
    * 
    * @return previous value of javax.net.ssl.trustStore
    */
-  protected String useTrustStore(File f)
-  {
+  protected String useTrustStore(File f) {
     String v, p;
 
-    if (f != null)
-    {
+    if (f != null) {
       p = f.getAbsolutePath();
 
       /*
@@ -225,22 +198,18 @@ public class InitSSL extends Task
        * warning messages but set keystore anyway.
        */
 
-      if (!f.exists())
-      {
+      if (!f.exists()) {
         System.err.println("*warning: trust store `" + p + "' does not exist.");
       }
-      if (!f.isFile())
-      {
+      if (!f.isFile()) {
         System.err.println("*warning: trust store `" + p + "' is not a loc.");
       }
-      if (!f.canRead())
-      {
+      if (!f.canRead()) {
         System.err.println("*warning: trust store `" + p + "' is unreadable.");
       }
       /* assign property - even if it appears invalid */
       v = System.setProperty(this.TRUSTSTORE, p);
-    } else
-    {
+    } else {
       /* remove trust store property */
       v = (String) System.getProperties().remove(this.TRUSTSTORE);
     }
@@ -248,18 +217,15 @@ public class InitSSL extends Task
     return v;
   }
 
-  protected boolean hasTrustStore()
-  {
+  protected boolean hasTrustStore() {
     return System.getProperty(this.TRUSTSTORE, null) != null;
   }
 
-  protected String getTrustStore()
-  {
+  protected String getTrustStore() {
     return System.getProperty(this.TRUSTSTORE, null);
   }
 
-  protected File getDefaultTrustStore()
-  {
+  protected File getDefaultTrustStore() {
     final String fname = "depot.keystore"; /* default name */
     final String clazz = "it.haefelinger.flaka.Break"; /* search here .. */
 
@@ -269,41 +235,34 @@ public class InitSSL extends Task
     InputStream cin = null;
 
     /* retrieve loc from from package */
-    try
-    {
+    try {
       C = Class.forName(clazz);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       error("unable to locate class `" + clazz + "' in classpath.");
       return null;
     }
 
     /* locate */
     cin = C.getResourceAsStream(fname);
-    if (cin == null)
-    {
+    if (cin == null) {
       error("'" + fname + "' not found in \"flaka\".");
       return null;
     }
 
     /* create temporary loc */
-    try
-    {
+    try {
       F = File.createTempFile("depot", null);
       F.deleteOnExit();
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       error("unable to create a temporary loc", e);
       return null;
     }
 
     /* extract */
     path = F.getAbsolutePath();
-    try
-    {
+    try {
       Static.writex(cin, path, false);
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       F.delete();
       error("error while writing (temporary) loc '" + path + "'.", e);
       return null;
@@ -311,38 +270,32 @@ public class InitSSL extends Task
     return F;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     File ts;
 
-    if (hasTrustStore())
-    {
-      info("truststore already installed: " + this.TRUSTSTORE + "=" + getTrustStore());
-    } else
-    {
+    if (hasTrustStore()) {
+      info("truststore already installed: " + this.TRUSTSTORE + "="
+          + getTrustStore());
+    } else {
       /* If no specific truststore given, use the default .. */
       ts = (this.truststore == null) ? getDefaultTrustStore() : this.truststore;
 
-      if (ts == null)
-      {
+      if (ts == null) {
         info("no truststore available to initialize '" + this.TRUSTSTORE + "'.");
-      } else
-      {
+      } else {
         /* use my trust store */
         useTrustStore(ts);
       }
     }
 
-    if (this.verifycert == false)
-    {
-      try
-      {
+    if (this.verifycert == false) {
+      try {
         install(new AntiX509TrustManager());
         if (!this.quiet)
           warn("** certificate verification disabled **");
-      } catch (Exception e)
-      {
-        System.err.println("*** error while installing trustmanager .." + e.getMessage());
+      } catch (Exception e) {
+        System.err.println("*** error while installing trustmanager .."
+            + e.getMessage());
         if (this.debug)
           e.printStackTrace(System.err);
         System.err.flush();

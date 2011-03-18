@@ -23,7 +23,6 @@ import it.haefelinger.flaka.util.Static;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.RuntimeConfigurable;
 import org.apache.tools.ant.taskdefs.MacroInstance;
@@ -37,8 +36,7 @@ import org.apache.tools.ant.taskdefs.PreSetDef;
  * @since 1.0
  */
 
-public class RunMacro extends Task
-{
+public class RunMacro extends Task {
   protected String name = "";
   protected boolean fail = false;
   protected List args = null; /* list of arguments */
@@ -48,8 +46,7 @@ public class RunMacro extends Task
    * 
    * @param s
    */
-  public void setName(String s)
-  {
+  public void setName(String s) {
     this.name = Static.trim2(s, this.name);
   }
 
@@ -58,87 +55,73 @@ public class RunMacro extends Task
    * 
    * @param b
    */
-  public void setFail(boolean b)
-  {
+  public void setFail(boolean b) {
     this.fail = b;
   }
 
-  public boolean getFail()
-  {
+  public boolean getFail() {
     return this.fail;
   }
 
   /** nested element <code>param</code> */
-  public Param createParam()
-  {
+  public Param createParam() {
     return createArg();
   }
 
   /** nested element <code>attribute</code> */
-  public Param createAttribute()
-  {
+  public Param createAttribute() {
     return createArg();
   }
 
   /** nested element <code>arg</code> */
-  public Param createArg()
-  {
+  public Param createArg() {
     Param P;
     P = new Param();
     addarg(P);
     return P;
   }
 
-  protected List getargs()
-  {
+  protected List getargs() {
     if (this.args == null)
       this.args = new ArrayList();
     return this.args;
   }
 
-  protected void addarg(Object obj)
-  {
+  protected void addarg(Object obj) {
     getargs().add(obj);
   }
 
-  protected class Param
-  {
+  protected class Param {
     protected String k;
     protected String v;
 
-    public Param()
-    {
+    public Param() {
       this.k = null;
       this.v = null;
     }
 
-    public void setName(String k)
-    {
+    public void setName(String k) {
       this.k = Static.trim2(k, this.k);
     }
 
-    public void setValue(String v)
-    {
+    public void setValue(String v) {
       this.v = Static.trim2(v, this.v);
     }
   }
 
-  protected void onerror(String s)
-  {
+  protected void onerror(String s) {
     if (this.fail)
       throwbx(s);
     else
       verbose("warning: " + s);
   }
 
-  protected void runmacro(String m, Object[] args)
-  {
+  protected void runmacro(String m, Object[] args) {
     Param P;
     Object obj;
 
     obj = Static.makecomp(getProject(), m);
-    if (obj == null)
-    {
+    if (obj == null) {
       onerror("`" + m + "' neither marco nor task.");
       return;
     }
@@ -148,31 +131,25 @@ public class RunMacro extends Task
      * with ClassCastException (1.6.5). In such a way we need to create the
      * object like shown below ..
      */
-    if (obj instanceof PreSetDef.PreSetDefinition)
-    {
+    if (obj instanceof PreSetDef.PreSetDefinition) {
       PreSetDef.PreSetDefinition psd;
       psd = (PreSetDef.PreSetDefinition) obj;
       obj = psd.createObject(getProject());
-    } else
-    {
+    } else {
       /* try to create task */
       obj = getProject().createTask(m);
-      if (obj == null)
-      {
+      if (obj == null) {
         /* this should not happen - anyhow, we check again */
         onerror("`" + m + "' neither marco nor task.");
         return;
       }
     }
 
-    if (obj instanceof MacroInstance)
-    {
+    if (obj instanceof MacroInstance) {
       MacroInstance M;
       M = (MacroInstance) obj;
-      for (int i = 0; i < args.length; ++i)
-      {
-        if (args[i] instanceof Param)
-        {
+      for (int i = 0; i < args.length; ++i) {
+        if (args[i] instanceof Param) {
           P = (Param) args[i];
           M.setDynamicAttribute(P.k, P.v);
         }
@@ -181,17 +158,14 @@ public class RunMacro extends Task
       return;
     }
 
-    if (obj instanceof org.apache.tools.ant.Task)
-    {
+    if (obj instanceof org.apache.tools.ant.Task) {
       RuntimeConfigurable rtc;
       org.apache.tools.ant.Task T;
 
       T = (org.apache.tools.ant.Task) obj;
       rtc = T.getRuntimeConfigurableWrapper();
-      for (int i = 0; i < args.length; ++i)
-      {
-        if (args[i] instanceof Param)
-        {
+      for (int i = 0; i < args.length; ++i) {
+        if (args[i] instanceof Param) {
           P = (Param) args[i];
           rtc.setAttribute(P.k, P.v);
         }
@@ -204,8 +178,7 @@ public class RunMacro extends Task
     return;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Object[] args = getargs().toArray();
     String[] name = this.name.split("\\s+");
 

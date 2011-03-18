@@ -34,60 +34,48 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Property extends Task
-{
+public class Property extends Task {
   protected TextReader tr = new TextReader();
 
-  public void setComment(String s)
-  {
+  public void setComment(String s) {
     this.tr.setCL(s);
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIcs(String s)
-  {
+  public void setIcs(String s) {
     // TODO: document me
     this.tr.setIC(s);
   }
 
-  public void setCL(boolean b)
-  {
+  public void setCL(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
 
-  public void addText(String text)
-  {
+  public void addText(String text) {
     this.tr.setText(text);
   }
 
-  protected Pattern makeregex(String s)
-  {
+  protected Pattern makeregex(String s) {
     Pattern re = null;
-    try
-    {
+    try {
       re = Pattern.compile(s);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       /* TODO: error */
       Static.debug(getProject(), "error compiling regex '" + s + "'", e);
     }
     return re;
   }
 
-  protected Pattern getPropRegex()
-  {
+  protected Pattern getPropRegex() {
     return makeregex("([^=:]+)[:=](.*)");
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
     Pattern regex;
     Matcher M;
@@ -96,31 +84,30 @@ public class Property extends Task
     project = this.getProject();
     regex = this.getPropRegex();
 
-    while ((line = this.tr.readLine()) != null)
-    {
+    while ((line = this.tr.readLine()) != null) {
       line = project.replaceProperties(line);
 
       /* resolve all EL references #{ ..} */
       line = Static.elresolve(project, line);
 
-      if (!(M = regex.matcher(line)).matches())
-      {
+      if (!(M = regex.matcher(line)).matches()) {
         Static.debug(getProject(), "line : bad property line '" + line + "'");
         continue;
       }
       // otherwise:
       k = M.group(1);
       v = M.group(2).trim();
-      try
-      {
+      try {
         // k = project.replaceProperties(k);
         // k = Static.elresolve(project, k);
         // v = project.replaceProperties(v);
         // v = Static.elresolve(project, v);
-      }
-      catch (Exception e)
-      {
-        Static.debug(project, "line : error evaluating EL expression (ignored) in " + Static.q(v));
+      } catch (Exception e) {
+        Static
+            .debug(
+                project,
+                "line : error evaluating EL expression (ignored) in "
+                    + Static.q(v));
       }
       Static.assign(project, k, v, Static.PROPTY);
     }

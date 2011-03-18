@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
@@ -40,36 +39,30 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
  * @since 1.0
  */
 
-public class Find extends MatchingTask
-{
+public class Find extends MatchingTask {
   protected String srcdir = "''.tofile";
   protected String type = null;
   protected String var = null;
 
-  public void setVar(String var)
-  {
-    this.var = Static.trim3(getProject(),var, this.var);
+  public void setVar(String var) {
+    this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void setDir(String dir)
-  {
-    this.srcdir = Static.trim3(getProject(),dir, this.srcdir);
+  public void setDir(String dir) {
+    this.srcdir = Static.trim3(getProject(), dir, this.srcdir);
   }
 
-  public void setType(String type)
-  {
-    this.type = Static.trim3(getProject(),type, this.type);
+  public void setType(String type) {
+    this.type = Static.trim3(getProject(), type, this.type);
   }
 
-  protected DirectoryScanner getds(File dir)
-  {
+  protected DirectoryScanner getds(File dir) {
     DirectoryScanner ds = null;
     ds = super.getDirectoryScanner(dir);
     return ds;
   }
 
-  protected void scan(File dir, List C)
-  {
+  protected void scan(File dir, List C) {
     Project project;
     DirectoryScanner ds;
 
@@ -77,18 +70,15 @@ public class Find extends MatchingTask
     if (dir == null)
       return;
 
-    if (!dir.exists())
-    {
+    if (!dir.exists()) {
       Static.debug(project, "ignoring non existent folder:" + dir);
       return;
     }
-    if (!dir.isDirectory())
-    {
+    if (!dir.isDirectory()) {
       Static.debug(project, "ignoring non folder:" + dir);
       return;
     }
-    try
-    {
+    try {
       ds = getds(dir);
       String[] buf = null;
       if (this.type == null || this.type.equals("f"))
@@ -96,26 +86,22 @@ public class Find extends MatchingTask
       else if (this.type.equals("d"))
         buf = ds.getIncludedDirectories();
       if (buf != null)
-        for (int j = 0; j < buf.length; ++j)
-        {
+        for (int j = 0; j < buf.length; ++j) {
           File file = new File(dir, buf[j]);
           C.add(file);
         }
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       Static.debug(project, "error scanning " + dir, e);
     }
   }
 
-  protected void set(String name, String value)
-  {
+  protected void set(String name, String value) {
     String p = getProject().getProperty(name);
     p = (p == null) ? value : (p + " " + value);
     getProject().setProperty(name, p);
   }
 
-  static List makelist(Object... argv)
-  {
+  static List makelist(Object... argv) {
     List L = new ArrayList();
     for (int i = 0, n = argv.length; i < n; ++i)
       if (argv[i] != null)
@@ -123,14 +109,11 @@ public class Find extends MatchingTask
     return L;
   }
 
-  static Iterator iteratorof(Object obj)
-  {
+  static Iterator iteratorof(Object obj) {
     Iterator iter = null;
-    if (obj instanceof Iterable)
-    {
+    if (obj instanceof Iterable) {
       iter = ((Iterable) obj).iterator();
-    } else
-    {
+    } else {
       iter = makelist(obj).iterator();
     }
     return iter;
@@ -143,8 +126,7 @@ public class Find extends MatchingTask
    *              if an error occurs
    */
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
     Object obj;
     File dir;
@@ -154,19 +136,17 @@ public class Find extends MatchingTask
     project = getProject();
 
     // eval dir attribute
-    obj = Static.el2obj(project,this.srcdir);
+    obj = Static.el2obj(project, this.srcdir);
     di = iteratorof(obj);
 
     L = new ArrayList();
 
-    while (di.hasNext())
-    {
+    while (di.hasNext()) {
       obj = di.next();
       dir = null;
       if (obj instanceof File)
         dir = (File) obj;
-      else
-      {
+      else {
         dir = Static.toFile(project, obj.toString());
       }
       scan(dir, L);

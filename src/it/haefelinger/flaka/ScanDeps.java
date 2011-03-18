@@ -42,8 +42,7 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class ScanDeps extends MatchingTask
-{
+public class ScanDeps extends MatchingTask {
   static protected Pattern P = Pattern.compile("^\\s*(\\w+)\\s*=\\s*(.*)");
   protected String var = "dependencies";
   protected String dir = "''.tofile";
@@ -52,99 +51,84 @@ public class ScanDeps extends MatchingTask
 
   // protected Scanner scanner;
 
-  public void setVar(String var)
-  {
+  public void setVar(String var) {
     this.var = Static.trim3(getProject(), var, this.var);
   }
 
-  public void setDir(String dir)
-  {
+  public void setDir(String dir) {
     this.dir = dir;
   }
 
-  protected void scan(String fname)
-  {
+  protected void scan(String fname) {
     File file;
     Scanner scanner;
     Project project;
-    
+
     project = this.getProject();
     file = Static.toFile(project, fname);
     this.map = new HashMap();
-    scanner = new Scanner(project,this.map);
+    scanner = new Scanner(project, this.map);
     scanner.scan(file);
   }
 
-  protected DirectoryScanner getds(File dir)
-  {
+  protected DirectoryScanner getds(File dir) {
     DirectoryScanner ds = null;
     if (dir != null)
       ds = super.getDirectoryScanner(dir);
     return ds;
   }
-  
- 
-  
-  public TextReader createDecorate() 
-  {
+
+  public TextReader createDecorate() {
     this.dec = new TextReader();
-     return this.dec;
+    return this.dec;
   }
-  
-  
-  protected java.util.List each()
-  {
-    return (ArrayList)this.map.get("each");
+
+  protected java.util.List each() {
+    return (ArrayList) this.map.get("each");
   }
-  
-  public void execute()
-  {
+
+  public void execute() {
     Project project;
     DirectoryScanner ds;
     String[] args;
 
     project = getProject();
     ds = getds(Static.el2file(project, this.dir));
-    if (ds != null)
-    {
+    if (ds != null) {
       args = ds.getIncludedFiles();
-      for (int i = 0; i < args.length; ++i)
-      {
+      for (int i = 0; i < args.length; ++i) {
         scan(args[i]);
       }
     }
     // All scanned dependencies are now in this.map.get('each').
-    if (this.dec != null)
-    {
+    if (this.dec != null) {
       java.util.List list;
-      String line,key,val;
+      String line, key, val;
       Matcher p;
       File dest;
-      
+
       while ((line = this.dec.readLine()) != null) {
         line = project.replaceProperties(line);
 
         /* resolve all EL references #{ ..} */
         line = Static.elresolve(project, line);
-       
+
         p = P.matcher(line);
-        if (p.matches())
-        {
+        if (p.matches()) {
           // This should be handled in a dynamic way: checkout whether
           // Dependency has 'set<<key>>(<<Type>>)' method. If so, then
-          // convert val like   el2obj(str,<<Type>>) and then assign
+          // convert val like el2obj(str,<<Type>>) and then assign
           // that result using method set..".
           key = p.group(1);
           if (key.equals("dest")) {
             val = p.group(2);
             val = Static.el2str(project, val);
-            dest = Static.toFile(project,val);
-            
+            dest = Static.toFile(project, val);
+
             list = each();
-            for(int i=0;i<list.size();++i)
-            {
-              Dependency d = (Dependency)list.get(i);
-              d.setFile(new File(dest,d.basename()));
+            for (int i = 0; i < list.size(); ++i) {
+              Dependency d = (Dependency) list.get(i);
+              d.setFile(new File(dest, d.basename()));
             }
             continue;
           }

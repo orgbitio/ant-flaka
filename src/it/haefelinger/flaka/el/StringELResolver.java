@@ -29,94 +29,80 @@ import javax.el.ELResolver;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
 
-
 import org.apache.tools.ant.Project;
 
-public class StringELResolver extends ELResolver
-{
+public class StringELResolver extends ELResolver {
   protected Project project = null;
 
-  public StringELResolver(Project project)
-  {
+  public StringELResolver(Project project) {
     super();
     this.project = project;
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     return Object.class;
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     return null;
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return Object.class;
   }
 
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     Object r = null;
 
-    if (base == null || context == null || property == null || !(base instanceof String))
+    if (base == null || context == null || property == null
+        || !(base instanceof String))
       return null;
 
-    try
-    {
+    try {
       String k;
       k = (String) property;
-      if (k.equals("length") || k.equals("size"))
-      {
+      if (k.equals("length") || k.equals("size")) {
         r = new Integer(((String) base).length());
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tolower"))
-      {
+      if (k.equals("tolower")) {
         r = ((String) base).toLowerCase();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("toupper"))
-      {
+      if (k.equals("toupper")) {
         r = ((String) base).toUpperCase();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("trim"))
-      {
+      if (k.equals("trim")) {
         r = ((String) base).trim();
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("ltrim"))
-      {
-        r = ((String) base).replaceFirst("^\\s*","");
+      if (k.equals("ltrim")) {
+        r = ((String) base).replaceFirst("^\\s*", "");
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("rtrim"))
-      {
-        r = ((String) base).replaceFirst("\\s*$","");
+      if (k.equals("rtrim")) {
+        r = ((String) base).replaceFirst("\\s*$", "");
         context.setPropertyResolved(true);
         return r;
       }
-      if (k.equals("tofile"))
-      {
+      if (k.equals("tofile")) {
         r = Static.toFile(this.project, (String) base);
         context.setPropertyResolved(true);
         return r;
       }
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
 
@@ -125,16 +111,14 @@ public class StringELResolver extends ELResolver
 
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return true;
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
     /* we do nothing here */
   }
 

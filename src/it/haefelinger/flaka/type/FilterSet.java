@@ -41,7 +41,6 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * A set of filters to be applied to something.
  * 
@@ -52,15 +51,12 @@ import java.util.regex.Pattern;
  * @author merzedes
  * @since 1.0
  */
-public class FilterSet extends org.apache.tools.ant.types.FilterSet
-{
-  public class Props
-  {
+public class FilterSet extends org.apache.tools.ant.types.FilterSet {
+  public class Props {
     /* empty class */
   }
 
-  public void grep(String regexpr)
-  {
+  public void grep(String regexpr) {
     String[] R;
     Pattern P;
     Matcher M;
@@ -72,15 +68,13 @@ public class FilterSet extends org.apache.tools.ant.types.FilterSet
     L = new LinkedList();
     E = getProject().getProperties().keys();
 
-    while (E.hasMoreElements())
-    {
+    while (E.hasMoreElements()) {
       String k;
 
       k = (String) E.nextElement();
       M = P.matcher(k);
 
-      if (M.matches() == false)
-      {
+      if (M.matches() == false) {
         continue;
       }
       L.add(k);
@@ -93,13 +87,10 @@ public class FilterSet extends org.apache.tools.ant.types.FilterSet
     addtokens(R);
   }
 
-  protected void addtokens(String[] name)
-  {
-    if (name != null && name.length > 0)
-    {
+  protected void addtokens(String[] name) {
+    if (name != null && name.length > 0) {
       String k, v;
-      for (int i = 0; i < name.length; ++i)
-      {
+      for (int i = 0; i < name.length; ++i) {
         k = name[i];
         v = getProject().getProperty(k);
         v = getProject().replaceProperties(v);
@@ -108,17 +99,14 @@ public class FilterSet extends org.apache.tools.ant.types.FilterSet
     }
   }
 
-  protected void addtoken(String K, String V)
-  {
+  protected void addtoken(String K, String V) {
     String k = K;
     String v = V;
-    if (k == null)
-    {
+    if (k == null) {
       return;
     }
     k = k.trim();
-    if (k.length() <= 0)
-    {
+    if (k.length() <= 0) {
       return;
     }
     if (v == null)
@@ -127,8 +115,7 @@ public class FilterSet extends org.apache.tools.ant.types.FilterSet
   }
 
   /** support for element </code>properties</code> */
-  public Props createProperties()
-  {
+  public Props createProperties() {
     String s;
     s = Static.patternAsRegex("*");
     grep(s);

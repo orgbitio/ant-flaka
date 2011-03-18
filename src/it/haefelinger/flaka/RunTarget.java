@@ -30,8 +30,7 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class RunTarget extends Task
-{
+public class RunTarget extends Task {
   protected String name = null;
   protected boolean fail = false;
 
@@ -40,13 +39,11 @@ public class RunTarget extends Task
    * 
    * @param s
    */
-  public void setName(String s)
-  {
+  public void setName(String s) {
     this.name = Static.trim2(s, this.name);
   }
 
-  public String getName()
-  {
+  public String getName() {
     return this.name;
   }
 
@@ -55,37 +52,30 @@ public class RunTarget extends Task
    * 
    * @param b
    */
-  public void setFail(boolean b)
-  {
+  public void setFail(boolean b) {
     this.fail = b;
   }
 
-  public boolean getFail()
-  {
+  public boolean getFail() {
     return this.fail;
   }
 
-  protected void onerror(String s)
-  {
+  protected void onerror(String s) {
     if (this.fail)
       throwbx(s);
     else
       verbose("warning: " + s);
   }
 
-  public void execute() throws BuildException
-  {
-    if (this.name == null)
-    {
+  public void execute() throws BuildException {
+    if (this.name == null) {
       onerror("attribute `name' missing.");
       return;
     }
 
-    if (Static.istarget(getProject(), this.name))
-    {
+    if (Static.istarget(getProject(), this.name)) {
       getProject().executeTarget(this.name);
-    } else
-    {
+    } else {
       onerror("`" + this.name + "' not a target.");
     }
     return;

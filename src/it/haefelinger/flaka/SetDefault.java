@@ -22,15 +22,13 @@ import it.haefelinger.flaka.util.Static;
 
 import java.util.Hashtable;
 
-
 import org.apache.tools.ant.BuildException;
 
 /**
  * @author merzedes
  * @since 1.0
  */
-public class SetDefault extends Task
-{
+public class SetDefault extends Task {
   protected String target = null;
   protected boolean fail = false;
   protected boolean override = false;
@@ -40,13 +38,11 @@ public class SetDefault extends Task
    * 
    * @param s
    */
-  public void setName(String s)
-  {
+  public void setName(String s) {
     this.target = Static.trim2(s, this.target);
   }
 
-  public String getName()
-  {
+  public String getName() {
     return this.target;
   }
 
@@ -55,13 +51,11 @@ public class SetDefault extends Task
    * 
    * @param b
    */
-  public void setFail(boolean b)
-  {
+  public void setFail(boolean b) {
     this.fail = b;
   }
 
-  public boolean getFail()
-  {
+  public boolean getFail() {
     return this.fail;
   }
 
@@ -70,46 +64,37 @@ public class SetDefault extends Task
    * 
    * @param b
    */
-  public void setOverride(boolean b)
-  {
+  public void setOverride(boolean b) {
     this.override = b;
   }
 
-  protected boolean hastarget(String s)
-  {
+  protected boolean hastarget(String s) {
     Hashtable H = getProject().getTargets();
     return H.containsKey(s);
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     String s;
 
-    if (this.target == null)
-    {
+    if (this.target == null) {
       debug("no default target given to set");
       return;
     }
 
     s = getProject().getDefaultTarget();
-    if (!Static.isEmpty(s) && this.override == false)
-    {
+    if (!Static.isEmpty(s) && this.override == false) {
       debug("default target already set to `" + s + "' (ignored)");
       return;
     }
 
-    if (hastarget(this.target))
-    {
+    if (hastarget(this.target)) {
       getProject().setDefault(this.target);
-    } else
-    {
+    } else {
       String m;
       m = "target `" + this.target + "' does not exist.";
-      if (this.fail)
-      {
+      if (this.fail) {
         throwbx(m);
-      } else
-      {
+      } else {
         verbose(m + " (ignored)");
       }
     }

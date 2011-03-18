@@ -34,17 +34,14 @@ import org.apache.tools.ant.PropertyHelper;
  * @since 1.0
  * 
  */
-public class EL extends Task
-{
+public class EL extends Task {
   protected boolean enable = true;
 
-  public void setEnable(boolean b)
-  {
+  public void setEnable(boolean b) {
     this.enable = b;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
     PropertyHelper current;
 
@@ -54,15 +51,13 @@ public class EL extends Task
     /* get current property helper */
     current = org.apache.tools.ant.PropertyHelper.getPropertyHelper(project);
 
-    if (current instanceof IFPropertyHelper)
-    {
+    if (current instanceof IFPropertyHelper) {
       IFPropertyHelper ph = (IFPropertyHelper) current;
       ph.enable(this.enable);
-    }
-    else
-    {
+    } else {
       // must be Flaka property handler.
-      throw new BuildException("unable to handle EL on non-Flaka property handler.");
+      throw new BuildException(
+          "unable to handle EL on non-Flaka property handler.");
     }
 
   }

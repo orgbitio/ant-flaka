@@ -34,51 +34,45 @@ import javax.el.PropertyNotWritableException;
 
 import org.apache.tools.ant.Project;
 
-public class ELProjectResolver extends ELResolver
-{
-  public ELProjectResolver()
-  {
+public class ELProjectResolver extends ELResolver {
+  public ELProjectResolver() {
     super();
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     return Object.class;
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     return null;
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return Object.class;
   }
 
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     Object r = null;
     String k = null;
     Project b = null;
 
-    if (base == null || context == null || property == null || !(base instanceof Project))
+    if (base == null || context == null || property == null
+        || !(base instanceof Project))
       return null;
 
-    try
-    {
+    try {
       k = (String) property;
       b = (Project) base;
-      if (k.equals("targets"))
-      {
+      if (k.equals("targets")) {
         List L = new ArrayList();
         Enumeration e = b.getTargets().keys();
-        while(e.hasMoreElements()) {
+        while (e.hasMoreElements()) {
           String s = e.nextElement().toString();
           if (s.equals("") == false)
             L.add(s);
@@ -86,11 +80,10 @@ public class ELProjectResolver extends ELResolver
         context.setPropertyResolved(true);
         return L;
       }
-      if (k.equals("tasks"))
-      {
+      if (k.equals("tasks")) {
         List L = new ArrayList();
         Enumeration e = b.getTaskDefinitions().keys();
-        while(e.hasMoreElements()) {
+        while (e.hasMoreElements()) {
           Object o = e.nextElement();
           String s = o.toString();
           if (s.equals("") == false)
@@ -99,24 +92,22 @@ public class ELProjectResolver extends ELResolver
         context.setPropertyResolved(true);
         return L;
       }
-      if (k.equals("taskdefs"))
-      {
+      if (k.equals("taskdefs")) {
         List L = new ArrayList();
         Enumeration e = b.getTaskDefinitions().keys();
-        while(e.hasMoreElements()) {
+        while (e.hasMoreElements()) {
           Object K = e.nextElement();
           String s = K.toString();
-          if (Static.istaskdef(b,s))
+          if (Static.istaskdef(b, s))
             L.add(s);
         }
         context.setPropertyResolved(true);
         return L;
       }
-      if (k.equals("macrodefs"))
-      {
+      if (k.equals("macrodefs")) {
         List L = new ArrayList();
         Enumeration e = b.getTaskDefinitions().keys();
-        while(e.hasMoreElements()) {
+        while (e.hasMoreElements()) {
           Object K = e.nextElement();
           String s = K.toString();
           if (Static.ismacrodef(b, s))
@@ -125,13 +116,11 @@ public class ELProjectResolver extends ELResolver
         context.setPropertyResolved(true);
         return L;
       }
-      if (k.equals("basedir"))
-      {
+      if (k.equals("basedir")) {
         context.setPropertyResolved(true);
         return b.getBaseDir();
       }
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
 
@@ -140,16 +129,14 @@ public class ELProjectResolver extends ELResolver
 
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return true;
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
     /* we do nothing here */
   }
 

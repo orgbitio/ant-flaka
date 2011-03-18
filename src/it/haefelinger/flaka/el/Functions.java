@@ -33,58 +33,50 @@ import java.util.Map;
 
 import org.apache.tools.ant.Project;
 
-public class Functions
-{
+public class Functions {
   /**
    * Quote a EL expression.
    * 
-   * A EL string is not allowed to have escaped characters other than <code>\'</code>
-   * and <code>\\</code>.
+   * A EL string is not allowed to have escaped characters other than
+   * <code>\'</code> and <code>\\</code>.
    */
-  static public String quote(String s)
-  {
+  static public String quote(String s) {
     char c0, c1;
     int i, n, l;
     StringBuilder buf = new StringBuilder();
-    for (i = 0, l = s.length(), n = l - 1; i < n; ++i)
-    {
+    for (i = 0, l = s.length(), n = l - 1; i < n; ++i) {
       c0 = s.charAt(i);
       c1 = s.charAt(i + 1);
-      switch (c0)
-      {
+      switch (c0) {
+      case '\\':
+        switch (c1) {
         case '\\':
-          switch (c1)
-          {
-            case '\\':
-              buf.append(c0);
-              i = i + 1;
-              break;
-            case '\'':
-            case '"':
-              break;
-            default:
-              buf.append(c0);
-          }
+          buf.append(c0);
+          i = i + 1;
           break;
+        case '\'':
+        case '"':
+          break;
+        default:
+          buf.append(c0);
+        }
+        break;
       }
       buf.append(c0);
     }
-    if (i < l)
-    {
+    if (i < l) {
       buf.append(s.charAt(n));
     }
     return buf.toString();
   }
 
-  static private File obj2file(Object obj)
-  {
+  static private File obj2file(Object obj) {
     String s;
 
     if (obj == null)
       return new File(".");
 
-    if (obj instanceof Project)
-    {
+    if (obj instanceof Project) {
       Project p = (Project) obj;
       File basedir = p.getBaseDir();
       return basedir;
@@ -93,16 +85,14 @@ public class Functions
     if (obj instanceof File)
       return (File) obj;
 
-    if (obj instanceof Iterable)
-    {
+    if (obj instanceof Iterable) {
       Iterator iter = ((Iterable) obj).iterator();
       File f;
       if (iter.hasNext() == false)
         f = new File(".");
       else
         f = obj2file(iter.next());
-      while (iter.hasNext())
-      {
+      while (iter.hasNext()) {
         f = new File(f, obj2file(iter.next()).toString());
       }
       return f;
@@ -119,89 +109,71 @@ public class Functions
     return new File(s);
   }
 
-  static public Object file(Object... varg)
-  {
+  static public Object file(Object... varg) {
     File f = null;
-    switch (varg.length)
-    {
-      case 0:
-        // When called without argument return the
-        f = new File(".");
-        break;
-      case 1:
-      {
-        f = obj2file(varg[0]);
-        break;
+    switch (varg.length) {
+    case 0:
+      // When called without argument return the
+      f = new File(".");
+      break;
+    case 1: {
+      f = obj2file(varg[0]);
+      break;
+    }
+    default: {
+      f = obj2file(varg[0]);
+      for (int i = 1; i < varg.length; ++i) {
+        f = new File(f, obj2file(varg[i]).toString());
       }
-      default:
-      {
-        f = obj2file(varg[0]);
-        for (int i = 1; i < varg.length; ++i)
-        {
-          f = new File(f, obj2file(varg[i]).toString());
-        }
-      }
+    }
     }
     return f;
   }
 
-  static private Object invoke(Object obj, String method)
-  {
+  static private Object invoke(Object obj, String method) {
     Object r = null;
     Method m;
-    try
-    {
+    try {
       m = obj.getClass().getMethod(method);
-      if (m != null)
-      {
+      if (m != null) {
         r = m.invoke(obj, (Object[]) null);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       /* pass */
     }
     return r;
   }
 
-  static private Object getfield(Object obj, String name)
-  {
+  static private Object getfield(Object obj, String name) {
     Object r = null;
     Field f;
-    try
-    {
+    try {
       f = obj.getClass().getField(name);
-      if (f != null)
-      {
+      if (f != null) {
         r = f.get(obj);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       /* pass */
     }
     return r;
   }
 
-  static public Object size(Object obj)
-  {
+  static public Object size(Object obj) {
     Object r = null;
     Class C;
 
-    if (obj != null)
-    {
+    if (obj != null) {
       C = obj.getClass();
 
       // The size of a primitve object is 0
       if (C.isPrimitive())
         return new Long(0);
 
-      if (C.isArray())
-      {
+      if (C.isArray()) {
         return new Long(Array.getLength(obj));
       }
       if (obj instanceof File) {
-        File f = (File)obj;
+        File f = (File) obj;
         if (f.isDirectory()) {
           String[] entries = f.list();
           r = new Long(entries != null ? entries.length : 0);
@@ -210,7 +182,7 @@ public class Functions
         }
         return r;
       }
-      
+
       r = invoke(obj, "size");
       if (r != null)
         return r;
@@ -227,18 +199,15 @@ public class Functions
     return new Long(0);
   }
 
-  static public Boolean isnil(Object obj)
-  {
+  static public Boolean isnil(Object obj) {
     return new Boolean(obj == null);
   }
 
-  static public Object concat(Object... argv)
-  {
+  static public Object concat(Object... argv) {
     Object obj;
     String str;
     StringBuilder buf = new StringBuilder();
-    for (int i = 0, n = argv.length; i < n; ++i)
-    {
+    for (int i = 0, n = argv.length; i < n; ++i) {
       obj = argv[i];
       if (obj == null)
         str = null;
@@ -257,27 +226,21 @@ public class Functions
    * This function returns a list containing all the elements.
    * 
    */
-  static public Object append(Object... argv)
-  {
+  static public Object append(Object... argv) {
     int i, n;
     List L;
 
     L = new ArrayList();
     n = argv.length;
 
-    for (i = 0, n = argv.length; i < n; ++i)
-    {
+    for (i = 0, n = argv.length; i < n; ++i) {
       Object obj = argv[i];
-      if (obj instanceof Iterable)
-      {
+      if (obj instanceof Iterable) {
         Iterator I = ((Iterable) obj).iterator();
-        while (I.hasNext())
-        {
+        while (I.hasNext()) {
           L.add(I.next());
         }
-      }
-      else
-      {
+      } else {
         /* null is like the empty list */
         if (obj != null)
           L.add(obj);
@@ -286,21 +249,18 @@ public class Functions
     return L;
   }
 
-  static public List list(Object... args)
-  {
+  static public List list(Object... args) {
     List list = new ArrayList();
     for (int i = 0, n = args.length; i < n; ++i)
       list.add(args[i]);
     return list;
   }
 
-  static public List split_ws(Object s)
-  {
+  static public List split_ws(Object s) {
     return split(s, "\\s+");
   }
 
-  static public List split(Object... args)
-  {
+  static public List split(Object... args) {
     String regex;
     List list = new ArrayList();
 
@@ -319,8 +279,7 @@ public class Functions
     return list;
   }
 
-  static public String replace(Object... args)
-  {
+  static public String replace(Object... args) {
     String r, src, regex, subst;
 
     if (args.length < 1)
@@ -338,92 +297,73 @@ public class Functions
 
     if (src == null || regex == null || subst == null)
       return null;
-    try
-    {
+    try {
       r = src.replaceAll(regex, subst);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       r = null;
     }
     return r;
   }
 
-  static public String trim(Object s)
-  {
+  static public String trim(Object s) {
     return replace(s, "^\\s*|\\s*$", "");
   }
 
-  static public String ltrim(Object s)
-  {
+  static public String ltrim(Object s) {
     return replace(s, "^\\s*", "");
   }
 
-  static public String rtrim(Object s)
-  {
+  static public String rtrim(Object s) {
     return replace(s, "\\s*$", "");
   }
 
-  static public String format(String f, Object... args)
-  {
+  static public String format(String f, Object... args) {
     String r;
     r = String.format(f, args);
     return r;
   }
 
-  static public String join(String f, Object... args)
-  {
+  static public String join(String f, Object... args) {
     String r;
-    switch (args.length)
-    {
-      case 0:
+    switch (args.length) {
+    case 0:
+      r = "";
+      break;
+    case 1: {
+      Object arg0 = args[0];
+      if (arg0 instanceof Iterable) {
+        Iterator i = ((Iterable) arg0).iterator();
         r = "";
-        break;
-      case 1:
-      {
-        Object arg0 = args[0];
-        if (arg0 instanceof Iterable)
-        {
-          Iterator i = ((Iterable) arg0).iterator();
-          r = "";
-          if (i.hasNext())
-          {
-            r = i.next().toString();
-          }
-          while (i.hasNext())
-          {
-            r = r + f + i.next();
-          }
+        if (i.hasNext()) {
+          r = i.next().toString();
         }
-        else
-        {
-          r = arg0.toString();
+        while (i.hasNext()) {
+          r = r + f + i.next();
         }
-        break;
+      } else {
+        r = arg0.toString();
       }
-      default:
-        // if there are more than one vararg, treat them as list.
-        r = args[0].toString();
-        for (int i = 1; i < args.length; ++i)
-        {
-          r = r + f + args[i].toString();
-        }
+      break;
+    }
+    default:
+      // if there are more than one vararg, treat them as list.
+      r = args[0].toString();
+      for (int i = 1; i < args.length; ++i) {
+        r = r + f + args[i].toString();
+      }
     }
     return r;
   }
 
-  static public String nativetype(Object object)
-  {
-    if (object == null)
-    {
+  static public String nativetype(Object object) {
+    if (object == null) {
       return "";
     }
     Class clazz = object.getClass();
     return clazz.getName();
   }
 
-  static public String typeof(Object object)
-  {
+  static public String typeof(Object object) {
     if (object == null)
       return "null";
 

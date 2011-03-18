@@ -29,15 +29,13 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Logo extends Task
-{
+public class Logo extends Task {
   protected String text = "";
   protected String chr = ":";
   protected int width = 80;
   protected TextReader tr = new TextReader();
 
-  public Logo()
-  {
+  public Logo() {
     super();
     this.tr.setIC(";");
     this.tr.setSkipws(true);
@@ -45,51 +43,42 @@ public class Logo extends Task
     this.tr.setSkipEmpty(false);
   }
 
-  public void addText(String s)
-  {
+  public void addText(String s) {
     this.tr.setText(s);
   }
 
-  public void setChr(String s)
-  {
+  public void setChr(String s) {
     this.chr = Static.trim2(s, this.chr);
   }
 
-  public void setWidth(int s)
-  {
+  public void setWidth(int s) {
     this.width = s;
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     this.tr.setCL(s);
   }
 
-  public void setIcs(String s)
-  {
+  public void setIcs(String s) {
     this.tr.setIC(s);
   }
 
-  public void setWs(boolean b)
-  {
+  public void setWs(boolean b) {
     // TODO: document me
     this.tr.setSkipws(b);
   }
 
-  public void setCl(boolean b)
-  {
+  public void setCl(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project = this.getProject();
     String line = this.tr.readLine();
     System.out.println(Static.mkchrseq(this.chr, this.width));
     int w = this.chr.length();
-    while (line != null)
-    {
+    while (line != null) {
       line = project.replaceProperties(line);
 
       /* resolve all EL references #{ ..} */

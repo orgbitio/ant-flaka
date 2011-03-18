@@ -38,7 +38,6 @@ import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
 import javax.el.ResourceBundleELResolver;
 
-
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
 
@@ -55,14 +54,12 @@ import org.apache.tools.ant.Project;
  * @author geronimo
  * 
  */
-public class Resolver extends ELResolver
-{
+public class Resolver extends ELResolver {
 
   /* A map for top level objects */
   private final Map<String, Object> map;
 
-  static public ELResolver makeResolver(Project project)
-  {
+  static public ELResolver makeResolver(Project project) {
     CompositeELResolver cr = new CompositeELResolver();
 
     cr.add(new StringELResolver(project));
@@ -78,8 +75,7 @@ public class Resolver extends ELResolver
     return cr;
   }
 
-  static public interface Wrapper
-  {
+  static public interface Wrapper {
     static final int HAVE = 0;
     static final int REFERENCE = 1;
     static final int PROPERTY = 2;
@@ -89,269 +85,222 @@ public class Resolver extends ELResolver
     static final int TYPE = 6;
     static final int FILTER = 7;
     static final int TARGET = 8;
- 
+
     public Object lookup(ELContext context, String property);
   }
 
-  static public class Have implements Wrapper
-  {
+  static public class Have implements Wrapper {
     protected Project project;
     protected String what;
 
-    public Have(Project project, String property)
-    {
+    public Have(Project project, String property) {
       this.project = project;
       this.what = property;
     }
 
-    public Object lookup(ELContext context, String property)
-    {
-      if (property == null)
-      {
+    public Object lookup(ELContext context, String property) {
+      if (property == null) {
         context.setPropertyResolved(true);
         return this;
       }
       // TODO: move var in it's own namespace
-      if (this.what.matches("reference|var"))
-      {
+      if (this.what.matches("reference|var")) {
         context.setPropertyResolved(true);
         return new Boolean(Static.isreference(this.project, property));
       }
-      if (this.what.matches("property"))
-      {
+      if (this.what.matches("property")) {
         context.setPropertyResolved(true);
         return new Boolean(Static.isproperty(this.project, property));
       }
-      if (this.what.matches("target"))
-      {
+      if (this.what.matches("target")) {
         context.setPropertyResolved(true);
-        return new Boolean(Static.istarget(this.project,property));
+        return new Boolean(Static.istarget(this.project, property));
       }
-      if (this.what.matches("task"))
-      {
+      if (this.what.matches("task")) {
         context.setPropertyResolved(true);
-        return new Boolean(Static.istask(this.project,property));
+        return new Boolean(Static.istask(this.project, property));
       }
-      if (this.what.matches("taskdef"))
-      {
+      if (this.what.matches("taskdef")) {
         context.setPropertyResolved(true);
-        return new Boolean(Static.istaskdef(this.project,property));
+        return new Boolean(Static.istaskdef(this.project, property));
       }
-      if (this.what.matches("macrodef"))
-      {
+      if (this.what.matches("macrodef")) {
         context.setPropertyResolved(true);
-        return new Boolean(Static.ismacrodef(this.project,property));
+        return new Boolean(Static.ismacrodef(this.project, property));
       }
       return Boolean.FALSE;
     }
   }
 
-  static public class ProjectWrapper implements Wrapper, Iterable
-  {
+  static public class ProjectWrapper implements Wrapper, Iterable {
 
     protected Project project;
     protected int what;
 
     @SuppressWarnings("unused")
-    private ProjectWrapper()
-    {
+    private ProjectWrapper() {
       /* not allowed */
     }
 
-    public ProjectWrapper(Project project, int what)
-    {
+    public ProjectWrapper(Project project, int what) {
       this.project = project;
       this.what = what;
     }
 
-    public Object lookup(ELContext context, String property)
-    {
+    public Object lookup(ELContext context, String property) {
       Object r = null;
-      switch (this.what)
-      {
-        case Wrapper.HAVE:
-        {
-          context.setPropertyResolved(true);
-          r = new Have(this.project, property);
-          break;
-        }
-        case Wrapper.PROPERTY:
-        {
-          context.setPropertyResolved(true);
-          r = this.project.getProperties().get(property);
-          //r= Static.property(this.project,property);
-          break;
-        }
-        case Wrapper.REFERENCE:
-        {
-          context.setPropertyResolved(true);
-          r = Static.reference(this.project,property);
-          break;
-        }
-        case Wrapper.TARGET:
-        {
-          context.setPropertyResolved(true);
-          r = Static.target(this.project,property);
-          break;
-        }
-        case Wrapper.TASKDEF:
-        {
-          context.setPropertyResolved(true);
-          r = Static.taskdef(this.project,property);
-          break;
-        }
-        case Wrapper.MACRODEF:
-        {
-          context.setPropertyResolved(true);
-          r = Static.macrodef(this.project,property);
-          break;
-        }
-        case Wrapper.TASK:
-        {
-          context.setPropertyResolved(true);
-          r = Static.task(this.project,property);
-          break;
-        }
-        case Wrapper.TYPE:
-        {
-          context.setPropertyResolved(true);
-          r = Static.type(this.project,property);
-          break;
-        }
-        case Wrapper.FILTER:
-        {
-          context.setPropertyResolved(true);
-          r = Static.filter(this.project,property);
-          break;
-        }
+      switch (this.what) {
+      case Wrapper.HAVE: {
+        context.setPropertyResolved(true);
+        r = new Have(this.project, property);
+        break;
+      }
+      case Wrapper.PROPERTY: {
+        context.setPropertyResolved(true);
+        r = this.project.getProperties().get(property);
+        // r= Static.property(this.project,property);
+        break;
+      }
+      case Wrapper.REFERENCE: {
+        context.setPropertyResolved(true);
+        r = Static.reference(this.project, property);
+        break;
+      }
+      case Wrapper.TARGET: {
+        context.setPropertyResolved(true);
+        r = Static.target(this.project, property);
+        break;
+      }
+      case Wrapper.TASKDEF: {
+        context.setPropertyResolved(true);
+        r = Static.taskdef(this.project, property);
+        break;
+      }
+      case Wrapper.MACRODEF: {
+        context.setPropertyResolved(true);
+        r = Static.macrodef(this.project, property);
+        break;
+      }
+      case Wrapper.TASK: {
+        context.setPropertyResolved(true);
+        r = Static.task(this.project, property);
+        break;
+      }
+      case Wrapper.TYPE: {
+        context.setPropertyResolved(true);
+        r = Static.type(this.project, property);
+        break;
+      }
+      case Wrapper.FILTER: {
+        context.setPropertyResolved(true);
+        r = Static.filter(this.project, property);
+        break;
+      }
       }
       return r;
     }
 
-    public int size()
-    {
+    public int size() {
       int size = 0;
-      switch (this.what)
-      {
-        case Wrapper.PROPERTY:
-        {
-          size = this.project.getProperties().size();
-          break;
-        }
-        case Wrapper.REFERENCE:
-        {
-          size = this.project.getReferences().size();
-          break;
-        }
-        case Wrapper.TARGET:
-        {
-          size = this.project.getTargets().size();
-          break;
-        }
-        case Wrapper.TASKDEF:
-        case Wrapper.MACRODEF:
-        case Wrapper.TASK:
-        {
-          ComponentHelper ch = Static.comphelper(this.project);
-          size = ch.getTaskDefinitions().size();
-          break;
-        }
-        case Wrapper.TYPE:
-        {
-          size = this.project.getDataTypeDefinitions().size();
-          break;
-        }
-        case Wrapper.FILTER:
-        {
-          size = this.project.getGlobalFilterSet().getFilterHash().size();
-          break;
-        }
+      switch (this.what) {
+      case Wrapper.PROPERTY: {
+        size = this.project.getProperties().size();
+        break;
+      }
+      case Wrapper.REFERENCE: {
+        size = this.project.getReferences().size();
+        break;
+      }
+      case Wrapper.TARGET: {
+        size = this.project.getTargets().size();
+        break;
+      }
+      case Wrapper.TASKDEF:
+      case Wrapper.MACRODEF:
+      case Wrapper.TASK: {
+        ComponentHelper ch = Static.comphelper(this.project);
+        size = ch.getTaskDefinitions().size();
+        break;
+      }
+      case Wrapper.TYPE: {
+        size = this.project.getDataTypeDefinitions().size();
+        break;
+      }
+      case Wrapper.FILTER: {
+        size = this.project.getGlobalFilterSet().getFilterHash().size();
+        break;
+      }
       }
       return size;
     }
 
-    public String toString()
-    {
+    public String toString() {
       String s = null;
-      switch (this.what)
-      {
-        case Wrapper.PROPERTY:
-        {
-          s = this.project.getProperties().toString();
-          break;
-        }
-        case Wrapper.REFERENCE:
-        {
-          s = this.project.getReferences().toString();
-          break;
-        }
-        case Wrapper.TARGET:
-        {
-          s = this.project.getTargets().toString();
-          break;
-        }
-        case Wrapper.TASKDEF:
-        case Wrapper.MACRODEF:
-        case Wrapper.TASK:
-        {
-          ComponentHelper ch = Static.comphelper(this.project);
-          s = ch.getTaskDefinitions().toString();
-          break;
-        }
-        case Wrapper.TYPE:
-        {
-          s = this.project.getDataTypeDefinitions().toString();
-          break;
-        }
-        case Wrapper.FILTER:
-        {
-          s = this.project.getGlobalFilterSet().getFilterHash().toString();
-          break;
-        }
+      switch (this.what) {
+      case Wrapper.PROPERTY: {
+        s = this.project.getProperties().toString();
+        break;
+      }
+      case Wrapper.REFERENCE: {
+        s = this.project.getReferences().toString();
+        break;
+      }
+      case Wrapper.TARGET: {
+        s = this.project.getTargets().toString();
+        break;
+      }
+      case Wrapper.TASKDEF:
+      case Wrapper.MACRODEF:
+      case Wrapper.TASK: {
+        ComponentHelper ch = Static.comphelper(this.project);
+        s = ch.getTaskDefinitions().toString();
+        break;
+      }
+      case Wrapper.TYPE: {
+        s = this.project.getDataTypeDefinitions().toString();
+        break;
+      }
+      case Wrapper.FILTER: {
+        s = this.project.getGlobalFilterSet().getFilterHash().toString();
+        break;
+      }
       }
       return s;
     }
 
-    public Iterator iterator()
-    {
+    public Iterator iterator() {
       Iterator iter = null;
       // TODO Auto-generated method stub
-      switch (this.what)
-      {
-        case Wrapper.PROPERTY:
-        {
-          iter = this.project.getProperties().keySet().iterator();
-          break;
-        }
-        case Wrapper.REFERENCE:
-        {
-          iter = this.project.getReferences().keySet().iterator();
-          break;
-        }
-        case Wrapper.TARGET:
-        {
-          iter = this.project.getTargets().keySet().iterator();
-          break;
-        }
-        case Wrapper.TASKDEF:
-        case Wrapper.MACRODEF:
-        case Wrapper.TASK:
-        {
-          // TODO: improve
-          ComponentHelper ch = Static.comphelper(this.project);
-          iter = ch.getTaskDefinitions().keySet().iterator();
-          break;
-        }
-        case Wrapper.TYPE:
-        {
-          iter = this.project.getDataTypeDefinitions().keySet().iterator();
-          break;
-        }
-        case Wrapper.FILTER:
-        {
-          iter = this.project.getGlobalFilterSet().getFilterHash().keySet().iterator();
-          break;
-        }
+      switch (this.what) {
+      case Wrapper.PROPERTY: {
+        iter = this.project.getProperties().keySet().iterator();
+        break;
+      }
+      case Wrapper.REFERENCE: {
+        iter = this.project.getReferences().keySet().iterator();
+        break;
+      }
+      case Wrapper.TARGET: {
+        iter = this.project.getTargets().keySet().iterator();
+        break;
+      }
+      case Wrapper.TASKDEF:
+      case Wrapper.MACRODEF:
+      case Wrapper.TASK: {
+        // TODO: improve
+        ComponentHelper ch = Static.comphelper(this.project);
+        iter = ch.getTaskDefinitions().keySet().iterator();
+        break;
+      }
+      case Wrapper.TYPE: {
+        iter = this.project.getDataTypeDefinitions().keySet().iterator();
+        break;
+      }
+      case Wrapper.FILTER: {
+        iter = this.project.getGlobalFilterSet().getFilterHash().keySet()
+            .iterator();
+        break;
+      }
       }
       return iter;
     }
@@ -361,8 +310,7 @@ public class Resolver extends ELResolver
   protected Project project = null;
   protected boolean debug = false;
 
-  public Resolver(Project project)
-  {
+  public Resolver(Project project) {
     this.delegate = makeResolver(project);
     this.project = project;
     this.map = makemap();
@@ -379,32 +327,27 @@ public class Resolver extends ELResolver
     this.map.put("filter", new ProjectWrapper(project, Wrapper.FILTER));
   }
 
-  public Resolver setDebug(boolean b)
-  {
+  public Resolver setDebug(boolean b) {
     this.debug = b;
     return this;
   }
 
-  public boolean getDebug()
-  {
+  public boolean getDebug() {
     return this.debug;
   }
 
-  protected Map<String, Object> makemap()
-  {
+  protected Map<String, Object> makemap() {
     HashMap<String, Object> map;
     map = new HashMap<String, Object>();
     return Collections.synchronizedMap(map);
   }
 
-  private boolean resolve(ELContext context, Object base)
-  {
+  private boolean resolve(ELContext context, Object base) {
     context.setPropertyResolved(base == null);
     return context.isPropertyResolved();
   }
 
-  private Object get(String property)
-  {
+  private Object get(String property) {
     Object obj = null;
     if (this.map.containsKey(property))
       obj = this.map.get(property);
@@ -416,23 +359,22 @@ public class Resolver extends ELResolver
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     boolean b = resolve(context, base);
-    return b ? Object.class : this.delegate.getCommonPropertyType(context, base);
+    return b ? Object.class : this.delegate
+        .getCommonPropertyType(context, base);
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     boolean b = resolve(context, base);
     return b ? null : this.delegate.getFeatureDescriptors(context, base);
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     boolean b = resolve(context, base);
     return b ? Object.class : this.delegate.getType(context, base, property);
   }
@@ -460,75 +402,62 @@ public class Resolver extends ELResolver
    * 
    * */
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     Object obj = null;
 
-    try
-    {
+    try {
       /*
        * If base is null, let other resolvers handle the issue. This resolver
        * shall handle top level objects. Top level objects are: a. The implict
        * object 'project'. b. All references defined within project.
        */
 
-      if (base == null)
-      {
+      if (base == null) {
         String key;
         key = property.toString();
         obj = get(key);
-      } else
-      {
+      } else {
         obj = this.delegate.getValue(context, base, property);
       }
-      if (obj == null && this.debug)
-      {
+      if (obj == null && this.debug) {
         String p = Static.q(property.toString());
         String b = base == null ? "{}" : Static.q(base.toString());
         error("unable to resolve property " + p + " on base " + b);
       }
 
-    } catch (PropertyNotFoundException pne)
-    {
+    } catch (PropertyNotFoundException pne) {
       /* we silently ignore this common exception */
-    } catch (Exception e)
-    {
-      if (this.debug)
-      {
+    } catch (Exception e) {
+      if (this.debug) {
         String p = Static.q(property.toString());
         String b = base == null ? "{}" : Static.q(base.toString());
-        Static.debug(this.project, "error while evaluating " + p + " on base " + b, e);
+        Static.debug(this.project, "error while evaluating " + p + " on base "
+            + b, e);
       }
-    } finally
-    {
+    } finally {
       context.setPropertyResolved(true);
     }
     return obj;
   }
 
-  private void error(String s)
-  {
+  private void error(String s) {
     this.project.log("error: " + s, Project.MSG_ERR);
   }
 
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     boolean b = resolve(context, base);
     return b ? false : this.delegate.isReadOnly(context, base, property);
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
-    if (resolve(context, base))
-    {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
+    if (resolve(context, base)) {
       this.map.put(property.toString(), value);
-    } else
-    {
+    } else {
       this.delegate.setValue(context, base, property, value);
     }
   }

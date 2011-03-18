@@ -32,98 +32,79 @@ import org.apache.tools.ant.Project;
  * @author merzedes
  * @since 1.0
  */
-public class Let extends Task
-{
+public class Let extends Task {
   protected TextReader tr = new TextReader();
 
-  public void setComment(String s)
-  {
+  public void setComment(String s) {
     this.tr.setCL(s);
   }
 
-  public void setCs(String s)
-  {
+  public void setCs(String s) {
     // TODO: document me
     this.tr.setCL(s);
   }
 
-  public void setIcs(String s)
-  {
+  public void setIcs(String s) {
     // TODO: document me
     this.tr.setIC(s);
   }
 
-  public void setCL(boolean b)
-  {
+  public void setCL(boolean b) {
     // TODO: document me
     this.tr.setResolveContLines(b);
   }
 
-  public void addText(String text)
-  {
+  public void addText(String text) {
     this.tr.setText(text);
   }
 
-  public String toString()
-  {
+  public String toString() {
     StringBuilder buf = new StringBuilder();
-    if (this.tr.getText() != null)
-    {
+    if (this.tr.getText() != null) {
       buf.append("<let>\n");
       buf.append(this.tr.getText());
       buf.append("\n</let>\n");
-    }
-    else
-    {
+    } else {
       buf.append("<let/>\n");
     }
     return buf.toString();
   }
 
-  protected Pattern makeregex(String s)
-  {
+  protected Pattern makeregex(String s) {
     Pattern re = null;
-    try
-    {
+    try {
       re = Pattern.compile(s);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       /* TODO: error */
       this.debug("error compiling regex '" + s + "'", e);
     }
     return re;
   }
 
-  protected Pattern getPropRegex()
-  {
+  protected Pattern getPropRegex() {
     return makeregex("([^=:]+)(=|:=|::=)(.*)");
   }
 
-  protected int howto(String s)
-  {
+  protected int howto(String s) {
     int r = Static.VARREF;
-    switch (s.charAt(0))
-    {
-      case '=':
-        r = Static.VARREF;
+    switch (s.charAt(0)) {
+    case '=':
+      r = Static.VARREF;
+      break;
+    default:
+      switch (s.length()) {
+      case 3: /* ::= */
+        r = Static.WRITEPROPTY;
         break;
       default:
-        switch (s.length())
-        {
-          case 3: /* ::= */
-            r = Static.WRITEPROPTY;
-            break;
-          default:
-            r = Static.PROPTY;
-        }
-        break;
+        r = Static.PROPTY;
+      }
+      break;
     }
     return r;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     Project project;
     Pattern regex;
     Matcher M;
@@ -137,21 +118,18 @@ public class Let extends Task
 
     regex = getPropRegex();
 
-    while ((line = this.tr.readLine()) != null)
-    {
+    while ((line = this.tr.readLine()) != null) {
       line = project.replaceProperties(line);
 
       /* resolve all EL references #{ ..} */
       line = Static.elresolve(project, line);
 
       /* eval text */
-      if ((M = regex.matcher(line)).matches() == false)
-      {
+      if ((M = regex.matcher(line)).matches() == false) {
         debug("line : syntax error '" + line + "'");
         continue;
       }
-      try
-      {
+      try {
         type = howto(M.group(2));
         k = M.group(1);
         if (type == Static.PROPTY && project.getProperty(k) != null)
@@ -160,11 +138,10 @@ public class Let extends Task
         o = Static.el2obj(project, v);
         Static.assign(project, k, o, type);
 
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (this.debug)
-          debug("line : error evaluating EL expression (ignored) in " + Static.q(line));
+          debug("line : error evaluating EL expression (ignored) in "
+              + Static.q(line));
       }
     }
   }

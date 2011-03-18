@@ -23,7 +23,6 @@ import it.haefelinger.flaka.util.Static;
 import java.io.File;
 import java.io.InputStream;
 
-
 import org.apache.tools.ant.BuildException;
 
 /**
@@ -36,66 +35,55 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class Export extends Task
-{
+public class Export extends Task {
   private String dst = null;
   private boolean tee = false;
   private String src = "antlib.xml";
 
-  private InputStream asStream(String fname)
-  {
+  private InputStream asStream(String fname) {
     if (fname == null)
       return null;
     /* returns null if fname can't be found. */
     return this.getClass().getResourceAsStream(fname);
   }
 
-  private String asString(String fname)
-  {
+  private String asString(String fname) {
     return Static.readlines(asStream(fname));
   }
 
-  public void setDst(String s)
-  {
+  public void setDst(String s) {
     this.dst = s;
   }
 
-  public void setDest(String s)
-  {
+  public void setDest(String s) {
     this.dst = s;
   }
 
-  public void setOut(String s)
-  {
+  public void setOut(String s) {
     this.dst = s;
   }
 
-  public void setSrc(String s)
-  {
+  public void setSrc(String s) {
     this.src = s;
   }
 
-  public void setTee(boolean b)
-  {
+  public void setTee(boolean b) {
     this.tee = b;
   }
 
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     String fname, s;
     File F;
 
     /* read it in one go .. */
     s = asString(this.src);
 
-    if (s == null)
-    {
+    if (s == null) {
       info("loc \"" + this.src + "\" not found in classpath.");
       return;
     }
 
-    if (this.dst == null || this.dst.equals("-"))
-    {
+    if (this.dst == null || this.dst.equals("-")) {
       /* dump loc on stdout */
       log(s);
       /* we are done */
@@ -105,22 +93,18 @@ public class Export extends Task
     fname = this.dst;
     F = new File(fname);
 
-    if (F.isDirectory())
-    {
+    if (F.isDirectory()) {
       File B = new File(this.src);
       fname = new File(this.dst, B.getName()).getAbsolutePath();
     }
-    try
-    {
-      if (this.tee)
-      {
+    try {
+      if (this.tee) {
         log(s);
       }
       Static.writex(toFile(fname), s, false);
       log("\tfile \"" + fname + "\" contains exported resource.");
 
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       throwbx("errors while exporting resource to loc \"" + fname + "\":", e);
       return;
     }

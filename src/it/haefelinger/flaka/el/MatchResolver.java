@@ -18,7 +18,6 @@
 
 package it.haefelinger.flaka.el;
 
-
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -29,35 +28,30 @@ import javax.el.ELResolver;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
 
-
 import org.apache.tools.ant.Project;
 
-public class MatchResolver extends ELResolver
-{
+public class MatchResolver extends ELResolver {
   protected Project project = null;
 
-  public MatchResolver(Project project)
-  {
+  public MatchResolver(Project project) {
     super();
     this.project = project;
   }
 
   @Override
-  public Class<?> getCommonPropertyType(ELContext context, Object base)
-  {
+  public Class<?> getCommonPropertyType(ELContext context, Object base) {
     return Object.class;
   }
 
   @Override
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-  {
+  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+      Object base) {
     return null;
   }
 
   @Override
   public Class<?> getType(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return Object.class;
   }
 
@@ -69,66 +63,61 @@ public class MatchResolver extends ELResolver
       try {
         index = Integer.valueOf((String) property).intValue();
       } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Cannot parse array index: " + property);
+        throw new IllegalArgumentException("Cannot parse array index: "
+            + property);
       }
     } else if (property instanceof Character) {
       index = ((Character) property).charValue();
     } else if (property instanceof Boolean) {
       index = ((Boolean) property).booleanValue() ? 1 : 0;
     } else {
-      throw new IllegalArgumentException("Cannot coerce property to array index: " + property);
+      throw new IllegalArgumentException(
+          "Cannot coerce property to array index: " + property);
     }
     return index;
   }
-  
-  
+
   public Object getValue(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     int idx;
     Object obj;
     Matcher bean;
-    
-    if (base == null || context == null || property == null || !(base instanceof MatcherBean))
+
+    if (base == null || context == null || property == null
+        || !(base instanceof MatcherBean))
       return null;
 
-    try 
-    {
+    try {
       idx = toIndex(property);
-    }
-    catch (Exception e)
-    {
-      /* Unable to  convert to numeric value, give up on numerics. However,
-       * do not set property as resolved to give further resolvers a chance
-       * to handle.
+    } catch (Exception e) {
+      /*
+       * Unable to convert to numeric value, give up on numerics. However, do
+       * not set property as resolved to give further resolvers a chance to
+       * handle.
        */
       return null;
     }
-    
+
     obj = null;
-    bean = ((MatcherBean)base).getMatcher();
-    
-    if (idx >= 0 && idx <= bean.groupCount())
-    {
-      obj = new MatcherBean(bean,idx);
+    bean = ((MatcherBean) base).getMatcher();
+
+    if (idx >= 0 && idx <= bean.groupCount()) {
+      obj = new MatcherBean(bean, idx);
       context.setPropertyResolved(true);
-    } 
+    }
     return obj;
   }
 
-  
   @Override
   public boolean isReadOnly(ELContext context, Object base, Object property)
-      throws NullPointerException, PropertyNotFoundException, ELException
-  {
+      throws NullPointerException, PropertyNotFoundException, ELException {
     return true;
   }
 
   @Override
-  public void setValue(ELContext context, Object base, Object property, Object value)
-      throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException,
-      ELException
-  {
+  public void setValue(ELContext context, Object base, Object property,
+      Object value) throws NullPointerException, PropertyNotFoundException,
+      PropertyNotWritableException, ELException {
     /* we do nothing here */
   }
 

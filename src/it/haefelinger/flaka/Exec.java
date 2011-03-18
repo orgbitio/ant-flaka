@@ -34,36 +34,29 @@ import org.apache.tools.ant.taskdefs.Execute;
  * @author merzedes
  * @since 1.0
  */
-public class Exec extends ExecTask
-{
+public class Exec extends ExecTask {
   protected boolean failIfExecFails = true;
 
-  public void setFailIfExecutionFails(boolean flag)
-  {
+  public void setFailIfExecutionFails(boolean flag) {
     super.setFailIfExecutionFails(flag);
     this.failIfExecFails = flag;
   }
 
-  protected void maybeSetResultPropertyValue(int result)
-  {
+  protected void maybeSetResultPropertyValue(int result) {
     super.maybeSetResultPropertyValue(result);
   }
 
-  protected void runExec(Execute exe) throws BuildException
-  {
+  protected void runExec(Execute exe) throws BuildException {
     log(this.cmdl.describeCommand(), Project.MSG_VERBOSE);
     exe.setCommandline(this.cmdl.getCommandline());
-    try
-    {
+    try {
       runExecute(exe);
-    } catch (IOException e)
-    {
-      if (this.failIfExecFails)
-      {
-        throw new BuildException("Execute failed: " + e.toString(), e, getLocation());
+    } catch (IOException e) {
+      if (this.failIfExecFails) {
+        throw new BuildException("Execute failed: " + e.toString(), e,
+            getLocation());
       }
-    } finally
-    {
+    } finally {
       logFlush();
     }
   }

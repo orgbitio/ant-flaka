@@ -32,14 +32,12 @@ import org.apache.tools.ant.BuildException;
  * @since 1.0
  */
 
-public class NoOp extends org.apache.tools.ant.Task
-{
+public class NoOp extends org.apache.tools.ant.Task {
   /** unused */
   /**
    * @param unused
    */
-  public void setName(String unused)
-  {
+  public void setName(String unused) {
     /* not used */
   }
 
@@ -47,8 +45,7 @@ public class NoOp extends org.apache.tools.ant.Task
   /**
    * @param unused
    */
-  public void setVar(String unused)
-  {
+  public void setVar(String unused) {
     /* not used */
   }
 
@@ -56,8 +53,7 @@ public class NoOp extends org.apache.tools.ant.Task
   /**
    * @param unused
    */
-  public void setProperty(String unused)
-  {
+  public void setProperty(String unused) {
     /* not used */
   }
 
@@ -65,8 +61,7 @@ public class NoOp extends org.apache.tools.ant.Task
   /**
    * @param unused
    */
-  public void setFlush(String unused)
-  {
+  public void setFlush(String unused) {
     /* not used */
   }
 
@@ -74,8 +69,7 @@ public class NoOp extends org.apache.tools.ant.Task
   /**
    * @param unused
    */
-  public void setSrcDir(String unused)
-  {
+  public void setSrcDir(String unused) {
     /* not used */
   }
 
@@ -83,8 +77,7 @@ public class NoOp extends org.apache.tools.ant.Task
   /**
    * @param unused
    */
-  public void setResDir(String unused)
-  {
+  public void setResDir(String unused) {
     /* not used */
   }
 
@@ -93,8 +86,7 @@ public class NoOp extends org.apache.tools.ant.Task
    * 
    * This task does nothing
    */
-  public void execute() throws BuildException
-  {
+  public void execute() throws BuildException {
     /* do nothing */
   }
 }
