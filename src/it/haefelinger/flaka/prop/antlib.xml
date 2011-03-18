@@ -1,9 +1,41 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <antlib xmlns:c="ant:current">
-  <!-- you need Ant 1.8.x -->
-  <componentdef name="flakapropertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
-  <componentdef name="elreferences" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
-  <typedef name="elpropertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
-  <typedef name="elevaluator" classname="it.haefelinger.flaka.el.ELPropertyEvaluator" />
-  <typedef name="elexpander" classname="it.haefelinger.flaka.el.ELPropertyExpander" />
+	<!-- you need Ant 1.8.x -->
+	<!--/////////////////////////////////////////////////////////////////////// -->
+	<!-- elreferences: -->
+	<!-- Enables #{ el-expr } on a global level. -->
+	<!--/////////////////////////////////////////////////////////////////////// -->
+
+	<typedef name="elreferences" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
+
+	<!--/////////////////////////////////////////////////////////////////////// -->
+	<!-- elevaluator: -->
+	<!-- Enables ${ el-expr } on a global level. -->
+	<!-- Warning: when enabled, Ant's property handler has no chance to be part -->
+	<!-- of the game. -->
+	<!--/////////////////////////////////////////////////////////////////////// -->
+
+	<typedef name="elevaluator" classname="it.haefelinger.flaka.el.ELPropertyEvaluator" />
+
+	<!--/////////////////////////////////////////////////////////////////////// -->
+	<!-- elexpander: -->
+	<!-- Just makes ${..} more tolerant for leading and trailing whitespace. -->
+	<!-- Traditionally, leading and trailing whitespace is significant. For -->
+	<!-- example, ${foo} and ${ foo } is not the same in Ant. The later will -->
+	<!-- cause Ant to lookup for a poperty ' foo '. -->
+	<!-- When enabled, leading an trailing whitespace becomes insignificant 
+		- -->
+	<!-- thus ${foo}, ${ foo}, ${foo } and ${ foo } are all looking up a prop -->
+	<!-- named 'foo'. -->
+	<!--/////////////////////////////////////////////////////////////////////// -->
+
+
+	<typedef name="elexpander" classname="it.haefelinger.flaka.el.ELPropertyExpander" />
+
+	<!--/////////////////////////////////////////////////////////////////////// -->
+	<!-- Deprecated - do not use. -->
+	<!--/////////////////////////////////////////////////////////////////////// -->
+
+	<typedef name="elpropertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
+	<typedef name="flakapropertyhelper" classname="it.haefelinger.flaka.prop.PropertyHelper12" />
 </antlib>
