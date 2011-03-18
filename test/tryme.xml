@@ -1,11 +1,16 @@
-<project xmlns:c="antlib:it.haefelinger.flaka" name="tryme">
-	
-	
-  <c:echo>
-    foobar
-     </c:echo>
-  <c:echo>
-    foobar\
-  </c:echo>
-	
+<project xmlns:f="antlib:it.haefelinger.flaka.prop" name="tryme">
+
+  <property name="foo" value="bar" />
+
+  <propertyhelper>
+    <f:elexpander />
+  </propertyhelper>
+
+  <echo>
+    ${ format("%s",'hello'.toupper) }
+    #{ format("%s",'hello'.toupper) }
+    ${ foo }
+    #{ foo }
+  </echo>
+
 </project>
