@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Haefelinger IT 
+ * Copyright (c) 2009 Haefelinger IT
  *
  * Licensed  under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7,11 +7,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required  by  applicable  law  or  agreed  to in writing, 
- * software distributed under the License is distributed on an "AS 
- * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ * Unless required  by  applicable  law  or  agreed  to in writing,
+ * software distributed under the License is distributed on an "AS
+ * IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied.
- 
+
  * See the License for the specific language governing permissions
  * and limitations under the License.
  */
@@ -62,7 +62,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * From the basis of an XML source, creates a list of dependencies.
- * 
+ *
  */
 
 final public class Static {
@@ -77,7 +77,7 @@ final public class Static {
 
   /**
    * Assign an object either as variable or as property to a given project.
-   * 
+   *
    * @param project
    *          not null
    * @param key
@@ -113,6 +113,7 @@ final public class Static {
     case Static.WRITEPROPTY: {
       if (obj != null) {
         String val = obj instanceof String ? (String) obj : obj.toString();
+        Static.unset(project, key);
         project.setProperty(key, val);
       } else {
         Static.unset(project, key);
@@ -639,7 +640,7 @@ final public class Static {
    * Redesign of rule to generate the stem. The ultimate goal is to get a name
    * suitable as shell variable. The stem should shall not include any version
    * information and shall unique stems. Here's how this shall be done now:
-   * 
+   *
    * a. find index of first dot (.) character scanning from left to right. b. if
    * there is no dot, then the argument will be the stem, otherwise we have an
    * index j >= 0 with s[j] = '.'. c. scan from j backwards to 1: while s[j-1]
@@ -866,7 +867,7 @@ final public class Static {
    * is given by key <code>key</code>. Note that * this method does not care
    * about accessability, i.e. it allows * to remove a key from a private
    * Hashtable. * *
-   * 
+   *
    * @param obj
    *          might be null *
    * @param att
@@ -897,7 +898,7 @@ final public class Static {
   /**
    * tests whether class <code>obj</code> is a subclass of <code>
    * * base</code>. * *
-   * 
+   *
    * @return true if clazz is a subclass of base (or equals base).
    */
 
@@ -1056,7 +1057,7 @@ final public class Static {
   /**
    * escape all non-alphanumeric characters in <code>s</code> by escape
    * character <code>esc</code>.
-   * 
+   *
    * @param s
    *          not null
    */
@@ -1076,12 +1077,12 @@ final public class Static {
   /**
    * escape non-alphanumeric character <code>c</code> by escape character
    * <code>esc</code>.
-   * 
+   *
    * @param c
    *          character in question
    * @param esc
    *          the escape character
-   * 
+   *
    * @return <code>c</code> if <code>c</code> is alpanumeric character otherwise
    *         return <code>esc</code>.
    */
@@ -1092,7 +1093,7 @@ final public class Static {
   /**
    * replace all <code>c</code> characters in <code>s</code> with string
    * <code>sub</code>.
-   * 
+   *
    * @param s
    *          not null
    */
@@ -1114,7 +1115,7 @@ final public class Static {
    * larger than <code>s.length()</code>. If <code>j</code> is less then
    * <code>i</code>, the empty string is returned. Otherwise function behaves as
    * <code>s.substring(i,j)</code>.
-   * 
+   *
    * @param s
    *          not null
    */
@@ -1134,7 +1135,7 @@ final public class Static {
 
   /**
    * * test whether a character is printable. * *
-   * 
+   *
    * @param c
    *          character to test *
    * @return true if printable
@@ -1173,7 +1174,7 @@ final public class Static {
   /**
    * * test whether a character is a 'textual' character, i.e. * not a binary
    * character. * *
-   * 
+   *
    * @param c
    *          character to test *
    * @return true if non-binary character.
@@ -1186,7 +1187,7 @@ final public class Static {
   /**
    * * test whether a character is a 'textual' character, i.e. * not a binary
    * character. * *
-   * 
+   *
    * @param c
    *          character to test *
    * @return true if non-binary character.
@@ -1204,7 +1205,7 @@ final public class Static {
 
   /**
    * Trim a given string.
-   * 
+   *
    * This version of trim ensures that the result value is not an empty string,
    * i.e. a string consisting only of whitespace characters. If an empty string
    * would be returned after trimming down, the alternative
@@ -1287,7 +1288,7 @@ final public class Static {
 
   /**
    * Cleans up the empty lines and tab after removing the nodes
-   * 
+   *
    * @param source
    */
   final protected static void tidyxml(DOMSource source) {
@@ -1407,7 +1408,7 @@ final public class Static {
 
   /**
    * A standard way to compile a given pattern into a RE Pattern.
-   * 
+   *
    * The interpretation of the given string depends on the first and last
    * character:
    * <ul>
@@ -1462,7 +1463,7 @@ final public class Static {
 
   /**
    * Resolve embedded EL references in <code>text</code>.
-   * 
+   *
    * Text can be an arbitrary text containing one or more references to EL
    * expressions {@code # ..} . Resolving a reference means that the embedded EL
    * expression is evaluated into an object and stringized in a second step.
@@ -1474,7 +1475,7 @@ final public class Static {
 
   /**
    * Evaluate EL expression in a string context.
-   * 
+   *
    * The given expression is evaluated and in a second step stringized.
    */
   final static public String el2str(Project project, String expr) {
@@ -1484,7 +1485,7 @@ final public class Static {
 
   /**
    * Evaluate EL expression.
-   * 
+   *
    * The expression given must be a native EL expression not containing any
    * embedded {@code # references. The expression is simply evaluated and not
    * coerced.
@@ -1503,7 +1504,7 @@ final public class Static {
 
   /**
    * Evaluate a EL expression in a boolean context.
-   * 
+   *
    * Important: The expr given is evaluated as true EL expression. Thus it may
    * not contain EL references like {@code # ..} .
    */
@@ -1517,7 +1518,7 @@ final public class Static {
   /**
    * A function to return a EL context reference (consisting of a context and
    * expression factory) for a given project.
-   * 
+   *
    * Important: This function is expected to be called only if and only if
    * function <code>haveEL(project)</code> returns true. Otherwise the behaviour
    * is undefined.
