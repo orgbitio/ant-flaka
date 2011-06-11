@@ -306,15 +306,15 @@ public class Functions {
   }
 
   static public String trim(Object s) {
-    return replace(s, "^\\s*|\\s*$", "");
+    return replace(s, "", "^\\s*|\\s*$");
   }
 
   static public String ltrim(Object s) {
-    return replace(s, "^\\s*", "");
+    return replace(s, "", "^\\s*");
   }
 
   static public String rtrim(Object s) {
-    return replace(s, "\\s*$", "");
+    return replace(s, "", "\\s*$");
   }
 
   static public String format(String f, Object... args) {
