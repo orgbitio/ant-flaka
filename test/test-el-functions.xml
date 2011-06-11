@@ -340,5 +340,93 @@
 		<expect have="${p8}" expected="a b" />
 		<fail if="p9" />
 	</target>
+
+	<target name="test-matches">
+		<init />
+		<c:let>
+		        p0 := matches(null,null)
+		        p1 := matches('','')
+		        p2 := matches('a','a')
+		        p3 := matches(' ','\s')
+		        p4 := matches('a','\w')
+		        p5 := matches('1','\d')
+		        p6 := matches('abc','[a]')
+		        p7 := matches('abc','ab')
+		</c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="true" />
+		<expect have="${p2}" expected="true" />
+		<expect have="${p3}" expected="true" />
+		<expect have="${p4}" expected="true" />
+		<expect have="${p5}" expected="true" />
+		<expect have="${p6}" expected="true" />
+		<expect have="${p7}" expected="true" />
+	</target>
 	
+	<target name="test-glob">
+		<init />
+		<c:let>
+		        p0 := glob(null,null)
+		        p1 := glob('','')
+		        p2 := glob('a','a')
+		        p3 := glob(' ','\s')
+		        p4 := glob('a','\w')
+		        p5 := glob('1','\d')
+		        p6 := glob('abc','[a]')
+			    ;;; glob's do work on entire input string
+		        p7 := glob('abc','ab')
+			    p8 := glob('abc','ab*')
+		    p9 := glob('abc','ab?')
+		    pa := glob('abc','ab[c]')
+		    pb := glob('ab*','ab\*')
+		</c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="true" />
+		<expect have="${p2}" expected="true" />
+		<expect have="${p3}" expected="false" />
+		<expect have="${p4}" expected="false" />
+		<expect have="${p5}" expected="false" />
+		<expect have="${p6}" expected="false" />
+		<expect have="${p7}" expected="false" />
+		<expect have="${p8}" expected="true" />
+		<expect have="${p9}" expected="true" />
+		<expect have="${pa}" expected="true" />
+		<!-- TODO -->
+		<!-- expect have="${pb}" expected="true" /-->
+
+	</target>
+	
+	<target name="test-glob1">
+		<init />
+		<c:let>
+		        p0 := glob('aZb','a*b')
+		        p1 := glob('aZb','a[*]')
+		        p2 := glob('aZb','a[Z]b')
+		        p3 := glob('aZb','a[Z*]b')
+		</c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="false" />
+		<expect have="${p2}" expected="true" />
+		<expect have="${p3}" expected="true" />
+	</target>
+	
+	<target name="test-glob2">
+		<init />
+		<c:let>
+		        p0 := glob('aZb','aZb')
+		        p1 := glob('aZb','a\Zb')
+		        p2 := glob('aZb','a\\Zb')       ; cause a\\Zb is internally repr. as 'a\Zb' - why?
+			    p3 := glob('aZb','a\\\\Zb') 
+		        p4 := glob('a[]b','a\[\]b')
+			    p5 := glob('aZb','a\*b')
+			    p6 := glob('a*b','a\*b')
+		</c:let>
+		<expect have="${p0}" expected="true" />
+		<expect have="${p1}" expected="true" />
+		<expect have="${p2}" expected="true" />
+		<expect have="${p3}" expected="false" />
+		<expect have="${p4}" expected="true" />
+		<expect have="${p5}" expected="false" />
+		<expect have="${p6}" expected="true" />
+	</target>
 </project>

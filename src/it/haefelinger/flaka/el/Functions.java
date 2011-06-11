@@ -21,6 +21,8 @@
  */
 package it.haefelinger.flaka.el;
 
+import it.haefelinger.flaka.util.Static;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -30,8 +32,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.tools.ant.Project;
+
 
 public class Functions {
   /**
@@ -400,4 +405,57 @@ public class Functions {
     return "object";
   }
 
+  public static String stringize(Object obj) {
+    return obj == null ? "" : obj.toString();
+  }
+  
+  /**
+   * A simple text matching function based on regular expressions.
+   * 
+   * Both arguments are stringized into textual arguments. The first
+   * argument is the text to be matched against the second, assumed to
+   * be a valid regular expression.
+   * 
+   * This function returns true if the regular expression matches either
+   * the full input text or only a fraction. This is contrary to Java's 
+   * behaviour where {@code matches} works on the entire input sequence
+   * only.
+   * 
+   * Notice that this function will not set a matcher object as side 
+   * effect.
+   * 
+   * @param text can be null
+   * @param regex can be null
+   */
+  public static boolean matches(Object text, Object regex) {
+    boolean ret = false;
+    try {
+      Pattern pat;
+      Matcher mat;
+      pat = Pattern.compile(stringize(regex));
+      mat = pat.matcher(stringize(text));
+      ret = mat.find();
+    } catch (Exception e) {
+      // TODO: log warning
+      ret = false;
+    }
+    return ret;
+  }
+  
+  public static boolean glob(Object text, Object glob) {
+    boolean ret = false;
+    try {
+      Pattern pat;
+      Matcher mat;
+      String rex;
+      rex = Static.patternAsRegex(stringize(glob));
+      pat = Pattern.compile(rex);
+      mat = pat.matcher(stringize(text));
+      ret = mat.matches();
+    } catch (Exception e) {
+      // TODO: log warning although this can't happen.
+      ret = false;
+    }
+    return ret;
+  }
 }

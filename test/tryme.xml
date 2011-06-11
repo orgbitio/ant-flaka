@@ -1,16 +1,10 @@
-<project xmlns:f="antlib:it.haefelinger.flaka.prop" name="tryme">
-
+<project xmlns:f="antlib:it.haefelinger.flaka" name="tryme">
+  <f:install-property-handler/>
   <property name="foo" value="bar" />
 
-  <propertyhelper>
-    <f:elexpander />
-  </propertyhelper>
 
   <echo>
-    ${ format("%s",'hello'.toupper) }
-    #{ format("%s",'hello'.toupper) }
-    ${ foo }
-    #{ foo }
+    #{ 'a\\Zb' }
   </echo>
 
 </project>

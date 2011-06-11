@@ -113,8 +113,9 @@ final public class Static {
     case Static.WRITEPROPTY: {
       if (obj != null) {
         String val = obj instanceof String ? (String) obj : obj.toString();
-        /* wh: merge of cs{333} - this will fix issue #3, where user properties were
-         * not overridden.
+        /*
+         * wh: merge of cs{333} - this will fix issue #3, where user properties
+         * were not overridden.
          */
         Static.unset(project, key);
         project.setProperty(key, val);
@@ -1006,24 +1007,39 @@ final public class Static {
 
   final static public String patternAsRegex(String glob) {
     char c;
-    int i, j, n;
-    String r;
-
+    int i, n;
+    StringBuilder B;
+    
     i = 0;
     n = glob.length();
-    r = "";
-
+    B = new StringBuilder();
+    
     while (i < n) {
       c = glob.charAt(i++);
       switch (c) {
+      case '\\': {
+        // take next character literally - if there
+        // is one, otherwise take this character
+        // literally.
+        if (i<n) {
+          c = glob.charAt(i++);
+          if (mustEscape(c))
+            B.append('\\');
+          B.append(c);
+        } 
+        else {
+          B.append('\\');
+        }
+        break;
+      }
       case '*':
-        r += ".*";
+        B.append('.').append('*');
         break;
       case '?':
-        r += '.';
+        B.append('.');
         break;
       case '[':
-        j = i;
+        int j = i;
         if (j < n && glob.charAt(j) == '!')
           j = j + 1;
         if (j < n && glob.charAt(j) == ']')
@@ -1032,7 +1048,7 @@ final public class Static {
           j = j + 1;
 
         if (j >= n)
-          r = r + "\\[";
+          B.append('\\').append('[');
         else {
           String s;
           s = substring(glob, i, j);
@@ -1045,54 +1061,25 @@ final public class Static {
             s = '\\' + s;
             break;
           }
-          r = r + "[" + s + "]";
+          B.append('[').append(s).append(']');
           i = j + 1;
         }
         break;
       default:
-        r = r + escape("" + c, '\\');
+        if (mustEscape(c))
+          B.append('\\');
+        B.append(c);
         break;
       }
     }
-    return r;
+    return B.toString();
   }
 
-  /**
-   * escape all non-alphanumeric characters in <code>s</code> by escape
-   * character <code>esc</code>.
-   * 
-   * @param s
-   *          not null
-   */
-  final static protected String escape(String s, char esc) {
-    String r = "";
-    char c;
-
-    for (int i = 0; i < s.length(); ++i) {
-      c = s.charAt(i);
-      if (Character.isLetterOrDigit(c) == false)
-        r += esc;
-      r += c;
-    }
-    return r;
+  final static protected boolean mustEscape(char c) {
+    return Character.isLetterOrDigit(c) ? false : true;
   }
-
-  /**
-   * escape non-alphanumeric character <code>c</code> by escape character
-   * <code>esc</code>.
-   * 
-   * @param c
-   *          character in question
-   * @param esc
-   *          the escape character
-   * 
-   * @return <code>c</code> if <code>c</code> is alpanumeric character otherwise
-   *         return <code>esc</code>.
-   */
-  final static protected String escape(char c, char esc) {
-    return "" + (Character.isLetterOrDigit(c) ? c : esc);
-  }
-
+  
+ 
   /**
    * replace all <code>c</code> characters in <code>s</code> with string
    * <code>sub</code>.

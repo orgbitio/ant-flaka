@@ -622,7 +622,9 @@ public final class EL {
     funcdef("rtrim", Functions.class, "rtrim", Object.class);
     funcdef1v("format", Functions.class, "format", String.class);
     funcdef1v("join", Functions.class, "join", String.class);
-
+    funcdef2("matches", Functions.class, "matches", Object.class, Object.class);
+    funcdef2("glob", Functions.class, "glob", Object.class, Object.class);
+    
     // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
     // funcdef("car", Functions.class, "car", List.class);
     // funcdef("cdr", Functions.class, "cdr", List.class);
