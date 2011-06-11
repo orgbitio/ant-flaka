@@ -69,10 +69,14 @@
       name="depot.url" 
       value="http://download.haefelinger.it/flaka/dependencies" 
       />
-
+  <!-- remember also to change displayversion below -->
   <property
       name="version"
-      value="1.02.02-SNAPSHOT"
+      value="1.02.03-SNAPSHOT"
+      />
+  <property
+      name="displayversion"
+      value="1.2.3" 
       />
   <property 
       name="src.dir" 
@@ -620,5 +624,100 @@
           description=">> use me when building a release - requires 1.8 or newer">
   </target>
 
+  <macrodef name="gcupload-available">
+    <attribute name="p" default="gc-file-missing" />
+    <attribute name="f" />
+    <sequential>
+      <condition property="@{p}" value="@{f}">
+        <not>
+          <available file="@{f}" />
+        </not>
+      </condition>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="gcupload-ready">
+    <attribute name="p" default="gc-file-missing" />
+    <sequential>
+       <fail if="gc-file-missing">
+        Error: a file to be released is missing, please make sure that it is available: ${gc-file-missing}
+      </fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="gcupload">
+    <attribute name="displayversion" />
+    <attribute name="version" />
+    <sequential>
+      <fail unless="gcname">
+        Property `gcname', your username @ google.code is not set. Make sure that you 
+        also set `gcpass', your google code's password (which is not the same as your
+        gmail password).
+      </fail>
+      <fail unless="gcpass">
+        Property `gcname', your username @ google.code is not set. Make sure that you 
+        also set `gcpass', your google code's password (which is not the same as your
+        gmail password).
+      </fail>
+      <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" 
+               classpath="${basedir}/lib/ant-googlecode-0.0.3.jar" 
+               name="_gcupload"/>
+
+      <presetdef name="_gcupload">
+        <_gcupload
+            username    = "${gcname}" 
+            password    = "${gcpass}" 
+            projectname = "flaka" 
+            />
+      </presetdef>
+
+      <!-- check that we have all files ready for uploading -->
+      <fail if="gc-file-missing">
+        property gc-file-missing is already set, please make sure to wipe it.
+      </fail>
+
+      <gcupload-available f="${dist.dir}/ant-flaka-${version}.jar" />
+      <gcupload-available f="${dist.dir}/ant-flaka-bare-${version}.jar" />
+      <gcupload-available f="${dist.dir}/flaka-sources-${version}.zip" />
+      <gcupload-available f="${dist.dir}/flaka-javadoc-${version}.zip" />
+      <gcupload-available f="${dist.dir}/flaka-${version}.zip" />
+      <gcupload-ready />
+      
+      <_gcupload 
+          filename="${dist.dir}/ant-flaka-${version}.jar" 
+          targetfilename="ant-flaka-${version}.jar"
+          summary="Flaka ${displayversion} - Ant plugin, fully charged (dependencies inlined)."
+          labels="Featured, Type-Package, OpSys-All" 
+          />
+       <_gcupload 
+          filename="${dist.dir}/ant-flaka-bare-${version}.jar" 
+          targetfilename="ant-flaka-bare-${version}.jar"
+          summary="Flaka ${displayversion} - Ant plugin, requires additional dependencies."
+          labels="Type-Package, OpSys-All" 
+          />
+       <_gcupload 
+          filename="${dist.dir}/flaka-sources-${version}.zip" 
+          targetfilename="flaka-sources-${version}.zip"
+          summary="Flaka ${displayversion} - Source code only."
+          labels="Type-Source, OpSys-All" 
+          />
+       <_gcupload 
+          filename="${dist.dir}/flaka-javadoc-${version}.zip" 
+          targetfilename="flaka-javadoc-${version}.zip"
+          summary="Flaka ${displayversion} - Javadoc only."
+          labels="Type-Docs, OpSys-All" 
+          />
+       <_gcupload 
+          filename="${dist.dir}/flaka-${version}.zip" 
+          targetfilename="flaka-${version}.zip"
+          summary="Flaka ${displayversion} - Complete development package (but 3rdparth dependencies)."
+          labels="Type-Archive, OpSys-All" 
+          />
+    </sequential>
+  </macrodef>
+
+  <target name="deploy">
+    <gcupload displayversion="${displayversion}" version="${version}" />
+  </target>
 
 </project>
