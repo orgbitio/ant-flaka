@@ -113,6 +113,10 @@ final public class Static {
     case Static.WRITEPROPTY: {
       if (obj != null) {
         String val = obj instanceof String ? (String) obj : obj.toString();
+        /* wh: merge of cs{333} - this will fix issue #3, where user properties were
+         * not overridden.
+         */
+        Static.unset(project, key);
         project.setProperty(key, val);
       } else {
         Static.unset(project, key);
