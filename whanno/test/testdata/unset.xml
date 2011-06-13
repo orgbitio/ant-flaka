@@ -1,0 +1,12 @@
+<project xmlns:c="antlib:it.haefelinger.flaka" >
+  <c:inline-properties>
+    v1 = v1
+  </c:inline-properties>
+  <echo>
+    v1 = ${v1} | v2 = ${v2}
+  </echo>
+  <c:unset var=" v1 v2 " />
+  <echo>
+    v1 = ${v1} | v2 = ${v2}
+  </echo>
+</project>

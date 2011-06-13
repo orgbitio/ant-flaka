@@ -1,0 +1,21 @@
+<project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
+  <c:find dir="${basedir}">
+    <include name="lib/*.jar" />
+  </c:find>
+  
+  <c:update-dist-jar jar="x.jar" dir="${basedir}">
+    <fileset dir="${basedir}/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </c:update-dist-jar>
+
+  <c:update-dist-jar jar="y.jar" dir="${basedir}">
+    <zipfileset dir="${basedir}/lib" prefix="wolfi">
+      <include name="**/*.jar" />
+    </zipfileset>
+  </c:update-dist-jar>
+
+  <c:dependencies />
+</target>
+</project>

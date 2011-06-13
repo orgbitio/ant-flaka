@@ -1,0 +1,106 @@
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-case">
+	<macrodef name="reset">
+		<sequential>
+			<c:unset>
+	        p
+	        p0
+	        p1
+	        p2
+	        p3
+	        p4
+	        p5
+	        p6
+	        p7
+	        p8
+	        p9
+	        pa
+	        pb
+	        pc
+	     </c:unset>
+		</sequential>
+	</macrodef>
+  <c:evalwhichant />
+  
+
+	<c:install-property-handler />
+
+	<target name="test-case">
+		<reset />
+		<property name="p0" value="p0" />
+		<property name="p" value="property `p'" />
+		<property name=" p " value="strange property name ` p '" />
+
+		<c:expect pname="p0" value="p0" />
+		<c:expect pname="p" value="property `p'" />
+		<c:expect pname=" p " value="strange property name ` p '" />
+
+		<reset />
+		<property name="p0" value="x0" />
+		<property name="p1" value="x1" />
+		<property name="p2" value="x2" />
+
+		<property name=" p0 " value="p0" />
+		<property name=" p1" value="p1" />
+		<property name="p2 " value="p2" />
+		<property name="p3" value="#{ project.properties[' p0 '] }" />
+		<property name="p4" value="#{ project.properties[' p1'] }" />
+		<property name="p5" value="#{ project.properties['p2 '] }" />
+		<property name="p6" value="${ p0 }" />
+		<property name="p7" value="${ p1}" />
+		<property name="p8" value="${p2 }" />
+
+		<c:expect pname=" p0 " value="p0" />
+		<c:expect pname=" p1" value="p1" />
+		<c:expect pname="p2 " value="p2" />
+		<c:expect pname="p3" value="p0" />
+		<c:expect pname="p4" value="p1" />
+		<c:expect pname="p5" value="p2" />
+		<c:expect pname="p6" value="p0" />
+		<c:expect pname="p7" value="p1" />
+		<c:expect pname="p8" value="p2" />
+
+		<reset />
+		<property name="p1" value="prop #{ 'v' }" />
+		<property name="p2" value="#{ '${p1}' }" />
+		<c:expect pname="p1" value="prop v" />
+		<c:expect pname="p2" value="prop v" />
+
+		<reset />
+		<property name="p3" value="$$" />
+		<property name="p4" value="##" />
+		<property name="p5" value="\#" />
+		<property name="p6" value="\#{}" />
+		<property name="p7" value="\#{x}" />
+    <!-- This has changed between 1.7 and 1.8 - before 1.8 we got an exception -->
+    <c:when test=" property.flaka_ant18_or_newer ">
+      <property name="p8" value="$${" />
+      <c:expect pname="p8" value="${" />
+    </c:when>
+		<property name="p9" value="$${}" />
+		<property name="pa" value="##{" />
+		<property name="pb" value="##{}" />
+
+		<c:echo debug="#{ true }" />
+
+		<c:expect pname="p3" value="$" />
+		<c:expect pname="p4" value="##" />
+		<c:expect pname="p5" value="\#" />
+		<c:expect pname="p6" value="#{}" />
+		<c:expect pname="p7" value="#{x}" />
+
+		<c:expect pname="p9" value="${}" />
+		<c:expect pname="pa" value="##{" />
+		<c:expect pname="pb" value="##{}" />
+
+		<reset />
+		<property name="p0" value="#{list(1,2)}" />
+		<property name="p1" value="${ v }" />
+		<property name="p2" value="#{ v }" />
+
+		<c:expect pname="p0" value="[1, 2]" />
+		<c:expect pname="p1" value="${ v }" />
+		<c:expect pname="p2" value="" />
+	</target>
+
+
+</project>

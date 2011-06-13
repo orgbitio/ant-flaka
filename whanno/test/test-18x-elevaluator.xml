@@ -1,0 +1,22 @@
+<project default="test-case" name="tryme" xmlns:c="antlib:it.haefelinger.flaka" xmlns:f="antlib:it.haefelinger.flaka.prop">
+
+  <propertyhelper>
+    <f:elevaluator />
+  </propertyhelper>
+
+  <target name="test-case">
+    <echo>
+      ${ format("%s",'hello'.toupper) }
+    </echo>
+  	<property name="p0" value="${ format('%s','hello'.toupper) }" />
+  	<c:expect pname="p0" value="HELLO" />
+  	
+  	<property name="p1" value="${ p0 }" />
+  	<c:expect pname="p1" value="HELLO" />
+ 	
+	<property name="p2" value="foobar" />
+  	<c:expect pname="p2" value="foobar" />
+ 
+  </target>
+
+</project>
