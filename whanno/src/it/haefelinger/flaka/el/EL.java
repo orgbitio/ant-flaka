@@ -755,6 +755,7 @@ public final class EL {
     
     if (clazz == null)
       return this;
+    
     clazz = clazz.trim();
     // bail out if only no classname is given.
     if (clazz.length()==0 || clazz.matches("[^:]*:$"))
@@ -773,9 +774,10 @@ public final class EL {
     for (Method m : Class.forName(clazz).getMethods()) {
        if (m.isAnnotationPresent(ELFunction.class)) {
           try {
-            // function with one argument of type Object.
-            String name = m.getName();
+            ELFunction meta = m.getAnnotation(ELFunction.class);
+            String name = Static.trim2(meta.name(), m.getName());
             this.context.setFunction(ns, name, m);
+            System.out.printf("loaded %s (%s)..\n",name,m);
             passed++;
           } catch (Throwable ex) {
              System.out.printf("something failed while loading %s: %s \n", m, ex.getCause());
