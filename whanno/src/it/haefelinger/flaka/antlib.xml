@@ -29,6 +29,7 @@
   <!--=============================================================-->
   <!--                         TASKS                               -->
   <!--=============================================================-->
+  <taskdef name="el-load" classname="it.haefelinger.flaka.ELLoad" />
   <taskdef name="el" classname="it.haefelinger.flaka.EL" />
   <taskdef name="noop" classname="it.haefelinger.flaka.NoOp" />
   <taskdef name="while" classname="it.haefelinger.flaka.While" />

@@ -49,6 +49,7 @@ import de.odysseus.el.tree.impl.ast.AstEval;
 import de.odysseus.el.tree.impl.ast.AstNode;
 import de.odysseus.el.tree.impl.ast.AstNull;
 import de.odysseus.el.tree.impl.ast.AstText;
+import java.lang.reflect.*;
 
 /**
  * This class is the entry point for EL evaluation.
@@ -746,6 +747,46 @@ public final class EL {
     return obj instanceof Boolean ? ((Boolean) obj).booleanValue() : false;
   }
 
+  
+  public EL sourceFunctions(String clazz) throws SecurityException, ClassNotFoundException {
+    
+    int passed = 0, failed = 0;
+    String ns = "";
+    
+    if (clazz == null)
+      return this;
+    clazz = clazz.trim();
+    // bail out if only no classname is given.
+    if (clazz.length()==0 || clazz.matches("[^:]*:$"))
+      return this;
+    
+    int p = clazz.indexOf(':');
+    switch(p) {
+      case -1: break;
+      case 0 : clazz = clazz.substring(1); break;
+      default: {
+        ns = clazz.substring(0,p);
+        clazz = clazz.substring(p+1);
+      }
+    }
+    
+    for (Method m : Class.forName(clazz).getMethods()) {
+       if (m.isAnnotationPresent(ELFunction.class)) {
+          try {
+            // function with one argument of type Object.
+            String name = m.getName();
+            this.context.setFunction(ns, name, m);
+            passed++;
+          } catch (Throwable ex) {
+             System.out.printf("something failed while loading %s: %s \n", m, ex.getCause());
+             failed++;
+          }
+       }
+    }
+    System.out.printf("Loaded %d/%d functions", passed, (passed+failed));
+    return this;
+  }
+  
   public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
     try {
