@@ -788,36 +788,7 @@ public final class EL {
     return clazz == null ? this : this.sourceFunctions(ns, Class.forName(clazz));
   }
 
-  public Class parseGroovy(String text) {
-    Class clazz = null;
-    if (text != null) {
-      ClassLoader parent = getClass().getClassLoader();
-      GroovyClassLoader loader = new GroovyClassLoader(parent);
-      clazz = loader.parseClass(text);
-    }
-    return clazz;
-  }
   
-  public Class parseGroovy(File file) {
-    Class clazz = null;
-    if (file != null) {
-      ClassLoader parent = getClass().getClassLoader();
-      GroovyClassLoader loader = new GroovyClassLoader(parent);
-      try {
-        clazz = loader.parseClass(file);
-      } catch (CompilationFailedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        return null;
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        return null;
-      }
-    }
-    return clazz;
-  }
-
   public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
     try {

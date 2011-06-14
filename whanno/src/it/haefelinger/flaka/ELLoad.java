@@ -19,6 +19,8 @@
 package it.haefelinger.flaka;
 
 import it.haefelinger.flaka.el.EL;
+import it.haefelinger.flaka.util.Groovenizer;
+import it.haefelinger.flaka.util.GroovenizerFactory;
 import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.util.TextReader;
 
@@ -97,7 +99,8 @@ public class ELLoad extends Task {
           /* resolve all EL references #{ ..} */
           line = Static.elresolve(project, line);
           /* interpret this line as name of a class */
-          cz = el.parseGroovy(new File(Static.trim2(line,"")));
+          Groovenizer grvnzr = GroovenizerFactory.newInstance();
+          cz = grvnzr.parse(new File(Static.trim2(line,"")));
           el.sourceFunctions(this.ns,cz);
         }
       }
@@ -114,7 +117,8 @@ public class ELLoad extends Task {
 
         el = Static.el(project);
         if (el != null) {
-          cz = el.parseGroovy(text);
+          Groovenizer grvnzr = GroovenizerFactory.newInstance();
+          cz = grvnzr.parse(text);
           el.sourceFunctions(this.ns, cz);
         }
       }
