@@ -18,11 +18,9 @@
 
 package it.haefelinger.flaka.el;
 
-import groovy.lang.GroovyClassLoader;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
 import org.apache.tools.ant.Project;
-import org.codehaus.groovy.control.CompilationFailedException;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 import de.odysseus.el.tree.Tree;
@@ -64,7 +61,8 @@ public final class EL {
   Context context = null;
   ExpressionFactory factory = null;
   boolean debug = false;
-  Project project = null; // TODO: remove me
+  boolean verbose = true; /* TODO: logging */
+  Project project = null;
 
   @SuppressWarnings("unused")
   private EL() {/* unused */
@@ -589,51 +587,63 @@ public final class EL {
     // TODO: add project to context
 
     // variables e, pi
-    vardef("e", new Double(Math.E), double.class);
-    vardef("pi", new Double(Math.PI), double.class);
+    //vardef("e", new Double(Math.E), double.class);
+    //vardef("pi", new Double(Math.PI), double.class);
 
     // functions sin, cos, tan, exp, log, abs, sqrt, min, max, pow
-    funcdef("sin", Math.class, "sin", double.class);
-    funcdef("cos", Math.class, "cos", double.class);
-    funcdef("tan", Math.class, "tan", double.class);
-    funcdef("exp", Math.class, "exp", double.class);
-    funcdef("log", Math.class, "log", double.class);
-    funcdef("abs", Math.class, "abs", double.class);
-    funcdef("sqrt", Math.class, "sqrt", double.class);
-    funcdef2("min", Math.class, "min", double.class, double.class);
-    funcdef2("max", Math.class, "max", double.class, double.class);
-    funcdef2("pow", Math.class, "pow", double.class, double.class);
-    funcdef0("rand", Math.class, "random");
+    //funcdef("sin", Math.class, "sin", double.class);
+    //funcdef("cos", Math.class, "cos", double.class);
+    //funcdef("tan", Math.class, "tan", double.class);
+    //funcdef("exp", Math.class, "exp", double.class);
+    //funcdef("log", Math.class, "log", double.class);
+    //funcdef("abs", Math.class, "abs", double.class);
+    //funcdef("sqrt", Math.class, "sqrt", double.class);
+    //funcdef2("min", Math.class, "min", double.class, double.class);
+    //funcdef2("max", Math.class, "max", double.class, double.class);
+    //funcdef2("pow", Math.class, "pow", double.class, double.class);
+    //funcdef0("rand", Math.class, "random");
 
-    funcdef("typeof", Functions.class, "typeof", Object.class);
-    funcdef("nativetype", Functions.class, "nativetype", Object.class);
-    funcdefv("file", Functions.class, "file", Object[].class);
-    funcdef("size", Functions.class, "size", Object.class);
-    funcdef("sizeof", Functions.class, "size", Object.class);
-    funcdef("nullp", Functions.class, "isnil", Object.class);
-
-    // string functions
-    funcdefv("concat", Functions.class, "concat", Object[].class);
-
-    funcdefv("list", Functions.class, "list", Object[].class);
-    funcdefv("append", Functions.class, "append", Object[].class);
-
-    funcdefv("split", Functions.class, "split", Object[].class);
-    funcdef("split_ws", Functions.class, "split_ws", Object.class);
-    funcdefv("replace", Functions.class, "replace", Object[].class);
-    funcdef("trim", Functions.class, "trim", Object.class);
-    funcdef("ltrim", Functions.class, "ltrim", Object.class);
-    funcdef("rtrim", Functions.class, "rtrim", Object.class);
-    funcdef1v("format", Functions.class, "format", String.class);
-    funcdef1v("join", Functions.class, "join", String.class);
-    funcdef2("matches", Functions.class, "matches", Object.class, Object.class);
-    funcdef2("glob", Functions.class, "glob", Object.class, Object.class);
-
-    // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
-    // funcdef("car", Functions.class, "car", List.class);
-    // funcdef("cdr", Functions.class, "cdr", List.class);
-
-    funcdef("q", Functions.class, "quote", String.class);
+    // How about loading some classes.
+    try {
+      this.sourceFunctions("", it.haefelinger.flaka.util.ELFunctions.class);
+      this.sourceFunctions("", it.haefelinger.flaka.util.ELBinding.class);
+    } catch (SecurityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    /*
+     * Remove me once tested.
+     * 
+     * funcdef("typeof", Functions.class, "typeof", Object.class);
+     * funcdef("nativetype", Functions.class, "nativetype", Object.class);
+     * funcdefv("file", Functions.class, "file", Object[].class);
+     * funcdef("size", Functions.class, "size", Object.class); funcdef("sizeof",
+     * Functions.class, "size", Object.class); funcdef("nullp", Functions.class,
+     * "isnil", Object.class);
+     * 
+     * // string functions funcdefv("concat", Functions.class, "concat",
+     * Object[].class);
+     * 
+     * funcdefv("list", Functions.class, "list", Object[].class);
+     * funcdefv("append", Functions.class, "append", Object[].class);
+     * 
+     * funcdefv("split", Functions.class, "split", Object[].class);
+     * funcdef("split_ws", Functions.class, "split_ws", Object.class);
+     * funcdefv("replace", Functions.class, "replace", Object[].class);
+     * funcdef("trim", Functions.class, "trim", Object.class); funcdef("ltrim",
+     * Functions.class, "ltrim", Object.class); funcdef("rtrim",
+     * Functions.class, "rtrim", Object.class); funcdef1v("format",
+     * Functions.class, "format", String.class); funcdef1v("join",
+     * Functions.class, "join", String.class); funcdef2("matches",
+     * Functions.class, "matches", Object.class, Object.class); funcdef2("glob",
+     * Functions.class, "glob", Object.class, Object.class);
+     * 
+     * 
+     * funcdef("q", Functions.class, "quote", String.class);
+     */
   }
 
   void vardef(String name, Object obj, Class clazz) {
@@ -752,43 +762,88 @@ public final class EL {
 
   public EL sourceFunctions(String ns, Class clazz) throws SecurityException,
       ClassNotFoundException {
+
     int passed = 0, failed = 0, ignored = 0;
-    if (clazz != null) {
-      ns = Static.condnull(ns, "");
-      // Load annotated and static methods.
-      for (Method m : clazz.getMethods()) {
-        if(!m.isAnnotationPresent(ELFunction.class)) {
+    /* bail out if no class is given */
+    if (clazz == null) {
+      return this;
+    }
+    /* get namespace right */
+    ns = Static.condnull(ns, "");
+
+    // Load annotated and static methods.
+    for (Method m : clazz.getMethods()) {
+      /* ignore any method not annotated by either ELFunction or Binding */
+      if (!m.isAnnotationPresent(ELFunction.class)
+          && !m.isAnnotationPresent(Binding.class)) {
+        continue;
+      }
+      /* we must ignore any non-statice function */
+      if (!Modifier.isStatic(m.getModifiers())) {
+        System.err.printf("warning: %s ignored cause not static..\n", m);
+        ignored++;
+        continue;
+      }
+      try {
+        if (m.isAnnotationPresent(ELFunction.class)) {
+          ELFunction meta = m.getAnnotation(ELFunction.class);
+          String name = Static.trim2(meta.name(), m.getName());
+          this.context.setFunction(ns, name, m);
+          System.out.printf("%s imported as %s..\n", m, name);
+          passed++;
           continue;
         }
-        if(!Modifier.isStatic(m.getModifiers())) {
-          System.err.printf("warning: %s ignored cause not static..\n", m);
-          ignored++;
-          continue;
-        }
-        try {
-            ELFunction meta = m.getAnnotation(ELFunction.class);
-            String name = Static.trim2(meta.name(), m.getName());
+        if (m.isAnnotationPresent(Binding.class)) {
+          Binding meta = m.getAnnotation(Binding.class);
+          String name = Static.trim2(meta.name(), m.getName());
+          switch (meta.type()) {
+          case 1: {
             this.context.setFunction(ns, name, m);
             System.out.printf("%s imported as %s..\n", m, name);
             passed++;
-          } catch (Throwable ex) {
-            System.out.printf("something failed while loading %s: %s \n", m,
-                ex.getCause());
+            break;
+          }
+          case 2: {
+            Object obj = m.invoke(null);
+            // TODO: namespace???
+            this.vardef(name, obj, obj.getClass());
+            System.out.printf("%s imported as %s..\n", obj, name);
+            passed++;
+            break;
+          }
+          case 3: {
+            Method func = (Method) m.invoke(null);
+            this.context.setFunction(ns, name, func);
+            System.out.printf("%s imported as %s..\n", func, name);
+            passed++;
+            break;
+          }
+          default:
+            System.err.printf(
+                "warning: %s ignored - unsupported binding type=%d\n", m,
+                meta.type());
             failed++;
           }
+        }
+      } catch (Throwable ex) {
+        System.out.printf("something failed while loading %s: %s \n", m,
+            ex.getCause());
+        failed++;
       }
-      System.out.printf("Loaded %d/%d annotated functions", passed, (passed + failed + ignored));
     }
+    System.out.printf("Loaded %d/%d annotated functions\n", passed, (passed
+        + failed + ignored));
+
     return this;
   }
 
-  public EL sourceFunctions(String ns,String clazz) throws SecurityException,
+  public EL sourceFunctions(String ns, String clazz) throws SecurityException,
       ClassNotFoundException {
-    clazz = Static.trim2(clazz,null);
-    return clazz == null ? this : this.sourceFunctions(ns, Class.forName(clazz));
+    clazz = Static.trim2(clazz, null);
+    return clazz == null ? this : this
+        .sourceFunctions(ns, Class.forName(clazz));
   }
 
-  
   public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
     try {
