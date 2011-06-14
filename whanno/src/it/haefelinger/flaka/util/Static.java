@@ -1585,4 +1585,13 @@ final public class Static {
     return bitset;
   }
 
+  static final public String condnull(String s,String otherwise) {
+    return s==null ? otherwise : s;
+  }
+  
+  final static public String condempty(String s, String otherwise) {
+    return (s == null || s.matches("^\\s*$")) ? otherwise : s;
+  }
+
+  
 }

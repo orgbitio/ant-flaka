@@ -18,6 +18,7 @@
 
 package it.haefelinger.flaka.el;
 
+import groovy.lang.GroovyClassLoader;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
@@ -49,7 +50,6 @@ import de.odysseus.el.tree.impl.ast.AstEval;
 import de.odysseus.el.tree.impl.ast.AstNode;
 import de.odysseus.el.tree.impl.ast.AstNull;
 import de.odysseus.el.tree.impl.ast.AstText;
-import java.lang.reflect.*;
 
 /**
  * This class is the entry point for EL evaluation.
@@ -625,7 +625,7 @@ public final class EL {
     funcdef1v("join", Functions.class, "join", String.class);
     funcdef2("matches", Functions.class, "matches", Object.class, Object.class);
     funcdef2("glob", Functions.class, "glob", Object.class, Object.class);
-    
+
     // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
     // funcdef("car", Functions.class, "car", List.class);
     // funcdef("cdr", Functions.class, "cdr", List.class);
@@ -747,48 +747,66 @@ public final class EL {
     return obj instanceof Boolean ? ((Boolean) obj).booleanValue() : false;
   }
 
-  
-  public EL sourceFunctions(String clazz) throws SecurityException, ClassNotFoundException {
-    
+  public EL sourceFunctions(String ns, Class clazz) throws SecurityException,
+      ClassNotFoundException {
     int passed = 0, failed = 0;
-    String ns = "";
-    
-    if (clazz == null)
-      return this;
-    
-    clazz = clazz.trim();
-    // bail out if only no classname is given.
-    if (clazz.length()==0 || clazz.matches("[^:]*:$"))
-      return this;
-    
-    int p = clazz.indexOf(':');
-    switch(p) {
-      case -1: break;
-      case 0 : clazz = clazz.substring(1); break;
-      default: {
-        ns = clazz.substring(0,p);
-        clazz = clazz.substring(p+1);
+    ns = Static.condnull(ns, "");
+    for (Method m : clazz.getMethods()) {
+      if (m.isAnnotationPresent(ELFunction.class)) {
+        try {
+          ELFunction meta = m.getAnnotation(ELFunction.class);
+          String name = Static.trim2(meta.name(), m.getName());
+          this.context.setFunction(ns, name, m);
+          System.out.printf("loaded %s (%s)..\n", name, m);
+          passed++;
+        } catch (Throwable ex) {
+          System.out.printf("something failed while loading %s: %s \n", m,
+              ex.getCause());
+          failed++;
+        }
       }
     }
-    
-    for (Method m : Class.forName(clazz).getMethods()) {
-       if (m.isAnnotationPresent(ELFunction.class)) {
-          try {
-            ELFunction meta = m.getAnnotation(ELFunction.class);
-            String name = Static.trim2(meta.name(), m.getName());
-            this.context.setFunction(ns, name, m);
-            System.out.printf("loaded %s (%s)..\n",name,m);
-            passed++;
-          } catch (Throwable ex) {
-             System.out.printf("something failed while loading %s: %s \n", m, ex.getCause());
-             failed++;
-          }
-       }
-    }
-    System.out.printf("Loaded %d/%d functions", passed, (passed+failed));
+    System.out.printf("Loaded %d/%d functions", passed, (passed + failed));
     return this;
   }
-  
+
+  public EL sourceFunctions(String clazz) throws SecurityException,
+      ClassNotFoundException {
+    String ns = "";
+
+    if (clazz == null)
+      return this;
+
+    clazz = clazz.trim();
+    // bail out if only no classname is given.
+    if (clazz.length() == 0 || clazz.matches("[^:]*:$"))
+      return this;
+
+    int p = clazz.indexOf(':');
+    switch (p) {
+    case -1:
+      break;
+    case 0:
+      clazz = clazz.substring(1);
+      break;
+    default: {
+      ns = clazz.substring(0, p);
+      clazz = clazz.substring(p + 1);
+    }
+    }
+    return this.sourceFunctions(ns, Class.forName(clazz));
+  }
+
+  public Class parseGroovy(String text) {
+    Class clazz = null;
+    if (text != null) {
+      ClassLoader parent = getClass().getClassLoader();
+      GroovyClassLoader loader = new GroovyClassLoader(parent);
+      clazz = loader.parseClass(text);
+    }
+    return clazz;
+  }
+
   public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
     try {

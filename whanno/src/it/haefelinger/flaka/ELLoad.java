@@ -32,7 +32,9 @@ import org.apache.tools.ant.Project;
  * 
  */
 public class ELLoad extends Task {
+  protected String ns; 
   protected String clazz;
+  protected String text;
   
   /**
    * The classname given be prefixed by ':'.
@@ -41,18 +43,40 @@ public class ELLoad extends Task {
   public void setClazz(String clazz) {
     this.clazz = clazz;
   }
+  public void setNS(String ns) {
+    this.ns = ns;
+  }
+  /**
+   * Experimental feature for adding inline functions.
+   * 
+   * @param text
+   */
+  public void addText(String text) {
+    this.text = text;
+  }
 
   public void execute() throws BuildException {
+    Class clazz;
     Project project = this.getProject();
     EL el = Static.el(project);
     
     try {
+      // source annotated functions of given class.
       el.sourceFunctions(this.clazz);
+      
+      clazz = el.parseGroovy(this.text);
+      if (clazz != null) {
+        el.sourceFunctions(this.ns, clazz);
+      }
+      
     } catch (SecurityException e) {
       throw new BuildException(e);
     } catch (ClassNotFoundException e) {
       throw new BuildException(e);
+    } catch(Exception e) {
+      throw new BuildException(e);
     }
+    
   }
 
 }
