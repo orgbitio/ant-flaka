@@ -23,6 +23,6 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.apache.tools.ant.launch.Launcher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-f ${resource_loc}"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-f ${workspace_loc:/flaka/test/tryme.xml}"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="flaka"/>
 </launchConfiguration>

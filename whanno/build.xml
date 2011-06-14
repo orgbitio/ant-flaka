@@ -215,6 +215,11 @@
           basename="juel-sources-2.2.1"
           dest="${libsrc.dir}/juel-sources-2.2.1.jar"
           />
+      <fetchjar 
+          group="org.codehaus.groovy" 
+          name="groovy-all" 
+          version="1.8.0"
+          />
     </sequential>
   </macrodef>
 

@@ -1,11 +1,3 @@
 <project xmlns:f="antlib:it.haefelinger.flaka" name="tryme">
-	<f:install-property-handler />
-	<property name="foo" value="bar" />
-
-	<f:el-load clazz="my:it.haefelinger.flaka.util.ELFunctions" />
-
-	<echo>
-		#{ my:lowercase("PPPPHelLLLLo") }
-	</echo>
-
+	<f:echo>#{'foo'}:#{ nohave() }:#{'bar'}</f:echo>
 </project>
