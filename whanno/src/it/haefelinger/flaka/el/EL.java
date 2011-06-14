@@ -24,6 +24,7 @@ import it.haefelinger.flaka.util.Static;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -751,25 +752,32 @@ public final class EL {
 
   public EL sourceFunctions(String ns, Class clazz) throws SecurityException,
       ClassNotFoundException {
-    int passed = 0, failed = 0;
+    int passed = 0, failed = 0, ignored = 0;
     if (clazz != null) {
       ns = Static.condnull(ns, "");
+      // Load annotated and static methods.
       for (Method m : clazz.getMethods()) {
-        if (m.isAnnotationPresent(ELFunction.class)) {
-          try {
+        if(!m.isAnnotationPresent(ELFunction.class)) {
+          continue;
+        }
+        if(!Modifier.isStatic(m.getModifiers())) {
+          System.err.printf("warning: %s ignored cause not static..\n", m);
+          ignored++;
+          continue;
+        }
+        try {
             ELFunction meta = m.getAnnotation(ELFunction.class);
             String name = Static.trim2(meta.name(), m.getName());
             this.context.setFunction(ns, name, m);
-            System.out.printf("loaded %s (%s)..\n", name, m);
+            System.out.printf("%s imported as %s..\n", m, name);
             passed++;
           } catch (Throwable ex) {
             System.out.printf("something failed while loading %s: %s \n", m,
                 ex.getCause());
             failed++;
           }
-        }
       }
-      System.out.printf("Loaded %d/%d functions", passed, (passed + failed));
+      System.out.printf("Loaded %d/%d annotated functions", passed, (passed + failed + ignored));
     }
     return this;
   }
