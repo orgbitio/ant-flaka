@@ -18,8 +18,11 @@
 
 package it.haefelinger.flaka;
 
-import it.haefelinger.flaka.util.Static;
 import it.haefelinger.flaka.el.EL;
+import it.haefelinger.flaka.util.Static;
+import it.haefelinger.flaka.util.TextReader;
+
+import java.io.File;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -32,20 +35,26 @@ import org.apache.tools.ant.Project;
  * 
  */
 public class ELLoad extends Task {
-  protected String ns; 
-  protected String clazz;
+  protected String ns;
   protected String text;
-  
+  protected String type = "groovy";
+
   /**
-   * The classname given be prefixed by ':'.
-   * @param clazz
+   * Define how to interpret the (inlined) text.
+   * 
+   * type | meaning class | text is a list of classes, one per line. groovy |
+   * text is inlined groovy source code
+   * 
+   * @param type
    */
-  public void setClazz(String clazz) {
-    this.clazz = clazz;
+  public void setType(String type) {
+    this.type = type;
   }
+
   public void setNS(String ns) {
     this.ns = ns;
   }
+
   /**
    * Experimental feature for adding inline functions.
    * 
@@ -56,27 +65,67 @@ public class ELLoad extends Task {
   }
 
   public void execute() throws BuildException {
-    Class clazz;
-    Project project = this.getProject();
-    EL el = Static.el(project);
-    
+    Project project;
+
+    project = this.getProject();
     try {
-      // source annotated functions of given class.
-      el.sourceFunctions(this.clazz);
-      
-      clazz = el.parseGroovy(this.text);
-      if (clazz != null) {
-        el.sourceFunctions(this.ns, clazz);
+      if (this.type.matches("(?i)\\s*file/class\\s*")) {
+        EL el = Static.el(project);
+        String line;
+        TextReader tr = new TextReader();
+        
+        tr.setText(this.text);
+        while ((line = tr.readLine()) != null) {
+          /* resolve properties */
+          line = project.replaceProperties(line);
+          /* resolve all EL references #{ ..} */
+          line = Static.elresolve(project, line);
+          /* interpret this line as name of a class */
+          el.sourceFunctions(this.ns,Static.trim2(line,null));
+        }
       }
-      
+      if (this.type.matches("(?i)\\s*file/groovy\\s*")) {
+        EL el = Static.el(project);
+        Class cz;
+        String line;
+        TextReader tr = new TextReader();
+        
+        tr.setText(this.text);
+        while ((line = tr.readLine()) != null) {
+          /* resolve properties */
+          line = project.replaceProperties(line);
+          /* resolve all EL references #{ ..} */
+          line = Static.elresolve(project, line);
+          /* interpret this line as name of a class */
+          cz = el.parseGroovy(new File(Static.trim2(line,"")));
+          el.sourceFunctions(this.ns,cz);
+        }
+      }
+      if (this.text != null && this.type.matches("(?i)\\s*text/groovy\\s*")) {
+        Class cz;
+        EL el;
+        String text;
+
+        /* resolve all Ant properties ${ } */
+        text = project.replaceProperties(this.text);
+
+        /* resolve all EL references #{ ..} */
+        text = Static.elresolve(project, text);
+
+        el = Static.el(project);
+        if (el != null) {
+          cz = el.parseGroovy(text);
+          el.sourceFunctions(this.ns, cz);
+        }
+      }
+
     } catch (SecurityException e) {
       throw new BuildException(e);
     } catch (ClassNotFoundException e) {
       throw new BuildException(e);
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new BuildException(e);
     }
-    
-  }
 
+  }
 }

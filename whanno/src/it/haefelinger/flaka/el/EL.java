@@ -22,6 +22,7 @@ import groovy.lang.GroovyClassLoader;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
 import org.apache.tools.ant.Project;
+import org.codehaus.groovy.control.CompilationFailedException;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 import de.odysseus.el.tree.Tree;
@@ -750,51 +752,32 @@ public final class EL {
   public EL sourceFunctions(String ns, Class clazz) throws SecurityException,
       ClassNotFoundException {
     int passed = 0, failed = 0;
-    ns = Static.condnull(ns, "");
-    for (Method m : clazz.getMethods()) {
-      if (m.isAnnotationPresent(ELFunction.class)) {
-        try {
-          ELFunction meta = m.getAnnotation(ELFunction.class);
-          String name = Static.trim2(meta.name(), m.getName());
-          this.context.setFunction(ns, name, m);
-          System.out.printf("loaded %s (%s)..\n", name, m);
-          passed++;
-        } catch (Throwable ex) {
-          System.out.printf("something failed while loading %s: %s \n", m,
-              ex.getCause());
-          failed++;
+    if (clazz != null) {
+      ns = Static.condnull(ns, "");
+      for (Method m : clazz.getMethods()) {
+        if (m.isAnnotationPresent(ELFunction.class)) {
+          try {
+            ELFunction meta = m.getAnnotation(ELFunction.class);
+            String name = Static.trim2(meta.name(), m.getName());
+            this.context.setFunction(ns, name, m);
+            System.out.printf("loaded %s (%s)..\n", name, m);
+            passed++;
+          } catch (Throwable ex) {
+            System.out.printf("something failed while loading %s: %s \n", m,
+                ex.getCause());
+            failed++;
+          }
         }
       }
+      System.out.printf("Loaded %d/%d functions", passed, (passed + failed));
     }
-    System.out.printf("Loaded %d/%d functions", passed, (passed + failed));
     return this;
   }
 
-  public EL sourceFunctions(String clazz) throws SecurityException,
+  public EL sourceFunctions(String ns,String clazz) throws SecurityException,
       ClassNotFoundException {
-    String ns = "";
-
-    if (clazz == null)
-      return this;
-
-    clazz = clazz.trim();
-    // bail out if only no classname is given.
-    if (clazz.length() == 0 || clazz.matches("[^:]*:$"))
-      return this;
-
-    int p = clazz.indexOf(':');
-    switch (p) {
-    case -1:
-      break;
-    case 0:
-      clazz = clazz.substring(1);
-      break;
-    default: {
-      ns = clazz.substring(0, p);
-      clazz = clazz.substring(p + 1);
-    }
-    }
-    return this.sourceFunctions(ns, Class.forName(clazz));
+    clazz = Static.trim2(clazz,null);
+    return clazz == null ? this : this.sourceFunctions(ns, Class.forName(clazz));
   }
 
   public Class parseGroovy(String text) {
@@ -803,6 +786,26 @@ public final class EL {
       ClassLoader parent = getClass().getClassLoader();
       GroovyClassLoader loader = new GroovyClassLoader(parent);
       clazz = loader.parseClass(text);
+    }
+    return clazz;
+  }
+  
+  public Class parseGroovy(File file) {
+    Class clazz = null;
+    if (file != null) {
+      ClassLoader parent = getClass().getClassLoader();
+      GroovyClassLoader loader = new GroovyClassLoader(parent);
+      try {
+        clazz = loader.parseClass(file);
+      } catch (CompilationFailedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return null;
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return null;
+      }
     }
     return clazz;
   }
