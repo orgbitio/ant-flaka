@@ -18,6 +18,7 @@
 
 package it.haefelinger.flaka.el;
 
+import it.haefelinger.flaka.util.ELBinding;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
@@ -745,7 +746,7 @@ public final class EL {
     // try to invoke Functions.list() via reflection.
     try {
       Method method;
-      method = Functions.class
+      method = ELBinding.class
           .getMethod("list", new Class[] { Object[].class });
       Object obj;
       Object[] argv = { new Object[] { "foo", "bar" } };
