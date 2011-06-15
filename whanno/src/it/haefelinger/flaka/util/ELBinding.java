@@ -545,5 +545,8 @@ public class ELBinding {
     }
     return ret;
   }
-
+  
+  public static Object otherwise(Object... arg) {
+    return "";
+  }
 }

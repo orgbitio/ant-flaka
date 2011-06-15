@@ -579,33 +579,7 @@ public final class EL {
     res.debug = this.debug;
     return new Context(res);
   }
-  void funcdefv(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, new Class[] { arg });
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-  void funcdef(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, arg);
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-  void funcdef1v(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, new Class[] { arg, Object[].class });
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
+
   protected void init(Project project) {
     this.project = project; // TODO: remove me
     this.factory = makefactory();
