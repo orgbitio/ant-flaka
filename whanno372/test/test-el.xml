@@ -1,0 +1,83 @@
+<project xmlns:c="antlib:it.haefelinger.flaka" default="test-references">
+	<target name="test-case">
+		<property name="foobar" value="" />
+		<fail unless="foobar" />
+		<c:when test=" not has.property.foobar ">
+			<fail />
+		</c:when>
+		<c:when test=" not has.task.fail ">
+			<fail />
+		</c:when>
+		<c:echo>
+    The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
+  </c:echo>
+		<c:echo>
+    The #{ 'good' } and the #{ 'ugly'.doesnotexist } is a well\
+    known movie.
+  </c:echo>
+		<c:echo>
+    The great \\#{escape}. Or: #{'#'}escape.
+  </c:echo>
+		<c:echo>;;#{'} #{'abc'} 3*5=#{3*5}</c:echo>
+		<c:echo>
+    The #{ 'good' } and the #{ 'ug' 'ly' } is a well known movie.
+  </c:echo>
+		<c:echo>;;#{'} #{'abc''} 3*5=#{3*5}</c:echo>
+		<c:echo>4*6=#{4*6}</c:echo>
+		<c:echo>#{'abc'}</c:echo>
+		<c:echo>
+    ;; should fail
+    ;; #{'}
+  </c:echo>
+		<c:echo>;;#{'} #{'abc'}</c:echo>
+		<c:echo>#{</c:echo>
+		<c:echo>$${}</c:echo>
+		<c:echo>;;$${</c:echo>
+		<c:echo>;;a$${ b</c:echo>
+		<c:echo>;;a$${</c:echo>
+		<c:echo>;;a$${b</c:echo>
+
+		<c:echo>
+    #{3 * 5}
+  </c:echo>
+
+		<c:echo>
+    ${ ' }
+	</c:echo>
+		<c:echo>;;a$${</c:echo>
+
+		<c:echo>
+    ${ ' }
+	</c:echo>
+		<c:echo>
+    a#{}b
+    ${ ' }
+	</c:echo>
+
+		<c:echo>
+    a#{ }b
+    #{ '\d' }
+    #{ "" }
+    #{ "'" }
+    #{}
+	</c:echo>
+	</target>
+
+	<target name="test-references">
+		<c:echo>
+			#{ project.references }  => #{ typeof(project.references) }
+		  #{ references }
+			#{ nativetype(project.properties) }
+      |#{ typeof(project.targets) }
+			#{ typeof(project.filters) }
+		</c:echo>
+		<c:for var="r" in="project.references">
+			<c:echo>
+				#{ format('%s %s %s',r,typeof(r),nativetype(r)) }
+			</c:echo>
+		</c:for>
+		<c:echo>
+			#{ project.references['ant.projectHelper'] }
+		</c:echo>
+	</target>
+</project>

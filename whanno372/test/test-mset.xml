@@ -1,0 +1,60 @@
+<project xmlns:c="antlib:it.haefelinger.flaka">
+<target name="test-case">
+  <c:let>
+    s := '3 * 5'
+    ;; defines r as 15
+    r = #{ ${s} }
+  </c:let>
+
+  <c:echo>
+    f = #{f}
+  </c:echo>
+  <c:when test="not (r == 15)">
+    <c:fail>
+      message="r has unexpected value: #{r}"
+  </c:fail>
+  </c:when>
+  <c:let>
+    p = null
+    p := null
+  </c:let>
+  <c:when test="has.var.p">
+    <fail message="variable p *does not* exist here!!" />
+  </c:when>
+  <fail message="property 'p' *does not* exist" if="p" />
+  
+  <c:when test=" property.p == '' ">
+    <fail message="property 'p' can't be empty string here" />
+  </c:when>
+  <c:let>
+    v = 'i'
+    #{v} = 0
+    it = 'f'
+
+    p := 'hello'
+    ;; override
+    p ::= 'HELLO'
+    ;;
+    try again
+    p := 'ignored'
+  </c:let>
+  <fail message="property 'p' does not exist" unless="p" />
+  <c:when test="not (property.p == 'HELLO')">
+    <fail message="property 'p' exists but not overridden as expected" />
+  </c:when>
+  <c:for var=" #{it} " in=" ''.tofile ">
+    <c:let>
+      #{v} = #{v} + 1
+      ;; last modified (as date)
+      d = f.mtime
+    </c:let>
+    <c:echo>
+      \#{it} = #{it}
+      \#{v} = #{v}
+      #{i} : `#{f}', last modified at
+      #{d}
+    </c:echo>
+  </c:for>
+
+</target>
+</project>

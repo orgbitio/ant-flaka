@@ -1,0 +1,8 @@
+action   = ${subst o, X, ${hate}}
+hate     =   do, very much, love
+
+classname = org.epo.epoline.jsf.service.Cache
+filename  = ${subst ., /,         ${classname} }
+
+version     = 3.20.4
+cvs.tag     = v-3_20_4

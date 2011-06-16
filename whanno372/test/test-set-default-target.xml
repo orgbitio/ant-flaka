@@ -1,0 +1,20 @@
+<project xmlns:c="antlib:it.haefelinger.flaka" default="this">
+  <target name="this">
+    <echo>THIS</echo>
+  </target>
+  
+  <target name="foobar">
+    <echo>FOOBAR</echo>
+  </target>
+  
+  <target name="test-case">
+    <c:set-default-target name="foobar" />
+  
+    <!--
+        ;; not yet ready
+        ;; it should execute target 'foobar'. However, what it does right now is to
+        ;; execute target 'this'.
+    -->
+    <fail message="set-default-target not ready"/>
+  </target>
+</project>
