@@ -1,3 +1,0 @@
-<project xmlns:f="antlib:it.haefelinger.flaka" name="tryme">
-	<f:echo>|#{ foo }|#{'foo'}:#{ nohave(null) }:#{'bar'}</f:echo>
-</project>
