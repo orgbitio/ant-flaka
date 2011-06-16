@@ -203,6 +203,8 @@ public final class EL {
       scanner.recover = true;
       while (!(sym(Symbol.END_EVAL) || sym(Symbol.EOF)))
         trytoken();
+      /* wh: fixing issue #13 */
+      scanner.recover = false;
     }
 
     protected String q(String s) {
