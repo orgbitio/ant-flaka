@@ -1,9 +1,0 @@
-target
-.settings
-.springBeans
-repository.xml
-bin
-build
-bad.txt
-good.txt
-flaka-SNAPSHOT.jar

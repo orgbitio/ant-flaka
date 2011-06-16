@@ -1,7 +1,0 @@
-<project xmlns:c="antlib:it.haefelinger.flaka">
-<target name="test-case">
-  
-  <!--  test needs to be rewritten using scan4deps and EL -->
-   
-</target>
-</project>
