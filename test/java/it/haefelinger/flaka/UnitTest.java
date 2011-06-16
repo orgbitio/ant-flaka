@@ -19,7 +19,7 @@
 package it.haefelinger.flaka;
 
 import it.haefelinger.flaka.el.EL;
-import it.haefelinger.flaka.el.Functions;
+import it.haefelinger.flaka.util.ELBinding;
 import it.haefelinger.flaka.util.Static;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -474,13 +474,13 @@ public class UnitTest extends TestCase {
     String s = "";
 
     try {
-      s = Functions.quote(orig);
+      s = ELBinding.quote(orig);
       if (s.equals(expected) == false) {
-        fail("Functions.quote(\"" + orig + "\")=>\"" + s + "\", expected \""
+        fail("ELBinding.quote(\"" + orig + "\")=>\"" + s + "\", expected \""
             + expected + "\"");
       }
     } catch (Exception e) {
-      fail("Functions.quote(\"" + orig + "\") throws unexpected exception: "
+      fail("ELBinding.quote(\"" + orig + "\") throws unexpected exception: "
           + e);
     }
   }

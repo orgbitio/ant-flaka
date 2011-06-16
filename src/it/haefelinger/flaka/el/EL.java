@@ -18,10 +18,12 @@
 
 package it.haefelinger.flaka.el;
 
+import it.haefelinger.flaka.util.ELBinding;
 import it.haefelinger.flaka.util.Static;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -60,7 +62,8 @@ public final class EL {
   Context context = null;
   ExpressionFactory factory = null;
   boolean debug = false;
-  Project project = null; // TODO: remove me
+  boolean verbose = true; /* TODO: logging */
+  Project project = null;
 
   @SuppressWarnings("unused")
   private EL() {/* unused */
@@ -582,110 +585,19 @@ public final class EL {
     this.project = project; // TODO: remove me
     this.factory = makefactory();
     this.context = makecontext();
-    // TODO: add project to context
-
-    // variables e, pi
-    vardef("e", new Double(Math.E), double.class);
-    vardef("pi", new Double(Math.PI), double.class);
-
-    // functions sin, cos, tan, exp, log, abs, sqrt, min, max, pow
-    funcdef("sin", Math.class, "sin", double.class);
-    funcdef("cos", Math.class, "cos", double.class);
-    funcdef("tan", Math.class, "tan", double.class);
-    funcdef("exp", Math.class, "exp", double.class);
-    funcdef("log", Math.class, "log", double.class);
-    funcdef("abs", Math.class, "abs", double.class);
-    funcdef("sqrt", Math.class, "sqrt", double.class);
-    funcdef2("min", Math.class, "min", double.class, double.class);
-    funcdef2("max", Math.class, "max", double.class, double.class);
-    funcdef2("pow", Math.class, "pow", double.class, double.class);
-    funcdef0("rand", Math.class, "random");
-
-    funcdef("typeof", Functions.class, "typeof", Object.class);
-    funcdef("nativetype", Functions.class, "nativetype", Object.class);
-    funcdefv("file", Functions.class, "file", Object[].class);
-    funcdef("size", Functions.class, "size", Object.class);
-    funcdef("sizeof", Functions.class, "size", Object.class);
-    funcdef("nullp", Functions.class, "isnil", Object.class);
-
-    // string functions
-    funcdefv("concat", Functions.class, "concat", Object[].class);
-
-    funcdefv("list", Functions.class, "list", Object[].class);
-    funcdefv("append", Functions.class, "append", Object[].class);
-
-    funcdefv("split", Functions.class, "split", Object[].class);
-    funcdef("split_ws", Functions.class, "split_ws", Object.class);
-    funcdefv("replace", Functions.class, "replace", Object[].class);
-    funcdef("trim", Functions.class, "trim", Object.class);
-    funcdef("ltrim", Functions.class, "ltrim", Object.class);
-    funcdef("rtrim", Functions.class, "rtrim", Object.class);
-    funcdef1v("format", Functions.class, "format", String.class);
-    funcdef1v("join", Functions.class, "join", String.class);
-    funcdef2("matches", Functions.class, "matches", Object.class, Object.class);
-    funcdef2("glob", Functions.class, "glob", Object.class, Object.class);
-    
-    // funcdef2("cons", Functions.class, "cons", Object.class,List.class);
-    // funcdef("car", Functions.class, "car", List.class);
-    // funcdef("cdr", Functions.class, "cdr", List.class);
-
-    funcdef("q", Functions.class, "quote", String.class);
+    // Load default functions and variables in EL context.
+    try {
+      this.sourceFunctions("", it.haefelinger.flaka.util.ELBinding.class);
+    } catch (SecurityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } 
   }
 
   void vardef(String name, Object obj, Class clazz) {
     ValueExpression ve;
     ve = this.factory.createValueExpression(obj, clazz);
     this.context.setVariable(name, ve);
-  }
-
-  void funcdef0(String name, Class clazz, String func) {
-    try {
-      Method method;
-      method = clazz.getMethod(func);
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-
-  void funcdef(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, arg);
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-
-  void funcdef2(String name, Class clazz, String func, Class arg1, Class arg2) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, arg1, arg2);
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-
-  void funcdefv(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, new Class[] { arg });
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
-  }
-
-  void funcdef1v(String name, Class clazz, String func, Class arg) {
-    try {
-      Method method;
-      method = clazz.getMethod(func, new Class[] { arg, Object[].class });
-      this.context.setFunction("", name, method);
-    } catch (NoSuchMethodException nsm) {
-      Static.error(this.project, "no such method:" + nsm);
-    }
   }
 
   /**
@@ -709,9 +621,9 @@ public final class EL {
       obj = ve.getValue(this.context);
     } catch (TreeBuilderException tbe) {
       // TODO: error handling
-      // System.err.println(tbe.getMessage());
+      System.err.println(tbe.getMessage());
     } catch (ELException ele) {
-      // System.err.println(ele.getMessage());
+      System.err.println(ele.getMessage());
     }
     return obj;
   }
@@ -746,11 +658,101 @@ public final class EL {
     return obj instanceof Boolean ? ((Boolean) obj).booleanValue() : false;
   }
 
+  public EL sourceFunctions(String ns, Class clazz) throws SecurityException
+       {
+
+    int passed = 0, failed = 0, ignored = 0;
+    /* bail out if no class is given */
+    if (clazz == null) {
+      return this;
+    }
+    /* get namespace right */
+    ns = Static.condnull(ns, "");
+
+    // Load annotated and static methods.
+    for (Method m : clazz.getMethods()) {
+      /* ignore any method not annotated by either ELFunction or Binding */
+      if (!m.isAnnotationPresent(ELFunction.class)
+          && !m.isAnnotationPresent(Binding.class)) {
+        continue;
+      }
+      /* we must ignore any non-statice function */
+      if (!Modifier.isStatic(m.getModifiers())) {
+        System.err.printf("warning: %s ignored cause not static..\n", m);
+        ignored++;
+        continue;
+      }
+      try {
+        if (m.isAnnotationPresent(ELFunction.class)) {
+          ELFunction meta = m.getAnnotation(ELFunction.class);
+          String name = Static.trim2(meta.name(), m.getName());
+          this.context.setFunction(ns, name, m);
+          System.out.printf("%s imported as %s..\n", m, name);
+          passed++;
+          continue;
+        }
+        if (m.isAnnotationPresent(Binding.class)) {
+          Binding meta = m.getAnnotation(Binding.class);
+          String name = Static.trim2(meta.name(), m.getName());
+          switch (meta.type()) {
+          case FUNCTION: {
+            this.context.setFunction(ns, name, m);
+            System.out.printf("%s imported as %s..\n", m, name);
+            passed++;
+            break;
+          }
+          case VARIABLE: {
+            Object obj = m.invoke(null);
+            // TODO: namespace???
+            this.vardef(name, obj, obj.getClass());
+            System.out.printf("%s imported as %s..\n", obj, name);
+            passed++;
+            break;
+          }
+          case FUNCTION_INDIRECT: {
+            // TODO: handle cast exception, or check whether m's return
+            // type could be casted into Method. A totally different way
+            // would be to annotate with FUNCTION and if return  type is
+            // Method (or child of) and  m is parameterless, then invoke
+            // m rather than taking it. On the other hand, that will make
+            // things slower cause of some reflection overhead.
+            Method func = (Method) m.invoke(null);
+            this.context.setFunction(ns, name, func);
+            System.out.printf("%s imported as %s..\n", func, name);
+            passed++;
+            break;
+          }
+          default:
+            System.err.printf(
+                "warning: %s ignored - unsupported binding type=%d\n", m,
+                meta.type());
+            failed++;
+          }
+        }
+      } catch (Throwable ex) {
+        System.out.printf("something failed while loading %s: %s \n", m,
+            ex.getCause());
+        failed++;
+      }
+    }
+    System.out.printf("Loaded %d/%d annotated functions\n", passed, (passed
+        + failed + ignored));
+
+    return this;
+  }
+
+  public EL sourceFunctions(String ns, String clazz) throws SecurityException,
+      ClassNotFoundException {
+    clazz = Static.trim2(clazz, null);
+    return clazz == null ? this : this
+        .sourceFunctions(ns, Class.forName(clazz));
+  }
+
   public static void main(String[] args) {
     // try to invoke Functions.list() via reflection.
     try {
       Method method;
-      method = Functions.class
+      method = ELBinding.class
           .getMethod("list", new Class[] { Object[].class });
       Object obj;
       Object[] argv = { new Object[] { "foo", "bar" } };

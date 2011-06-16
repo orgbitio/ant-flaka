@@ -18,6 +18,8 @@
 
 package it.haefelinger.flaka.el;
 
+import it.haefelinger.flaka.util.ELBinding;
+
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,9 +38,31 @@ public class Context extends ELContext {
 
   static class Functions extends FunctionMapper {
     Map<String, Method> map = Collections.emptyMap();
-
+    protected Method otherwise; 
+ 
+    
+    public Method notfound() {
+      if (this.otherwise == null) {
+        try {
+          this.otherwise = ELBinding.class.getMethod("otherwise",new Class[] { Object[].class });
+        } catch (SecurityException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+      return this.otherwise;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.el.FunctionMapper#resolveFunction(java.lang.String, java.lang.String)
+     */
     public Method resolveFunction(String prefix, String localName) {
-      return this.map.get(prefix + ":" + localName);
+      String funcname = String.format("%s:%s",prefix,localName);
+      Method func = this.map.get(funcname);
+      return func == null ? this.notfound() : func;
     }
 
     public void setFunction(String prefix, String localName, Method method) {
@@ -46,6 +70,8 @@ public class Context extends ELContext {
         this.map = new HashMap<String, Method>();
       this.map.put(prefix + ":" + localName, method);
     }
+    
+
   }
 
   static class Variables extends VariableMapper {

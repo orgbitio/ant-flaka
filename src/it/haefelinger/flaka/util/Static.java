@@ -1509,11 +1509,8 @@ final public class Static {
    * A function to return a EL context reference (consisting of a context and
    * expression factory) for a given project.
    * 
-   * Important: This function is expected to be called only if and only if
-   * function <code>haveEL(project)</code> returns true. Otherwise the behaviour
-   * is undefined.
    */
-  final static private EL el(Project project) {
+  final static public EL el(Project project) {
     EL ctxref = null;
 
     try {
@@ -1588,4 +1585,13 @@ final public class Static {
     return bitset;
   }
 
+  static final public String condnull(String s,String otherwise) {
+    return s==null ? otherwise : s;
+  }
+  
+  final static public String condempty(String s, String otherwise) {
+    return (s == null || s.matches("^\\s*$")) ? otherwise : s;
+  }
+
+  
 }
