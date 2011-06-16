@@ -42,67 +42,67 @@ import org.apache.tools.ant.Project;
  */
 public class ELBinding {
 
-  @Binding(type = 2)
+  @Binding(type = Binding.Type.VARIABLE)
   static public Object e() {
     return new Double(Math.E);
   }
 
-  @Binding(type = 2)
+  @Binding(type = Binding.Type.VARIABLE)
   static public Object pi() {
     return new Double(Math.PI);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method rand() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("random");
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method sin() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("sin", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method cos() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("cos", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method tan() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("tan", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method log() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("log", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method exp() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("exp", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method abs() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("abs", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method sqrt() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("sqrt", double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method min() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("min", double.class, double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method max() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("max", double.class, double.class);
   }
 
-  @Binding(type = 3)
+  @Binding(type = Binding.Type.FUNCTION_INDIRECT)
   static public Method pow() throws SecurityException, NoSuchMethodException {
     return Math.class.getMethod("pow", double.class, double.class);
   }
@@ -113,7 +113,7 @@ public class ELBinding {
    * A EL string is not allowed to have escaped characters other than
    * <code>\'</code> and <code>\\</code>.
    */
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String quote(String s) {
     char c0, c1;
     int i, n, l;
@@ -183,7 +183,7 @@ public class ELBinding {
     return new File(s);
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public Object file(Object... varg) {
     File f = null;
     switch (varg.length) {
@@ -233,7 +233,7 @@ public class ELBinding {
     return r;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public Object size(Object obj) {
     Object r = null;
     Class C;
@@ -275,12 +275,12 @@ public class ELBinding {
     return new Long(0);
   }
   
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public Boolean nullp(Object obj) {
     return new Boolean(obj == null);
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public Object concat(Object... argv) {
     Object obj;
     String str;
@@ -304,7 +304,7 @@ public class ELBinding {
    * This function returns a list containing all the elements.
    * 
    */
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public Object append(Object... argv) {
     int i, n;
     List L;
@@ -328,7 +328,7 @@ public class ELBinding {
     return L;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public List list(Object... args) {
     List list = new ArrayList();
     for (int i = 0, n = args.length; i < n; ++i)
@@ -336,12 +336,12 @@ public class ELBinding {
     return list;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public List split_ws(Object s) {
     return split(s, "\\s+");
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public List split(Object... args) {
     String regex;
     List list = new ArrayList();
@@ -361,7 +361,7 @@ public class ELBinding {
     return list;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String replace(Object... args) {
     String r, src, regex, subst;
 
@@ -388,29 +388,29 @@ public class ELBinding {
     return r;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String trim(Object s) {
     return replace(s, "", "^\\s*|\\s*$");
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String ltrim(Object s) {
     return replace(s, "", "^\\s*");
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String rtrim(Object s) {
     return replace(s, "", "\\s*$");
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String format(String f, Object... args) {
     String r;
     r = String.format(f, args);
     return r;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String join(String f, Object... args) {
     String r;
     switch (args.length) {
@@ -443,7 +443,7 @@ public class ELBinding {
     return r;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String nativetype(Object object) {
     if (object == null) {
       return "";
@@ -452,7 +452,7 @@ public class ELBinding {
     return clazz.getName();
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   static public String typeof(Object object) {
     if (object == null)
       return "null";
@@ -512,7 +512,7 @@ public class ELBinding {
    * @param regex
    *          can be null
    */
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   public static boolean matches(Object text, Object regex) {
     boolean ret = false;
     try {
@@ -528,7 +528,7 @@ public class ELBinding {
     return ret;
   }
 
-  @Binding(type = 1)
+  @Binding(type = Binding.Type.FUNCTION)
   public static boolean glob(Object text, Object glob) {
     boolean ret = false;
     try {

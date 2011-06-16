@@ -695,13 +695,13 @@ public final class EL {
           Binding meta = m.getAnnotation(Binding.class);
           String name = Static.trim2(meta.name(), m.getName());
           switch (meta.type()) {
-          case 1: {
+          case FUNCTION: {
             this.context.setFunction(ns, name, m);
             System.out.printf("%s imported as %s..\n", m, name);
             passed++;
             break;
           }
-          case 2: {
+          case VARIABLE: {
             Object obj = m.invoke(null);
             // TODO: namespace???
             this.vardef(name, obj, obj.getClass());
@@ -709,7 +709,13 @@ public final class EL {
             passed++;
             break;
           }
-          case 3: {
+          case FUNCTION_INDIRECT: {
+            // TODO: handle cast exception, or check whether m's return
+            // type could be casted into Method. A totally different way
+            // would be to annotate with FUNCTION and if return  type is
+            // Method (or child of) and  m is parameterless, then invoke
+            // m rather than taking it. On the other hand, that will make
+            // things slower cause of some reflection overhead.
             Method func = (Method) m.invoke(null);
             this.context.setFunction(ns, name, func);
             System.out.printf("%s imported as %s..\n", func, name);
