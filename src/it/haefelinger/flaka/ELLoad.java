@@ -39,7 +39,7 @@ import org.apache.tools.ant.Project;
 public class ELLoad extends Task {
   protected String ns;
   protected String text;
-  protected String type = "groovy";
+  protected String type = "text/groovy";
 
   /**
    * Define how to interpret the (inlined) text.

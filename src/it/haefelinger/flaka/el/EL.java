@@ -671,9 +671,8 @@ public final class EL {
 
     // Load annotated and static methods.
     for (Method m : clazz.getMethods()) {
-      /* ignore any method not annotated by either ELFunction or Binding */
-      if (!m.isAnnotationPresent(ELFunction.class)
-          && !m.isAnnotationPresent(Binding.class)) {
+      /* ignore any method not annotated by Binding */
+      if (!m.isAnnotationPresent(Binding.class)) {
         continue;
       }
       /* we must ignore any non-statice function */
@@ -683,14 +682,6 @@ public final class EL {
         continue;
       }
       try {
-        if (m.isAnnotationPresent(ELFunction.class)) {
-          ELFunction meta = m.getAnnotation(ELFunction.class);
-          String name = Static.trim2(meta.name(), m.getName());
-          this.context.setFunction(ns, name, m);
-          System.out.printf("%s imported as %s..\n", m, name);
-          passed++;
-          continue;
-        }
         if (m.isAnnotationPresent(Binding.class)) {
           Binding meta = m.getAnnotation(Binding.class);
           String name = Static.trim2(meta.name(), m.getName());
