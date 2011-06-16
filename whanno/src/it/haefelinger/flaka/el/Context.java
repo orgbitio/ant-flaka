@@ -18,6 +18,8 @@
 
 package it.haefelinger.flaka.el;
 
+import it.haefelinger.flaka.util.ELBinding;
+
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +44,7 @@ public class Context extends ELContext {
     public Method notfound() {
       if (this.otherwise == null) {
         try {
-          this.otherwise = it.haefelinger.flaka.util.ELBinding.class.getMethod("otherwise",new Class[] { Object[].class });
+          this.otherwise = ELBinding.class.getMethod("otherwise",new Class[] { Object[].class });
         } catch (SecurityException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
