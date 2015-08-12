@@ -3,3 +3,4 @@ ant-flaka.jar
 test/tmp/echo.txt
 test/x.jar
 test/y.jar
+target
